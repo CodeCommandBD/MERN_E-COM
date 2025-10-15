@@ -4,4 +4,4 @@ export const WEBSITE_REGISTER = '/auth/register'
 export const WEBSITE_RESETPASSWORD = '/auth/reset-password'
 
 // user route
-export const USER_DASHBOARD = '/my-account'
+export const USER_DASHBOARD = '/website/my-account'

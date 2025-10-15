@@ -24,11 +24,13 @@ import Link from 'next/link'
 import { WEBSITE_LOGIN } from '@/Routes/WebsiteRoute'
 import axios from 'axios'
 import { showToast } from '@/lib/showToast'
+import { useRouter } from 'next/navigation'
 
 const RegisterPage = () => {
 
     const [loading, setLoading] = useState(false)
     const [isTypePassword, setIsTypePassword] = useState(true)
+    const router = useRouter()
 
     // TODO:##### Form valid
     // TODO:##### Form valid
@@ -64,6 +66,7 @@ const RegisterPage = () => {
             }
             form.reset()
             showToast('success', registerResponse.message)
+            router.push(WEBSITE_LOGIN)
         } catch (error) {
             showToast('error', error.message || 'Registration failed. Please try again.')
         }finally{
