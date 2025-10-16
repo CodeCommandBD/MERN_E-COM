@@ -13,12 +13,12 @@ const mediaSchema =  new mongoose.Schema({
     },
     path: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     thumbnail_url: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     alt: {
@@ -40,6 +40,6 @@ const mediaSchema =  new mongoose.Schema({
 
 
 
-const MediaModel = mongoose.models.Media || mongoose.model('MEDIA', mediaSchema, 'medias')
+const MediaModel = mongoose.models['MEDIA'] || mongoose.model('MEDIA', mediaSchema, 'medias')
 
 export default MediaModel
