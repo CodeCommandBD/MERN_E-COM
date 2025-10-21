@@ -1,5 +1,6 @@
 
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 import { Assistant } from 'next/font/google'
@@ -20,11 +21,67 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${assistant.className} antialiased`}>
+    <html lang="en" suppressHydrationWarning={true}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Prevent browser extensions from interfering with hydration
+              (function() {
+                if (typeof window !== 'undefined') {
+                  const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                      if (mutation.type === 'attributes') {
+                        const target = mutation.target;
+                        if (target.hasAttribute && target.hasAttribute('bis_skin_checked')) {
+                          target.removeAttribute('bis_skin_checked');
+                        }
+                      }
+                    });
+                  });
+                  
+                  // Start observing when DOM is ready
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                      observer.observe(document.body, {
+                        attributes: true,
+                        subtree: true,
+                        attributeFilter: ['bis_skin_checked']
+                      });
+                    });
+                  } else {
+                    observer.observe(document.body, {
+                      attributes: true,
+                      subtree: true,
+                      attributeFilter: ['bis_skin_checked']
+                    });
+                  }
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className={`${assistant.className} antialiased`} suppressHydrationWarning={true}>
         <GlobalProvider>
-          <ToastContainer></ToastContainer>
-          {children}
+          <div suppressHydrationWarning={true}>
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick={false}
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              suppressHydrationWarning={true}
+            />
+            <div suppressHydrationWarning={true}>
+              {children}
+            </div>
+          </div>
         </GlobalProvider>
       </body>
     </html>

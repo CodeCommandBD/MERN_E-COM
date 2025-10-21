@@ -4,9 +4,12 @@ import { showToast } from '@/lib/showToast';
 import { CldUploadWidget } from 'next-cloudinary';
 import { FaPlus } from "react-icons/fa";
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 
 
 const UploadMedia = ({ isMultiple }) => {
+    const queryClient = useQueryClient();
+    
     const handleOnError = (error) => {
         console.error('Cloudinary upload error:', error);
         showToast('error', error.message || error.statusText || 'Upload failed')
@@ -27,6 +30,9 @@ const UploadMedia = ({ isMultiple }) => {
                     throw new Error(mediaUploadResponse.message)
                 }
                 showToast('success', mediaUploadResponse.message)
+                
+                // Invalidate the media query cache to refresh the media list
+                await queryClient.invalidateQueries({ queryKey: ['delete-data'] })
             } catch (error) {
                 showToast('error', error.message)
             }
