@@ -15,6 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import useDeleteMutation from '@/hooks/useDeleteMutation'
 import ConfirmationDialog from '@/components/Application/ConfirmationDialog'
 import { MediaSkeletonGrid } from '@/components/Application/Admin/MediaSkeleton'
+import { ButtonLoading } from '@/components/Application/ButtonLoading'
 const breadcrumbData = [
   { href: ADMIN_DASHBOARD, label: 'Home' },
   { href: '', label: 'Media' },
@@ -137,7 +138,7 @@ const Media = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent suppressHydrationWarning={true}>
+        <CardContent className={'py-5'} suppressHydrationWarning={true}>
           {selectedMedia.length > 0 
             && 
             <div className='py-2 px-3 bg-violet-200 mb-2 rounded flex justify-between items-center' suppressHydrationWarning={true}>
@@ -180,6 +181,11 @@ const Media = () => {
                 {error.message}
               </div>
               :
+              data.pages?.every(page => page.mediaData?.length === 0) ? (
+                <div className="text-center text-gray-500 py-10">
+                  Data not found
+                </div>
+              ) : (
               <div className='grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-2 mb-5' suppressHydrationWarning={true}>
                 {
                   data.pages?.map((page, index)=>(
@@ -195,32 +201,28 @@ const Media = () => {
                         setSelectedMedia={setSelectedMedia}
                         onChanged={refetch}
                         >
-                                          
+                                            
                         </MediaSection>
                       ))}
                     </React.Fragment>
                   ))
                 }
               </div>
+            )
           }
           
           {/* Load more button and loading indicator */}
-          {hasNextPage && !isFetchingNextPage && (
+          {hasNextPage && (
             <div className="mt-4 flex justify-center">
-              <Button 
+              <ButtonLoading 
+                type='button'
+                loading={isFetching}
                 onClick={() => fetchNextPage()} 
-                variant="outline"
-                className="px-8"
+                className="px-8 cursor-pointer"
+                text='Load More Images'
               >
-                Load More Images
-              </Button>
-            </div>
-          )}
-          
-          {/* Loading more images indicator */}
-          {isFetchingNextPage && (
-            <div className="mt-4 flex justify-center">
-              <MediaSkeletonGrid count={5} />
+             
+              </ButtonLoading>
             </div>
           )}
         </CardContent>
