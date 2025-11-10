@@ -1,9 +1,10 @@
+import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
-import { catchError, isAuthenticated, res } from "@/lib/helper";
+import { catchError,  res } from "@/lib/helper";
 import MediaModel from "@/Models/Media.model";
 import { isValidObjectId } from "mongoose";
 
-export async function GET(params) {
+export async function GET(request, { params }) {
     try {
         const auth = await isAuthenticated('admin')
         if(!auth.isAuth) {
@@ -11,8 +12,7 @@ export async function GET(params) {
         }
         await connectDB()
 
-        const getParams  = await params 
-        const id = getParams.id
+        const id = params.id
 
         const filter = {
             deletedAt: null

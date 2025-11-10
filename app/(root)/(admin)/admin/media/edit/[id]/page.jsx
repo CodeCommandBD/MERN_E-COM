@@ -5,8 +5,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import useFetch from '@/hooks/useFetch'
+import { showToast } from '@/lib/showToast'
+import { zSchema } from '@/lib/zodSchema'
+import { imagePlaceholder } from '@/public/image'
 import { ADMIN_DASHBOARD, ADMIN_MEDIA_SHOW } from '@/Routes/AdminPanelRoute'
-import React, { use } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import axios from 'axios'
+import Image from 'next/image'
+import React, { use, useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 const breadcrumbData = [
   {
@@ -25,51 +32,55 @@ const breadcrumbData = [
 
 const EditPage = ({ params }) => {
   const { id } = use(params)
-  const { data: mediaData } = useFetch(`/api/media/get/${id}`)
+  const { data: mediaData, loading: fetchLoading, error: fetchError } = useFetch(`/api/media/get/${id}`)
+  const [loading, setLoading] = useState(false)
 
+  // Debug logging
+  console.log('mediaData:', mediaData)
+  console.log('mediaData?.data:', mediaData?.data)
+  console.log('mediaData?.data?.secure_url:', mediaData?.data?.secure_url)
 
    // TODO:##### Form valid
   // TODO:##### Form valid
   const formSchema = zSchema.pick({
-    email: true,
-  }).extend({
-    password: z.string().min(3, 'Password is required & must be at least 3 characters!')
+    _id: true,
+    alt: true,
+    title: true
   })
-
   // TODO: ########## Form Define
   // TODO: ########## Form Define
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: ''
+      _id: '',
+      alt: '',
+      title: ''
     },
   })
 
+  // Update form when data is loaded
+  React.useEffect(() => {
+    if (mediaData?.data) {
+      form.reset({
+        _id: mediaData.data._id || '',
+        alt: mediaData.data.alt || '',
+        title: mediaData.data.title || ''
+      })
+    }
+  }, [mediaData, form])
 
-  const handleLoginSubmit = async (value) => {
+
+  const onSubmit = async (value) => {
     try {
       setLoading(true)
-      const { data: registerResponse } = await axios.post('/api/auth/login', value)
-      if (!registerResponse.success) {
-        throw new Error(registerResponse.message)
+      const { data: response } = await axios.put('/api/media/update', value)
+      if (!response.success) {
+        throw new Error(response.message)
       }
       
-      // If login successful and OTP is required
-      if (registerResponse.message === 'Please verify your device') {
-        setOtpEmail(value.email)
-        setShowOTP(true)
-        showToast('success', 'OTP sent to your email')
-      } else {
-        // Login successful without OTP - dispatch user data
-        if (registerResponse.data) {
-          dispatch(login(registerResponse.data))
-        }
-        form.reset()
-        showToast('success', registerResponse.message)
-      }
+      showToast('success', response.message || 'Media updated successfully')
     } catch (error) {
-      showToast('error', error.message || 'Login failed. Please try again.')
+      showToast('error', error.message || 'Failed to update media. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -83,16 +94,73 @@ const EditPage = ({ params }) => {
         </CardHeader>
         <CardContent className={'py-5'} suppressHydrationWarning={true}>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className='mb-5'>
+                {/* Loading state */}
+                {fetchLoading && (
+                  <div className="w-[200px] h-[200px] bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                    <span className="text-gray-500">Loading...</span>
+                  </div>
+                )}
+                
+                {/* Error state */}
+                {fetchError && (
+                  <div className="w-[200px] h-[200px] bg-red-100 border-2 border-dashed border-red-300 flex items-center justify-center">
+                    <div className="text-center">
+                      <span className="text-red-500 text-sm">Error loading media</span>
+                      <p className="text-xs text-red-400 mt-1">{fetchError}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Success state with image */}
+                {!fetchLoading && !fetchError && mediaData?.data && (
+                  <div className="mb-2">
+                    {mediaData.data.secure_url && (
+                      <Image 
+                        src={mediaData.data.secure_url}
+                        width={150}
+                        height={150}
+                        alt={mediaData.data.alt || "image"}
+                        priority
+                        onError={(e) => console.log('Image load error:', e)}
+                        onLoad={() => console.log('Image loaded successfully')}
+                      />
+                    )}
+                  </div>
+                )}
+                
+                {/* No data state */}
+                {!fetchLoading && !fetchError && !mediaData?.data && (
+                  <div className="w-[200px] h-[200px] bg-gray-200 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                    <span className="text-gray-500">No media data found</span>
+                  </div>
+                )}
+              </div>
               <div className='mb-5'>
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="alt"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Alt</FormLabel>
                       <FormControl>
-                        <Input type='email' placeholder="Example@gmail.com" {...field} />
+                        <Input type='text' placeholder="Enter alt" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className='mb-5'>
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input type='text' placeholder="Enter title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -101,7 +169,7 @@ const EditPage = ({ params }) => {
               </div>
             
               <div>
-                <ButtonLoading loading={loading} type={"submit"} text={'Login'} className={'w-full cursor-pointer duration-300'}></ButtonLoading>
+                <ButtonLoading loading={loading} type={"submit"} text={'Update Media'} className={'cursor-pointer duration-300'}></ButtonLoading>
               </div>
             </form>
           </Form>
