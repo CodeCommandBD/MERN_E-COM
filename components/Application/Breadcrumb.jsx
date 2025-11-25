@@ -26,7 +26,7 @@ const Breadcrumb = ({ data = [], className = "" }) => {
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage>{item.label}</BreadcrumbPage>
-              )}
+              )}  
             </BreadcrumbItem>
             {index < data.length - 1 && <BreadcrumbSeparator />}
           </React.Fragment>
