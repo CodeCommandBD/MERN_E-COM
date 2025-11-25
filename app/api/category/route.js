@@ -26,7 +26,7 @@ export async function GET(request) {
 
         if(deleteType === 'SD'){
             matchQuery = { deletedAt: null}
-        }else if(deleteType === 'PD'){
+        }else if(deleteType === 'PD' || deleteType === 'TD'){
             matchQuery = {deletedAt: {$ne: null}}
         }
 

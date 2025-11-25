@@ -66,21 +66,6 @@ export async function DELETE(request) {
         
         await CategoryModel.deleteMany({_id: {$in: ids}})
 
-        // delete all media from cloudinary
-
-        const publicIds = category.map(m => m.public_id)
-
-        try {
-            await cloudinary.api.delete_resources(publicIds)
-        } catch (error) {
-            await session.abortTransaction()
-            session.endSession()
-            return catchError(error)
-        }
-
-        await session.commitTransaction()
-        session.endSession()
-
         return res(true, 200, 'Data deleted permanently')
 
     } catch (error) {
