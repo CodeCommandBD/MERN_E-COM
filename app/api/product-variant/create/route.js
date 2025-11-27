@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
-import ProductModel from "@/Models/Product.model";
+
 
 export async function POST(request) {
   try {
@@ -14,38 +14,37 @@ export async function POST(request) {
     const payload = await request.json();
 
     const schema = zSchema.pick({
-      name: true,
-      slug: true,
-      category: true,
+      color: true,
+      sku: true,
+      size: true,
+      product: true,
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
-      description: true,
-      media: true,
     });
+
     const validate = schema.safeParse(payload);
     if (!validate.success) {
       return res(false, 400, "Invalid or missing fields.", validate.error);
     }
-    const produductData = validate.data;
+    const variantData = validate.data;
 
     const existingProduct = await ProductModel.findOne({
-      name: produductData.name,
-      
+      _id: variantData.product,
     });
-    if (existingProduct) {
-      return res(false, 200, "Product already created.");
+    if (!existingProduct) {
+      return res(false, 200, "Product not found.");
     }
 
-    const newProduct = new ProductModel({
-      name: produductData.name,
-      slug: produductData.slug,
-      category: produductData.category,
-      mrp: produductData.mrp,
-      sellingPrice: produductData.sellingPrice,
-      discountPercentage: produductData.discountPercentage,
-      description:encode(produductData.description),
-      media: produductData.media,
+    const newProduct = new ProductVariantModel({
+      color: variantData.color,
+      sku: variantData.sku,
+      size: variantData.size,
+      product: variantData.product,
+      mrp: variantData.mrp,
+      sellingPrice: variantData.sellingPrice,
+      discountPercentage: variantData.discountPercentage,
+      media: variantData.media,
     });
     await newProduct.save();
 

@@ -4,7 +4,7 @@ import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 import ProductModel from "@/Models/Product.model";
 
-export async function POST(request) {
+export async function PUT(request) {
   try {
     const auth = await isAuthenticated("admin");
     if (!auth.isAuth) {
@@ -14,6 +14,7 @@ export async function POST(request) {
     const payload = await request.json();
 
     const schema = zSchema.pick({
+      _id: true,
       name: true,
       slug: true,
       category: true,
@@ -27,29 +28,26 @@ export async function POST(request) {
     if (!validate.success) {
       return res(false, 400, "Invalid or missing fields.", validate.error);
     }
-    const produductData = validate.data;
+    const validateData = validate.data;
 
-    const existingProduct = await ProductModel.findOne({
-      name: produductData.name,
-      
+    const getProduct = await ProductModel.findOne({
+      deletedAt: null,
+      _id: validateData._id,
     });
-    if (existingProduct) {
-      return res(false, 200, "Product already created.");
+    if (!getProduct) {
+      return res(false, 404, "Product not found.");
     }
 
-    const newProduct = new ProductModel({
-      name: produductData.name,
-      slug: produductData.slug,
-      category: produductData.category,
-      mrp: produductData.mrp,
-      sellingPrice: produductData.sellingPrice,
-      discountPercentage: produductData.discountPercentage,
-      description:encode(produductData.description),
-      media: produductData.media,
-    });
-    await newProduct.save();
-
-    return res(true, 200, "Product added successfully.");
+    getProduct.name = validateData.name;
+    getProduct.slug = validateData.slug;
+    getProduct.category = validateData.category;
+    getProduct.mrp = validateData.mrp;
+    getProduct.sellingPrice = validateData.sellingPrice;
+    getProduct.discountPercentage = validateData.discountPercentage;
+    getProduct.description = encodeURI(validateData.description);
+    getProduct.media = validateData.media;
+    await getProduct.save();
+    return res(true, 200, "Product updated successfully.");
   } catch (error) {
     return catchError(error);
   }
