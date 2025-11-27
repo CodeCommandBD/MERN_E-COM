@@ -31,6 +31,7 @@ export async function POST(request) {
 
     const existingProduct = await ProductModel.findOne({
       name: produductData.name,
+      
     });
     if (existingProduct) {
       return res(false, 200, "Product already created.");

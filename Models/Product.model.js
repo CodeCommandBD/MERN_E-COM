@@ -1,22 +1,23 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-const productSchema =  new mongoose.Schema({
+const productSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
-        trim: true,
+      type: String,
+      required: true,
+      trim: true,
     },
     slug: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase:true,
-        trim: true
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
     },
     // brand: {
     //     type: mongoose.Schema.Types.ObjectId,
@@ -24,46 +25,46 @@ const productSchema =  new mongoose.Schema({
     //     required: true,
     // },
     mrp: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     sellingPrice: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     discountPercentage: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     media: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Media',
-            required: true,
-        }
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MEDIA",
+        required: true,
+      },
     ],
     description: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
-    
-
 
     // stock: {
     //     type: Number,
     //     required: true,
-    // },  
-    deletedAt:{
-        type: Date,
-        default: null,
-        index: true,
-    }
+    // },
+    deletedAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+  },
+  { timestamps: true }
+);
 
+productSchema.index({ category: 1 });
 
-},{timestamps: true})
+const ProductModel =
+  mongoose.models.Product ||
+  mongoose.model("Product", productSchema, "products");
 
-productSchema.index({category: 1})
-
-const ProductModel = mongoose.models.Product || mongoose.model('Product', productSchema, 'products')
-
-export default ProductModel
+export default ProductModel;

@@ -43,6 +43,7 @@ const breadcrumbData = [
 const AddProduct = () => {
   const [loading, setLoading] = useState(false);
   const [categoryOption, setCategoryOption] = useState([]);
+  const [editorKey, setEditorKey] = useState(0);
 
   const { data: getCategories } = useFetch(
     "/api/category?deleteType=SD&&size=10000"
@@ -74,7 +75,7 @@ const AddProduct = () => {
     mrp: true,
     sellingPrice: true,
     discountPercentage: true,
-    media: true,
+    // media: true,
     description: true,
   });
   // TODO: ########## Form Define
@@ -89,7 +90,7 @@ const AddProduct = () => {
       category: "",
       sellingPrice: "",
       discountPercentage: "",
-      media: [],
+      // media: [],
     },
   });
 
@@ -139,6 +140,7 @@ const AddProduct = () => {
 
       showToast("success", response.message);
       form.reset();
+      setEditorKey((prev) => prev + 1);
       setSelectedMedia([]);
     } catch (error) {
       showToast("error", error.message);
@@ -242,11 +244,7 @@ const AddProduct = () => {
                           MRP <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="00.00"
-                            {...field}
-                          />
+                          <Input type="number" placeholder="00.00" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -263,11 +261,7 @@ const AddProduct = () => {
                           Selling Price <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="00.00"
-                            {...field}
-                          />
+                          <Input type="number" placeholder="00.00" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -302,6 +296,7 @@ const AddProduct = () => {
                     Description <span className="text-red-500">*</span>
                   </FormLabel>
                   <Editor
+                    key={editorKey}
                     initialData={form.getValues("description")}
                     onChange={(event, editor) => {
                       form.setValue("description", editor.getData());
