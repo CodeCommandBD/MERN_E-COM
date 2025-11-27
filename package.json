@@ -36,6 +36,7 @@
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "dayjs": "^1.11.19",
     "entities": "^7.0.0",
     "export-to-csv": "^1.4.0",
     "input-otp": "^1.4.2",
