@@ -3,7 +3,6 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 
-import ProductModel from "@/Models/Product.model";
 import ProductVariantModel from "@/Models/Product.Variant.model";
 
 export async function POST(request) {
@@ -33,11 +32,11 @@ export async function POST(request) {
     }
     const variantData = validate.data;
 
-    const existingProduct = await ProductModel.findOne({
+    const existingProductVariant = await ProductVariantModel.findOne({
       _id: variantData.product,
     });
-    if (!existingProduct) {
-      return res(false, 200, "Product not found.");
+    if (!existingProductVariant) {
+      return res(false, 200, "Product variant not found.");
     }
 
     const newProductVariant = new ProductVariantModel({

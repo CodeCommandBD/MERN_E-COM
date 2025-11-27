@@ -10,20 +10,22 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from "@/Routes/AdminPanelRoute";
+import {
+  ADMIN_DASHBOARD,
+  ADMIN_PRODUCT_VARIANT_SHOW,
+} from "@/Routes/AdminPanelRoute";
 import React, { useEffect, useState } from "react";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import slugify from "slugify";
 import axios from "axios";
 import { showToast } from "@/lib/showToast";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/Application/Select";
-import Editor from "@/components/Application/Admin/Editor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
+import { sizes } from "@/lib/utils";
 import { use } from "react";
 
 const breadcrumbData = [
@@ -32,48 +34,59 @@ const breadcrumbData = [
     label: "Home",
   },
   {
-    href: ADMIN_PRODUCT_SHOW,
-    label: "Product",
+    href: ADMIN_PRODUCT_VARIANT_SHOW,
+    label: "Product Variant",
   },
   {
     href: "",
-    label: "Edit Product",
+    label: "Edit Product variant",
   },
 ];
 
-const EditProduct = ({ params }) => {
+const EditProductVariant = ({ params }) => {
   const { id } = use(params);
   const [loading, setLoading] = useState(false);
-  const [categoryOption, setCategoryOption] = useState([]);
+  const [productOption, setProductOption] = useState([]);
+  const [editorKey, setEditorKey] = useState(0);
 
-  const { data: getCategories } = useFetch(
-    "/api/category?deleteType=SD&&size=10000"
+  const { data: getProduct } = useFetch(
+    "/api/product?deleteType=SD&&size=10000"
   );
 
   const {
-    data: getProduct,
-    loading: getProductLoading,
-    error: getProductError,
-  } = useFetch(`/api/product/get/${id}`);
-
-  console.log(getProduct);
+    data: getProductVariant,
+    loading: getProductVariantLoading,
+    error: getProductVariantError,
+  } = useFetch(`/api/product-variant/get/${id}`);
 
   // mediamodel state
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
 
+  useEffect(() => {
+    if (getProduct && getProduct.success) {
+      const data = getProduct.data;
+      const options = data.map((item) => {
+        return {
+          value: item._id,
+          label: item.name,
+        };
+      });
+      setProductOption(options);
+    }
+  }, [getProduct]);
+
   // TODO:##### Form valid
   // TODO:##### Form valid
   const formSchema = zSchema.pick({
     _id: true,
-    name: true,
-    slug: true,
-    category: true,
+    color: true,
+    sku: true,
+    size: true,
+    product: true,
     mrp: true,
     sellingPrice: true,
     discountPercentage: true,
-    // media: true,
-    description: true,
   });
   // TODO: ########## Form Define
   // TODO: ########## Form Define
@@ -81,59 +94,39 @@ const EditProduct = ({ params }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       _id: "",
-      name: "",
-      slug: "",
-      description: "",
+      color: "",
+      sku: "",
+      size: "",
+      product: "",
       mrp: "",
-      category: "",
       sellingPrice: "",
       discountPercentage: "",
-      // media: [],
     },
   });
 
   useEffect(() => {
-    if (getCategories && getCategories.success) {
-      const categories = getCategories.data;
-      const categoryOptions = categories.map((category) => ({
-        value: category._id,
-        label: category.name,
-      }));
-      setCategoryOption(categoryOptions);
-    }
-  }, [getCategories]);
-
-  useEffect(() => {
-    if (getProduct && getProduct.success) {
-      const product = getProduct.data;
+    if (getProductVariant && getProductVariant.success) {
+      const variant = getProductVariant.data;
       form.reset({
-        _id: product?._id,
-        name: product?.name,
-        slug: product?.slug,
-        description: product?.description,
-        mrp: product?.mrp,
-        category: product?.category,
-        sellingPrice: product?.sellingPrice,
-        discountPercentage: product?.discountPercentage,
-        // media: product.media,
+        _id: variant?._id,
+        color: variant?.color,
+        sku: variant?.sku,
+        size: variant?.size,
+        product: variant?.product,
+        mrp: variant?.mrp,
+        sellingPrice: variant?.sellingPrice,
+        discountPercentage: variant?.discountPercentage,
       });
 
-      if (product.media) {
-        const mediaIds = product.media.map((media) => ({
+      if (variant.media) {
+        const mediaIds = variant.media.map((media) => ({
           _id: media._id,
           url: media.secure_url,
         }));
         setSelectedMedia(mediaIds);
       }
     }
-  }, [getProduct]);
-
-  useEffect(() => {
-    const name = form.getValues("name");
-    if (name) {
-      form.setValue("slug", slugify(name).toLowerCase());
-    }
-  }, [form.watch("name")]);
+  }, [getProductVariant]);
 
   // discount percentage calculate
   useEffect(() => {
@@ -166,7 +159,10 @@ const EditProduct = ({ params }) => {
       const mediaIds = selectedMedia.map((media) => media._id);
       value.media = mediaIds;
 
-      const { data: response } = await axios.put("/api/product/update", value);
+      const { data: response } = await axios.put(
+        "/api/product-variant/update",
+        value
+      );
 
       if (!response.success) {
         throw new Error(response.message);
@@ -174,7 +170,8 @@ const EditProduct = ({ params }) => {
 
       showToast("success", response.message);
     } catch (error) {
-      showToast("error", error.message);
+      const errorMessage = error.response?.data?.message || error.message;
+      showToast("error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -195,7 +192,7 @@ const EditProduct = ({ params }) => {
           style={{ borderBottom: "1px solid #e5e7eb" }}
           suppressHydrationWarning={true}
         >
-          <h4 className="text-xl font-semibold">Edit Product</h4>
+          <h4 className="text-xl font-semibold">Edit Product Variant</h4>
         </CardHeader>
         <CardContent className={"py-5"} suppressHydrationWarning={true}>
           <Form {...form}>
@@ -204,57 +201,81 @@ const EditProduct = ({ params }) => {
                 <div className="mb-5">
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="product"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Name <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter Product Name"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Slug<span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter Slug"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Category<span className="text-red-500">*</span>
+                          Product<span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Select
-                            options={categoryOption}
+                            options={productOption}
+                            selected={field.value}
+                            setSelected={field.onChange}
+                            isMulti={false}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="sku"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          SKU <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter SKU"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Color <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter Color"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Size<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            options={sizes}
                             selected={field.value}
                             setSelected={field.onChange}
                             isMulti={false}
@@ -282,6 +303,7 @@ const EditProduct = ({ params }) => {
                     )}
                   />
                 </div>
+
                 <div className="mb-5">
                   <FormField
                     control={form.control}
@@ -321,20 +343,6 @@ const EditProduct = ({ params }) => {
                       </FormItem>
                     )}
                   />
-                </div>
-                <div className="mb-5 md:col-span-2">
-                  <FormLabel className={"mb-2"}>
-                    Description <span className="text-red-500">*</span>
-                  </FormLabel>
-                  {!getProductLoading && (
-                    <Editor
-                      initialData={form.getValues("description")}
-                      onChange={(event, editor) => {
-                        form.setValue("description", editor.getData());
-                      }}
-                    />
-                  )}
-                  <FormMessage />
                 </div>
               </div>
 
@@ -408,11 +416,11 @@ const EditProduct = ({ params }) => {
                 )}
               </div>
 
-              <div className="mb-5 ">
+              <div className="mt-5 ">
                 <ButtonLoading
                   loading={loading}
                   type={"submit"}
-                  text={"Save Changes"}
+                  text={" Save Changes"}
                   className={"cursor-pointer duration-300"}
                 ></ButtonLoading>
               </div>
@@ -424,4 +432,4 @@ const EditProduct = ({ params }) => {
   );
 };
 
-export default EditProduct;
+export default EditProductVariant;
