@@ -1,10 +1,7 @@
 "use client";
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  ADMIN_DASHBOARD,
-  ADMIN_TRASH,
-} from "@/Routes/AdminPanelRoute";
+import { ADMIN_DASHBOARD, ADMIN_TRASH } from "@/Routes/AdminPanelRoute";
 
 import { useCallback, useMemo } from "react";
 import { DT_CUSTOMER_COLUMN } from "@/lib/column";
@@ -14,14 +11,13 @@ import { columnConfig } from "@/lib/helper";
 import DataTableWrapper from "@/components/Application/Admin/DataTableWrapper";
 import { ADMIN_CUSTOMER_EDIT } from "@/Routes/AdminPanelRoute";
 
-
 const breadcrumbData = [
   {
     href: ADMIN_DASHBOARD,
     label: "Home",
   },
   {
-    href: '',
+    href: "",
     label: "Customers",
   },
 ];
@@ -69,7 +65,7 @@ const ShowCustomers = () => {
         <CardContent className={"py-5 px-2"} suppressHydrationWarning={true}>
           <DataTableWrapper
             queryKey="customer-data"
-            fetchUrl="/api/customer"
+            fetchUrl="/api/customers"
             columnsConfig={columns}
             initialPageSize={10}
             exportEndpoint="/api/customer/export"
