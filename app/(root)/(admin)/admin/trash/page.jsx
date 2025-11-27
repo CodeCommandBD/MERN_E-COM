@@ -8,6 +8,7 @@ import {
   DT_PRODUCT_COLUMN,
   DT_PRODUCT_VARIANT_COLUMN,
   DT_COUPON_COLUMN,
+  DT_CUSTOMER_COLUMN,
 } from "@/lib/column";
 import DeleteAction from "@/components/Application/Admin/DeleteAction";
 import RestoreAction from "@/components/Application/Admin/RestoreAction";
@@ -53,6 +54,13 @@ const TRASH_CONFIG = {
     fetchUrl: "/api/coupon",
     exportUrl: "/api/coupon/export",
     deleteUrl: "/api/coupon/delete",
+  },
+  customer: {
+    title: "Customer Trash",
+    columns: DT_CUSTOMER_COLUMN,
+    fetchUrl: "/api/customers",
+    exportUrl: "/api/customers/export",
+    deleteUrl: "/api/customers/delete",
   },
 };
 
