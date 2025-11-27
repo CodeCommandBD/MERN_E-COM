@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import CouponModel from "@/Models/Coupon.model";
+import couponModel from "@/Models/Coupon.model";
 import { isValidObjectId } from "mongoose";
 
 export async function GET(request, { params }) {
@@ -23,7 +23,7 @@ export async function GET(request, { params }) {
       return res(false, 400, "Invalid coupon id.");
     }
     filter._id = id;
-    const getCoupon = await CouponModel.findOne(filter).lean();
+    const getCoupon = await couponModel.findOne(filter).lean();
     if (!getCoupon) {
       return res(false, 404, "Coupon not found.");
     }
