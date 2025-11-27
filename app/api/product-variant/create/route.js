@@ -3,6 +3,8 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 
+import ProductModel from "@/Models/Product.model";
+import ProductVariantModel from "@/Models/Product.Variant.model";
 
 export async function POST(request) {
   try {
@@ -21,10 +23,12 @@ export async function POST(request) {
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
+      media: true,
     });
 
     const validate = schema.safeParse(payload);
     if (!validate.success) {
+      console.log("Validation Error:", validate.error);
       return res(false, 400, "Invalid or missing fields.", validate.error);
     }
     const variantData = validate.data;
@@ -36,7 +40,7 @@ export async function POST(request) {
       return res(false, 200, "Product not found.");
     }
 
-    const newProduct = new ProductVariantModel({
+    const newProductVariant = new ProductVariantModel({
       color: variantData.color,
       sku: variantData.sku,
       size: variantData.size,
@@ -46,10 +50,11 @@ export async function POST(request) {
       discountPercentage: variantData.discountPercentage,
       media: variantData.media,
     });
-    await newProduct.save();
+    await newProductVariant.save();
 
-    return res(true, 200, "Product added successfully.");
+    return res(true, 200, "Product variant added successfully.");
   } catch (error) {
+    console.log("Create Variant Error:", error);
     return catchError(error);
   }
 }

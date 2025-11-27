@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 import ProductModel from "@/Models/Product.model";
-
+import { encode } from "entities";
 export async function PUT(request) {
   try {
     const auth = await isAuthenticated("admin");
@@ -44,7 +44,7 @@ export async function PUT(request) {
     getProduct.mrp = validateData.mrp;
     getProduct.sellingPrice = validateData.sellingPrice;
     getProduct.discountPercentage = validateData.discountPercentage;
-    getProduct.description = encodeURI(validateData.description);
+    getProduct.description = encode(validateData.description);
     getProduct.media = validateData.media;
     await getProduct.save();
     return res(true, 200, "Product updated successfully.");

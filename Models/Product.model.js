@@ -36,6 +36,11 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    sku: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     media: [
       {
         type: mongoose.Schema.Types.ObjectId,
