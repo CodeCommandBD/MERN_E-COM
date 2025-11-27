@@ -1,33 +1,36 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
-import { catchError,  res } from "@/lib/helper";
-import CategoryModel from "@/Models/category.model";
+import { catchError, res } from "@/lib/helper";
+import ProductModel from "@/Models/Product.model";
 import { isValidObjectId } from "mongoose";
 
 export async function GET(request, { params }) {
-    try {
-        const auth = await isAuthenticated('admin')
-        if(!auth.isAuth) {
-            return res(false, 403, 'Unauthorized.') 
-        }
-        await connectDB()
-
-        const id = params.id
-
-        const filter = {
-            deletedAt: null
-        }
-
-        if(!isValidObjectId(id)){
-            return res(false, 400, 'Invalid object id.')
-        }
-        filter._id = id
-        const getCategory = await CategoryModel.findOne(filter).lean()
-        if(!getCategory){
-            return res(false, 404, 'Category not found.')
-        }
-        return res(true, 200, 'Category found.' , getCategory)
-    } catch (error) {
-        return catchError(error)
+  try {
+    const auth = await isAuthenticated("admin");
+    if (!auth.isAuth) {
+      return res(false, 403, "Unauthorized.");
     }
+    await connectDB();
+
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
+    const filter = {
+      deletedAt: null,
+    };
+
+    if (!isValidObjectId(id)) {
+      return res(false, 400, "Invalid product id.");
+    }
+    filter._id = id;
+    const getProduct = await ProductModel.findOne(filter)
+      .populate("media", "_id secure_url thumbnail_url alt title")
+      .lean();
+    if (!getProduct) {
+      return res(false, 404, "Product not found.");
+    }
+    return res(true, 200, "Product found.", getProduct);
+  } catch (error) {
+    return catchError(error);
+  }
 }

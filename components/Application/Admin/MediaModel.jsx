@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import React from "react";
-import { loader } from "@/public/image";
+import {loader} from "@/public/image";
+import { useState } from "react";
 import axios from "axios";
 import ModalMediaBlock from "./ModalMediaBlock";
 import { showToast } from "@/lib/showToast";
-import { useState } from "react";
+import React from "react";
 
 const MediaModel = ({
   open,
@@ -18,7 +18,7 @@ const MediaModel = ({
 }) => {
 
 
-  const [previouslySelected, setPreviouslySelected] = React.useState([])
+  const [previouslySelected, setPreviouslySelected] = useState([])
 
   const fetchMedia = async (pageParam = 0) => {
     const { data: response } = await axios.get(
