@@ -51,7 +51,7 @@ const AddCoupon = () => {
     defaultValues: {
       code: "",
       discountPercentage: "",
-      validity: new Date(),
+      validity: 0,
       miniShoppingAmount: "",
     },
   });
