@@ -2,6 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
+import couponModel from "@/Models/Coupon.model";
 
 export async function POST(request) {
   try {
@@ -24,14 +25,14 @@ export async function POST(request) {
     }
     const couponData = validate.data;
 
-    const existingCoupon = await CouponModel.findOne({
+    const existingCoupon = await couponModel.findOne({
       code: couponData.code,
     });
     if (existingCoupon) {
       return res(false, 200, "Coupon already created.");
     }
 
-    const newCoupon = new CouponModel({
+    const newCoupon = new couponModel({
       code: couponData.code,
       discountPercentage: couponData.discountPercentage,
       validity: couponData.validity,

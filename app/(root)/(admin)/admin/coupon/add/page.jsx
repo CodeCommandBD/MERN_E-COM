@@ -16,6 +16,8 @@ import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { showToast } from "@/lib/showToast";
 
 const breadcrumbData = [
   {
@@ -57,6 +59,7 @@ const AddCoupon = () => {
   });
 
   const onSubmit = async (value) => {
+    setLoading(true);
     try {
       const { data: response } = await axios.post("/api/coupon/create", value);
 
