@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import UserModel from "@/Models/user.models";
+import ReviewModel from "@/Models/review.models";
 
 export async function GET(request) {
   try {
@@ -15,14 +15,14 @@ export async function GET(request) {
       deletedAt: null,
     };
 
-    const getUsers = await UserModel.find(filter)
+    const getReviews = await ReviewModel.find(filter)
       .sort({ createdAt: -1 })
       .lean();
-    if (!getUsers) {
+    if (!getReviews) {
       return res(false, 404, "Collection empty.");
     }
 
-    return res(true, 200, "Users found.", getUsers);
+    return res(true, 200, "Reviews found.", getReviews);
   } catch (error) {
     return catchError(error);
   }

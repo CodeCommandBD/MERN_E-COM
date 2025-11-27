@@ -9,6 +9,7 @@ import {
   DT_PRODUCT_VARIANT_COLUMN,
   DT_COUPON_COLUMN,
   DT_CUSTOMER_COLUMN,
+  DT_REVIEW_COLUMN,
 } from "@/lib/column";
 import DeleteAction from "@/components/Application/Admin/DeleteAction";
 import RestoreAction from "@/components/Application/Admin/RestoreAction";
@@ -61,6 +62,13 @@ const TRASH_CONFIG = {
     fetchUrl: "/api/customers",
     exportUrl: "/api/customers/export",
     deleteUrl: "/api/customers/delete",
+  },
+  review: {
+    title: "Review Trash",
+    columns: DT_REVIEW_COLUMN,
+    fetchUrl: "/api/reviews",
+    exportUrl: "/api/reviews/export",
+    deleteUrl: "/api/reviews/delete",
   },
 };
 
