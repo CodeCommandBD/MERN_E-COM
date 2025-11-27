@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const couponSchema =  new mongoose.Schema({
-    coupon_code: {
+    code: {
         type: String,
         required: true,
         unique: true,
