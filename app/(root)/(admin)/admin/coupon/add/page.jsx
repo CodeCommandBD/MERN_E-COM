@@ -10,13 +10,12 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ADMIN_COUPON_SHOW, ADMIN_DASHBOARD} from "@/Routes/AdminPanelRoute";
-import React, {  useState } from "react";
+import { ADMIN_COUPON_SHOW, ADMIN_DASHBOARD } from "@/Routes/AdminPanelRoute";
+import React, { useState } from "react";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 
 const breadcrumbData = [
   {
@@ -36,18 +35,13 @@ const breadcrumbData = [
 const AddCoupon = () => {
   const [loading, setLoading] = useState(false);
 
-
   // TODO:##### Form valid
   // TODO:##### Form valid
   const formSchema = zSchema.pick({
-    name: true,
-    slug: true,
-    category: true,
-    mrp: true,
-    sellingPrice: true,
+    code: true,
     discountPercentage: true,
-    // media: true,
-    description: true,
+    validity: true,
+    miniShoppingAmount: true,
   });
 
   // TODO: ########## Form Define
@@ -55,25 +49,15 @@ const AddCoupon = () => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      slug: "",
-      description: "",
-      mrp: "",
-      category: "",
-      sellingPrice: "",
+      code: "",
       discountPercentage: "",
-      // media: [],
+      validity: new Date(),
+      miniShoppingAmount: "",
     },
   });
 
-
-
-
-
-
   const onSubmit = async (value) => {
     try {
-
       const { data: response } = await axios.post("/api/coupon/create", value);
 
       if (!response.success) {
@@ -82,7 +66,6 @@ const AddCoupon = () => {
 
       form.reset();
       showToast("success", response.message);
-
     } catch (error) {
       showToast("error", error.message);
     } finally {
@@ -106,60 +89,90 @@ const AddCoupon = () => {
         <CardContent className={"py-5"} suppressHydrationWarning={true}>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="grid md:grid-cols-2 gap-5 ">
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="code"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Coupon Code <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter Coupon Code"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div>
+                <div className="grid md:grid-cols-2 gap-5 ">
+                  <div className="mb-5">
+                    <FormField
+                      control={form.control}
+                      name="code"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Coupon Code <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Enter Coupon Code"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <FormField
+                      control={form.control}
+                      name="discountPercentage"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Discount Percentage{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="00" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <FormField
+                      control={form.control}
+                      name="miniShoppingAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Minimum Shopping Amount{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="00" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <FormField
+                      control={form.control}
+                      name="validity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Validity <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="discountPercentage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Discount Percentage{" "}
-                          <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            readOnly
-                            type="number"
-                            placeholder="00"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>  
               </div>
-              <div className="mt-5 ">
-                <ButtonLoading
-                  loading={loading}
-                  type={"submit"}
-                  text={"Add Coupon"}
-                  className={"cursor-pointer duration-300"}
-                ></ButtonLoading>
-              </div>
+              <ButtonLoading
+                loading={loading}
+                type={"submit"}
+                text={"Add Coupon"}
+                className={"cursor-pointer duration-300"}
+              ></ButtonLoading>
             </form>
           </Form>
         </CardContent>
