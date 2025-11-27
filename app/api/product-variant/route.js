@@ -1,8 +1,8 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import ProductModel from "@/Models/Product.model";
 import { NextResponse } from "next/server";
+import ProductVariantModel from "@/Models/Product.Variant.model";
 
 export async function GET(request) {
   try {
@@ -35,45 +35,54 @@ export async function GET(request) {
       matchQuery.$or = [
         { name: { $regex: globalFilters, $options: "i" } },
         { slug: { $regex: globalFilters, $options: "i" } },
-        { 'categoryData.name': { $regex: globalFilters, $options: "i" } },
+        { "productData.name": { $regex: globalFilters, $options: "i" } },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$mrp'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$mrp" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
         },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$sellingPrice'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$sellingPrice" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
         },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$discountPercentage'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
-        }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$discountPercentage" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
+        },
       ];
     }
 
     // Column filteration
 
     filters.forEach((element) => {
-        if(element.id === 'mrp' || element.id === 'sellingPrice' || element.id === 'discountPercentage'){
-            matchQuery[element.id] =  Number(element.value)
-        }else{
-            matchQuery[element.id] = { $regex: element.value, $options: "i" };
-        }
+      if (
+        element.id === "mrp" ||
+        element.id === "sellingPrice" ||
+        element.id === "discountPercentage"
+      ) {
+        matchQuery[element.id] = Number(element.value);
+      } else if (element.id === "product") {
+        matchQuery["productData.name"] = {
+          $regex: element.value,
+          $options: "i",
+        };
+      } else {
+        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+      }
     });
 
     // sorting
@@ -87,15 +96,15 @@ export async function GET(request) {
     const aggregatePipeline = [
       {
         $lookup: {
-          from: "categories",
-          localField: "category",
+          from: "products",
+          localField: "product",
           foreignField: "_id",
-          as: "categoryData",
+          as: "productData",
         },
       },
       {
         $unwind: {
-          path: "$categoryData",
+          path: "$productData",
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -106,12 +115,12 @@ export async function GET(request) {
       {
         $project: {
           _id: 1,
-          name: 1,
-          slug: 1,
+          product: "$productData.name",
+          color: 1,
+          size: 1,
           mrp: 1,
           sellingPrice: 1,
           discountPercentage: 1,
-          category: "$categoryData.name",
           createdAt: 1,
           updatedAt: 1,
           deletedAt: 1,
@@ -119,14 +128,16 @@ export async function GET(request) {
       },
     ];
     // Execute query
-    const getProducts = await ProductModel.aggregate(aggregatePipeline);
+    const getProductVariant = await ProductVariantModel.aggregate(
+      aggregatePipeline
+    );
 
     // Get TotalRowCount
-    const totalRowCount = await ProductModel.countDocuments(matchQuery);
+    const totalRowCount = await ProductVariantModel.countDocuments(matchQuery);
 
     return NextResponse.json({
       success: true,
-      data: getProducts,
+      data: getProductVariant,
       meta: { totalRowCount },
     });
   } catch (error) {
