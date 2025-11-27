@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import UserModel from "@/Models/user.models";
+import ReviewModel from "@/Models/review.models";
 
 export async function PUT(request) {
   try {
@@ -19,8 +19,8 @@ export async function PUT(request) {
       return res(false, 400, "Invalid or empty id list.");
     }
 
-    const user = await UserModel.find({ _id: { $in: ids } }).lean();
-    if (!user.length) {
+    const review = await ReviewModel.find({ _id: { $in: ids } }).lean();
+    if (!review.length) {
       return res(false, 404, "Data not found.");
     }
     if (!["SD", "RSD"].includes(deleteType)) {
@@ -31,12 +31,12 @@ export async function PUT(request) {
       );
     }
     if (deleteType === "SD") {
-      await UserModel.updateMany(
+      await ReviewModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: new Date().toISOString() } }
       );
     } else {
-      await UserModel.updateMany(
+      await ReviewModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: null } }
       );
@@ -68,8 +68,8 @@ export async function DELETE(request) {
       return res(false, 400, "Invalid or empty id list.");
     }
 
-    const user = await UserModel.find({ _id: { $in: ids } }).lean();
-    if (!user.length) {
+    const review = await ReviewModel.find({ _id: { $in: ids } }).lean();
+    if (!review.length) {
       return res(false, 404, "Data not found.");
     }
     if (deleteType !== "PD") {
@@ -80,7 +80,7 @@ export async function DELETE(request) {
       );
     }
 
-    await UserModel.deleteMany({ _id: { $in: ids } });
+    await ReviewModel.deleteMany({ _id: { $in: ids } });
 
     return res(true, 200, "Data deleted permanently");
   } catch (error) {
