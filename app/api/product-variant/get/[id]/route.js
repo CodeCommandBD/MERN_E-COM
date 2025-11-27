@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import ProductModel from "@/Models/Product.model";
+import ProductVariantModel from "@/Models/Product.Variant.model";
 import { isValidObjectId } from "mongoose";
 
 export async function GET(request, { params }) {
@@ -20,16 +20,16 @@ export async function GET(request, { params }) {
     };
 
     if (!isValidObjectId(id)) {
-      return res(false, 400, "Invalid product id.");
+      return res(false, 400, "Invalid product variant id.");
     }
     filter._id = id;
-    const getProduct = await ProductModel.findOne(filter)
+    const getProductVariant = await ProductVariantModel.findOne(filter)
       .populate("media", "_id secure_url thumbnail_url alt title")
       .lean();
-    if (!getProduct) {
-      return res(false, 404, "Product not found.");
+    if (!getProductVariant) {
+      return res(false, 404, "Product variant not found.");
     }
-    return res(true, 200, "Product found.", getProduct);
+    return res(true, 200, "Product variant found.", getProductVariant);
   } catch (error) {
     return catchError(error);
   }

@@ -21,20 +21,22 @@ export async function GET(request) {
     const sorting = JSON.parse(searchParams.get("sorting") || "[]");
     const deleteType = searchParams.get("deleteType");
 
-    // build match query
-    let matchQuery = {};
+    // build match query (before lookup)
+    let preLookupMatch = {};
+    let postLookupMatch = {};
 
     if (deleteType === "SD") {
-      matchQuery = { deletedAt: null };
+      preLookupMatch = { deletedAt: null };
     } else if (deleteType === "PD" || deleteType === "TD") {
-      matchQuery = { deletedAt: { $ne: null } };
+      preLookupMatch = { deletedAt: { $ne: null } };
     }
 
     // Global search
     if (globalFilters) {
-      matchQuery.$or = [
-        { name: { $regex: globalFilters, $options: "i" } },
-        { slug: { $regex: globalFilters, $options: "i" } },
+      postLookupMatch.$or = [
+        { sku: { $regex: globalFilters, $options: "i" } },
+        { color: { $regex: globalFilters, $options: "i" } },
+        { size: { $regex: globalFilters, $options: "i" } },
         { "productData.name": { $regex: globalFilters, $options: "i" } },
         {
           $expr: {
@@ -67,21 +69,20 @@ export async function GET(request) {
     }
 
     // Column filteration
-
     filters.forEach((element) => {
       if (
         element.id === "mrp" ||
         element.id === "sellingPrice" ||
         element.id === "discountPercentage"
       ) {
-        matchQuery[element.id] = Number(element.value);
+        postLookupMatch[element.id] = Number(element.value);
       } else if (element.id === "product") {
-        matchQuery["productData.name"] = {
+        postLookupMatch["productData.name"] = {
           $regex: element.value,
           $options: "i",
         };
       } else {
-        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+        postLookupMatch[element.id] = { $regex: element.value, $options: "i" };
       }
     });
 
@@ -94,6 +95,7 @@ export async function GET(request) {
 
     // Aggregate pipeline
     const aggregatePipeline = [
+      { $match: preLookupMatch },
       {
         $lookup: {
           from: "products",
@@ -108,7 +110,9 @@ export async function GET(request) {
           preserveNullAndEmptyArrays: true,
         },
       },
-      { $match: matchQuery },
+      ...(Object.keys(postLookupMatch).length > 0
+        ? [{ $match: postLookupMatch }]
+        : []),
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
       { $skip: start },
       { $limit: size },
@@ -116,6 +120,7 @@ export async function GET(request) {
         $project: {
           _id: 1,
           product: "$productData.name",
+          sku: 1,
           color: 1,
           size: 1,
           mrp: 1,
@@ -127,13 +132,37 @@ export async function GET(request) {
         },
       },
     ];
+
     // Execute query
     const getProductVariant = await ProductVariantModel.aggregate(
       aggregatePipeline
     );
 
-    // Get TotalRowCount
-    const totalRowCount = await ProductVariantModel.countDocuments(matchQuery);
+    // Get TotalRowCount using aggregation
+    const countPipeline = [
+      { $match: preLookupMatch },
+      {
+        $lookup: {
+          from: "products",
+          localField: "product",
+          foreignField: "_id",
+          as: "productData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      ...(Object.keys(postLookupMatch).length > 0
+        ? [{ $match: postLookupMatch }]
+        : []),
+      { $count: "total" },
+    ];
+
+    const countResult = await ProductVariantModel.aggregate(countPipeline);
+    const totalRowCount = countResult.length > 0 ? countResult[0].total : 0;
 
     return NextResponse.json({
       success: true,

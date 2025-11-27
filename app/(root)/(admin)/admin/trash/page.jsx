@@ -3,7 +3,11 @@ import BreadCrumb from "@/components/Application/Admin/BreadCrumb";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ADMIN_DASHBOARD, ADMIN_TRASH } from "@/Routes/AdminPanelRoute";
 import { useCallback, useMemo } from "react";
-import { DT_CATEGORY_COLUMN, DT_PRODUCT_COLUMN } from "@/lib/column";
+import {
+  DT_CATEGORY_COLUMN,
+  DT_PRODUCT_COLUMN,
+  DT_PRODUCT_VARIANT_COLUMN,
+} from "@/lib/column";
 import DeleteAction from "@/components/Application/Admin/DeleteAction";
 import RestoreAction from "@/components/Application/Admin/RestoreAction";
 import { columnConfig } from "@/lib/helper";
@@ -34,6 +38,13 @@ const TRASH_CONFIG = {
     fetchUrl: "/api/product",
     exportUrl: "/api/product/export",
     deleteUrl: "/api/product/delete",
+  },
+  "product-variant": {
+    title: "Product Variant Trash",
+    columns: DT_PRODUCT_VARIANT_COLUMN,
+    fetchUrl: "/api/product-variant",
+    exportUrl: "/api/product-variant/export",
+    deleteUrl: "/api/product-variant/delete",
   },
 };
 
