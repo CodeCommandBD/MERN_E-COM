@@ -23,3 +23,9 @@ export const ADMIN_PRODUCT_ADD = '/admin/product/add'
 export const ADMIN_PRODUCT_SHOW = '/admin/product'
 export const ADMIN_PRODUCT_EDIT = (id) => id ? `/admin/product/edit/${id}` : ''
     
+// Product-variant routes
+
+export const ADMIN_PRODUCT_VARIANT_ADD = '/admin/product-variant/add'
+export const ADMIN_PRODUCT_VARIANT_SHOW = '/admin/product-variant'
+export const ADMIN_PRODUCT_VARIANT_EDIT = (id) => id ? `/admin/product-variant/edit/${id}` : ''
+    
