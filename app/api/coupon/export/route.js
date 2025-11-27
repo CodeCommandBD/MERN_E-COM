@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import ProductModel from "@/Models/Product.model";
+import CouponModel from "@/Models/Coupon.model";
 
 export async function GET(request) {
   try {
@@ -15,15 +15,12 @@ export async function GET(request) {
       deletedAt: null,
     };
 
-    const getProducts = await ProductModel.find(filter)
-      .select("-media -description")
-      .sort({ createdAt: -1 })
-      .lean();
-    if (!getProducts) {
+    const getCoupons = await CouponModel.find(filter).sort({ createdAt: -1 }).lean();
+    if (!getCoupons) {
       return res(false, 404, "Collection empty.");
     }
 
-    return res(true, 200, "Products found.", getProducts);
+    return res(true, 200, "Coupons found.", getCoupons);
   } catch (error) {
     return catchError(error);
   }

@@ -12,6 +12,7 @@ import DeleteAction from '@/components/Application/Admin/DeleteAction'
 import { columnConfig } from '@/lib/helper'
 import DataTableWrapper from '@/components/Application/Admin/DataTableWrapper'
 
+
 const breadcrumbData = [
   {
     href: ADMIN_DASHBOARD,
