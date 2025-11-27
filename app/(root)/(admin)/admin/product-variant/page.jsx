@@ -1,12 +1,12 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { ADMIN_PRODUCT_ADD, ADMIN_PRODUCT_EDIT, ADMIN_PRODUCT_SHOW, ADMIN_DASHBOARD, ADMIN_TRASH } from '@/Routes/AdminPanelRoute'
+import { ADMIN_DASHBOARD, ADMIN_TRASH, ADMIN_PRODUCT_VARIANT_EDIT, ADMIN_PRODUCT_VARIANT_SHOW, ADMIN_PRODUCT_VARIANT_ADD } from '@/Routes/AdminPanelRoute'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { FiPlus } from 'react-icons/fi'
 import { useCallback, useMemo } from 'react'
-import { DT_PRODUCT_COLUMN } from '@/lib/column'
+import { DT_PRODUCT_VARIANT_COLUMN } from '@/lib/column'
 import EditAction from '@/components/Application/Admin/EditAction'
 import DeleteAction from '@/components/Application/Admin/DeleteAction'
 import { columnConfig } from '@/lib/helper'
@@ -18,25 +18,20 @@ const breadcrumbData = [
     label: "Home"
   },
   {
-    href: ADMIN_PRODUCT_SHOW,
-    label: "Product"
+    href: ADMIN_PRODUCT_VARIANT_SHOW,
+    label: "Product Variant"
   },
-  {
-    href: '',
-    label: "Product List"
-  },
-
 ]
 
-const ShowProduct = () => {
+const ShowProductVariant = () => {
 
   const columns = useMemo(()=>{
-    return columnConfig(DT_PRODUCT_COLUMN)
+    return columnConfig(DT_PRODUCT_VARIANT_COLUMN)
   }, [])
 
   const action = useCallback((row, deleteType, handleDelete) => {
     let actionMenu = []
-    actionMenu.push(<EditAction key='edit' href={ADMIN_PRODUCT_EDIT(row.original._id)}></EditAction>)
+    actionMenu.push(<EditAction key='edit' href={ADMIN_PRODUCT_VARIANT_EDIT(row.original._id)}></EditAction>)
     actionMenu.push(<DeleteAction key='delete' handleDelete={handleDelete} row={row} deleteType={deleteType}></DeleteAction>)
     return actionMenu
   }, [])
@@ -47,23 +42,23 @@ const ShowProduct = () => {
       <Card className='py-0 rounded shadow-sm border' suppressHydrationWarning={true}>
         <CardHeader className='pt-3 px-3 pb-1' style={{ borderBottom: '1px solid #e5e7eb' }} suppressHydrationWarning={true}>
           <div className='flex items-center justify-between'>
-            <h4 className='text-xl font-semibold'>Product List</h4>
+            <h4 className='text-xl font-semibold'>Product Variant List</h4>
             <Button className='flex items-center gap-2'>
               <FiPlus></FiPlus>
-              <Link href={ADMIN_PRODUCT_ADD}>New Product</Link>
+              <Link href={ADMIN_PRODUCT_VARIANT_ADD}>New Variant</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent className={'py-5 px-2'} suppressHydrationWarning={true}>
           <DataTableWrapper
-            queryKey='product-data'
-            fetchUrl='/api/product'
+            queryKey='product-variant-data'
+            fetchUrl='/api/product-variant'
             columnsConfig={columns}
             initialPageSize={10}
-            exportEndpoint='/api/product/export'
-            deleteEndpoint='/api/product/delete'
+            exportEndpoint='/api/product-variant/export'
+            deleteEndpoint='/api/product-variant/delete'
             deleteType='SD'
-            trashView={`${ADMIN_TRASH}?trashof=product`}
+            trashView={`${ADMIN_TRASH}?trashof=product-variant`}
             createAction={action}
           />
         </CardContent>
@@ -72,7 +67,7 @@ const ShowProduct = () => {
   )
 }
 
-export default ShowProduct 
+export default ShowProductVariant 
 
 
 
