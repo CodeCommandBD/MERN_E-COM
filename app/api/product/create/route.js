@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 import ProductModel from "@/Models/Product.model";
+import { encode } from "entities";
 
 export async function POST(request) {
   try {

@@ -19,12 +19,10 @@ import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import slugify from "slugify";
 import axios from "axios";
 import { showToast } from "@/lib/showToast";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/Application/Select";
-import Editor from "@/components/Application/Admin/Editor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import { sizes } from "@/lib/utils";
@@ -141,7 +139,8 @@ const AddProductVariant = () => {
       setEditorKey((prev) => prev + 1);
       setSelectedMedia([]);
     } catch (error) {
-      showToast("error", error.message);
+      const errorMessage = error.response?.data?.message || error.message;
+      showToast("error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -245,10 +244,7 @@ const AddProductVariant = () => {
                         </FormLabel>
                         <FormControl>
                           <Select
-                            options={sizes.map((size) => ({
-                              value: size,
-                              label: size,
-                            }))}
+                            options={sizes}
                             selected={field.value}
                             setSelected={field.onChange}
                             isMulti={false}

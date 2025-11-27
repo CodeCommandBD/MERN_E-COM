@@ -31,7 +31,7 @@ const productVariantSchema = new mongoose.Schema(
       required: true,
     },
     sku: {
-      type: Number,
+      type: String,
       required: true,
     },
     media: [
