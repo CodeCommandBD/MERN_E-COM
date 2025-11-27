@@ -1,9 +1,10 @@
 import React from 'react'
+import CountOverView from './CountOverView'
 
 const AdminDashBoard = () => {
   return (
     <div>
-      admin
+      <CountOverView />
     </div>
   )
 }
