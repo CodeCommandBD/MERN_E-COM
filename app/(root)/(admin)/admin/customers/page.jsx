@@ -30,12 +30,6 @@ const ShowCustomers = () => {
   const action = useCallback((row, deleteType, handleDelete) => {
     let actionMenu = [];
     actionMenu.push(
-      <EditAction
-        key="edit"
-        href={ADMIN_CUSTOMER_EDIT(row.original._id)}
-      ></EditAction>
-    );
-    actionMenu.push(
       <DeleteAction
         key="delete"
         handleDelete={handleDelete}
@@ -68,8 +62,8 @@ const ShowCustomers = () => {
             fetchUrl="/api/customers"
             columnsConfig={columns}
             initialPageSize={10}
-            exportEndpoint="/api/customer/export"
-            deleteEndpoint="/api/customer/delete"
+            exportEndpoint="/api/customers/export"
+            deleteEndpoint="/api/customers/delete"
             deleteType="SD"
             trashView={`${ADMIN_TRASH}?trashof=customer`}
             createAction={action}
