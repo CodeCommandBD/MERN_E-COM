@@ -24,6 +24,7 @@ import Select from "@/components/Application/Select";
 import Editor from "@/components/Application/Admin/Editor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
+import { use } from "react";
 
 const breadcrumbData = [
   {
@@ -36,39 +37,35 @@ const breadcrumbData = [
   },
   {
     href: "",
-    label: "Add Product",
+    label: "Edit Product",
   },
 ];
 
-const AddProduct = () => {
+const EditProduct = ({ params }) => {
+  const { id } = use(params);
   const [loading, setLoading] = useState(false);
   const [categoryOption, setCategoryOption] = useState([]);
-  const [editorKey, setEditorKey] = useState(0);
 
   const { data: getCategories } = useFetch(
     "/api/category?deleteType=SD&&size=10000"
   );
 
+  const {
+    data: getProduct,
+    loading: getProductLoading,
+    error: getProductError,
+  } = useFetch(`/api/product/get/${id}`);
+
+  console.log(getProduct);
+
   // mediamodel state
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
 
-  useEffect(() => {
-    if (getCategories && getCategories.success) {
-      const data = getCategories.data;
-      const options = data.map((item) => {
-        return {
-          value: item._id,
-          label: item.name,
-        };
-      });
-      setCategoryOption(options);
-    }
-  }, [getCategories]);
-
   // TODO:##### Form valid
   // TODO:##### Form valid
   const formSchema = zSchema.pick({
+    _id: true,
     name: true,
     slug: true,
     category: true,
@@ -83,6 +80,7 @@ const AddProduct = () => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      _id: "",
       name: "",
       slug: "",
       description: "",
@@ -93,6 +91,42 @@ const AddProduct = () => {
       // media: [],
     },
   });
+
+  useEffect(() => {
+    if (getCategories && getCategories.success) {
+      const categories = getCategories.data;
+      const categoryOptions = categories.map((category) => ({
+        value: category._id,
+        label: category.name,
+      }));
+      setCategoryOption(categoryOptions);
+    }
+  }, [getCategories]);
+
+  useEffect(() => {
+    if (getProduct && getProduct.success) {
+      const product = getProduct.data;
+      form.reset({
+        _id: product?._id,
+        name: product?.name,
+        slug: product?.slug,
+        description: product?.description,
+        mrp: product?.mrp,
+        category: product?.category,
+        sellingPrice: product?.sellingPrice,
+        discountPercentage: product?.discountPercentage,
+        // media: product.media,
+      });
+
+      if (product.media) {
+        const mediaIds = product.media.map((media) => ({
+          _id: media._id,
+          url: media.secure_url,
+        }));
+        setSelectedMedia(mediaIds);
+      }
+    }
+  }, [getProduct]);
 
   useEffect(() => {
     const name = form.getValues("name");
@@ -132,16 +166,13 @@ const AddProduct = () => {
       const mediaIds = selectedMedia.map((media) => media._id);
       value.media = mediaIds;
 
-      const { data: response } = await axios.post("/api/product/create", value);
+      const { data: response } = await axios.put("/api/product/update", value);
 
       if (!response.success) {
         throw new Error(response.message);
       }
 
       showToast("success", response.message);
-      form.reset();
-      setEditorKey((prev) => prev + 1);
-      setSelectedMedia([]);
     } catch (error) {
       showToast("error", error.message);
     } finally {
@@ -164,7 +195,7 @@ const AddProduct = () => {
           style={{ borderBottom: "1px solid #e5e7eb" }}
           suppressHydrationWarning={true}
         >
-          <h4 className="text-xl font-semibold">Add Product</h4>
+          <h4 className="text-xl font-semibold">Edit Product</h4>
         </CardHeader>
         <CardContent className={"py-5"} suppressHydrationWarning={true}>
           <Form {...form}>
@@ -295,13 +326,15 @@ const AddProduct = () => {
                   <FormLabel className={"mb-2"}>
                     Description <span className="text-red-500">*</span>
                   </FormLabel>
-                  <Editor
-                    key={editorKey}
-                    initialData={form.getValues("description")}
-                    onChange={(event, editor) => {
-                      form.setValue("description", editor.getData());
-                    }}
-                  />
+                  {!getProductLoading && (
+                    <Editor
+                      initialData={form.getValues("description")}
+                      onChange={(event, editor) => {
+                        form.setValue("description", editor.getData());
+                      }}
+                    />
+                  )}
+                  <FormMessage />
                 </div>
               </div>
 
@@ -375,11 +408,11 @@ const AddProduct = () => {
                 )}
               </div>
 
-              <div className="mt-5 ">
+              <div className="mb-5 ">
                 <ButtonLoading
                   loading={loading}
                   type={"submit"}
-                  text={"Add Product"}
+                  text={"Save Changes"}
                   className={"cursor-pointer duration-300"}
                 ></ButtonLoading>
               </div>
@@ -391,4 +424,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;

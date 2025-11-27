@@ -10,7 +10,10 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from "@/Routes/AdminPanelRoute";
+import {
+  ADMIN_DASHBOARD,
+  ADMIN_PRODUCT_VARIANT_SHOW,
+} from "@/Routes/AdminPanelRoute";
 import React, { useEffect, useState } from "react";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { zSchema } from "@/lib/zodSchema";
@@ -24,6 +27,7 @@ import Select from "@/components/Application/Select";
 import Editor from "@/components/Application/Admin/Editor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
+import { sizes } from "@/lib/utils";
 
 const breadcrumbData = [
   {
@@ -31,22 +35,22 @@ const breadcrumbData = [
     label: "Home",
   },
   {
-    href: ADMIN_PRODUCT_SHOW,
-    label: "Product",
+    href: ADMIN_PRODUCT_VARIANT_SHOW,
+    label: "Product Variant",
   },
   {
     href: "",
-    label: "Add Product",
+    label: "Add Product variants",
   },
 ];
 
-const AddProduct = () => {
+const AddProductVariant = () => {
   const [loading, setLoading] = useState(false);
-  const [categoryOption, setCategoryOption] = useState([]);
+  const [productOption, setProductOption] = useState([]);
   const [editorKey, setEditorKey] = useState(0);
 
-  const { data: getCategories } = useFetch(
-    "/api/category?deleteType=SD&&size=10000"
+  const { data: getProduct } = useFetch(
+    "/api/product?deleteType=SD&&size=10000"
   );
 
   // mediamodel state
@@ -54,52 +58,43 @@ const AddProduct = () => {
   const [selectedMedia, setSelectedMedia] = useState([]);
 
   useEffect(() => {
-    if (getCategories && getCategories.success) {
-      const data = getCategories.data;
+    if (getProduct && getProduct.success) {
+      const data = getProduct.data;
       const options = data.map((item) => {
         return {
           value: item._id,
           label: item.name,
         };
       });
-      setCategoryOption(options);
+      setProductOption(options);
     }
-  }, [getCategories]);
+  }, [getProduct]);
 
   // TODO:##### Form valid
   // TODO:##### Form valid
   const formSchema = zSchema.pick({
-    name: true,
-    slug: true,
-    category: true,
+    color: true,
+    sku: true,
+    size: true,
+    product: true,
     mrp: true,
     sellingPrice: true,
     discountPercentage: true,
-    // media: true,
-    description: true,
   });
   // TODO: ########## Form Define
   // TODO: ########## Form Define
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      slug: "",
-      description: "",
+      color: "",
+      sku: "",
+      size: "",
+      product: "",
       mrp: "",
-      category: "",
       sellingPrice: "",
       discountPercentage: "",
-      // media: [],
     },
   });
-
-  useEffect(() => {
-    const name = form.getValues("name");
-    if (name) {
-      form.setValue("slug", slugify(name).toLowerCase());
-    }
-  }, [form.watch("name")]);
 
   // discount percentage calculate
   useEffect(() => {
@@ -132,7 +127,10 @@ const AddProduct = () => {
       const mediaIds = selectedMedia.map((media) => media._id);
       value.media = mediaIds;
 
-      const { data: response } = await axios.post("/api/product/create", value);
+      const { data: response } = await axios.post(
+        "/api/product-variant/create",
+        value
+      );
 
       if (!response.success) {
         throw new Error(response.message);
@@ -164,7 +162,7 @@ const AddProduct = () => {
           style={{ borderBottom: "1px solid #e5e7eb" }}
           suppressHydrationWarning={true}
         >
-          <h4 className="text-xl font-semibold">Add Product</h4>
+          <h4 className="text-xl font-semibold">Add Product Variant</h4>
         </CardHeader>
         <CardContent className={"py-5"} suppressHydrationWarning={true}>
           <Form {...form}>
@@ -173,57 +171,84 @@ const AddProduct = () => {
                 <div className="mb-5">
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="product"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Name <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter Product Name"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Slug<span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter Slug"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Category<span className="text-red-500">*</span>
+                          Product<span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Select
-                            options={categoryOption}
+                            options={productOption}
+                            selected={field.value}
+                            setSelected={field.onChange}
+                            isMulti={false}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="sku"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          SKU <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter SKU"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Color <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter Color"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Size<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            options={sizes.map((size) => ({
+                              value: size,
+                              label: size,
+                            }))}
                             selected={field.value}
                             setSelected={field.onChange}
                             isMulti={false}
@@ -251,6 +276,7 @@ const AddProduct = () => {
                     )}
                   />
                 </div>
+
                 <div className="mb-5">
                   <FormField
                     control={form.control}
@@ -289,18 +315,6 @@ const AddProduct = () => {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-                </div>
-                <div className="mb-5 md:col-span-2">
-                  <FormLabel className={"mb-2"}>
-                    Description <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <Editor
-                    key={editorKey}
-                    initialData={form.getValues("description")}
-                    onChange={(event, editor) => {
-                      form.setValue("description", editor.getData());
-                    }}
                   />
                 </div>
               </div>
@@ -379,7 +393,7 @@ const AddProduct = () => {
                 <ButtonLoading
                   loading={loading}
                   type={"submit"}
-                  text={"Add Product"}
+                  text={"Add Variant"}
                   className={"cursor-pointer duration-300"}
                 ></ButtonLoading>
               </div>
@@ -391,4 +405,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default AddProductVariant;

@@ -112,7 +112,7 @@ const AddCategory = () => {
                 />
               </div>
             
-              <div>
+              <div className="mt-5">
                 <ButtonLoading loading={loading} type={"submit"} text={'Add Category'} className={'cursor-pointer duration-300'}></ButtonLoading>
               </div>
             </form>
