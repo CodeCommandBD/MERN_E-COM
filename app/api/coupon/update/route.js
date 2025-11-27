@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
-import CouponModel from "@/Models/Coupon.model";
+import couponModel from "@/Models/Coupon.model";
 
 export async function PUT(request) {
   try {
@@ -27,7 +27,7 @@ export async function PUT(request) {
     }
     const validateData = validate.data;
 
-    const getCoupon = await CouponModel.findOne({
+    const getCoupon = await couponModel.findOne({
       deletedAt: null,
       _id: validateData._id,
     });

@@ -21,10 +21,7 @@ const breadcrumbData = [
     href: ADMIN_PRODUCT_SHOW,
     label: "Product"
   },
-  {
-    href: '',
-    label: "Product List"
-  },
+
 
 ]
 
@@ -47,7 +44,7 @@ const ShowProduct = () => {
       <Card className='py-0 rounded shadow-sm border' suppressHydrationWarning={true}>
         <CardHeader className='pt-3 px-3 pb-1' style={{ borderBottom: '1px solid #e5e7eb' }} suppressHydrationWarning={true}>
           <div className='flex items-center justify-between'>
-            <h4 className='text-xl font-semibold'>Product List</h4>
+            <h4 className='text-xl font-semibold'>All Product</h4>
             <Button className='flex items-center gap-2'>
               <FiPlus></FiPlus>
               <Link href={ADMIN_PRODUCT_ADD}>New Product</Link>
