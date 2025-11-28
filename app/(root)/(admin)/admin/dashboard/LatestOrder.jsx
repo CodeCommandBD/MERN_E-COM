@@ -57,31 +57,26 @@ const invoices = [
 const LatestOrder = () => {
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
+          <TableHead>Order ID</TableHead>
+          <TableHead>Payment Id</TableHead>
+          <TableHead>Total Item</TableHead>
+          <TableHead>status</TableHead>
+          <TableHead>Amount</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.invoice}>
-            <TableCell className="font-medium">{invoice.invoice}</TableCell>
-            <TableCell>{invoice.paymentStatus}</TableCell>
-            <TableCell>{invoice.paymentMethod}</TableCell>
-            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-          </TableRow>
-        ))}
+       {Array.from({length: 10}).map((_, index) => (
+         <TableRow key={index}>
+           <TableCell>Order {index + 1}</TableCell>
+           <TableCell>Payment {index + 1}</TableCell>
+           <TableCell>Total Item {index + 1}</TableCell>
+           <TableCell>status {index + 1}</TableCell>
+           <TableCell>Amount {index + 1}</TableCell>
+         </TableRow>
+       ))}
       </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter>
     </Table>
   )
 }
