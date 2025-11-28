@@ -166,7 +166,7 @@ const AddProductVariant = () => {
         <CardContent className={"py-5"} suppressHydrationWarning={true}>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="grid md:grid-cols-2 gap-5 ">
+              <div className="grid md:grid-cols-2 grid-cols-1 gap-5 ">
                 <div className="mb-5">
                   <FormField
                     control={form.control}

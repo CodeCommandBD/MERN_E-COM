@@ -1,7 +1,7 @@
 import AppSidebar from '@/components/Application/Admin/AppSidebar'
 import ThemeProvider from '@/components/Application/Admin/ThemeProvider'
 import TopBar from '@/components/Application/Admin/Topbar'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import React from 'react'
 
 const layout = ({ children }) => {
@@ -15,8 +15,8 @@ const layout = ({ children }) => {
       >
         <SidebarProvider>
           <AppSidebar />
-          <main className=' md:w-[calc(100vw-16rem)]'>
-            <div className='px-8 pt-18 min-h-[calc(100vh-40px)] pb-10'>
+          <main className=' md:w-[calc(100vw-16rem)] w-full'>
+            <div className='px-4 md:px-8 pt-18 min-h-[calc(100vh-40px)] pb-10'>
               {/* <SidebarTrigger></SidebarTrigger> */}
               <TopBar></TopBar>
               {children}

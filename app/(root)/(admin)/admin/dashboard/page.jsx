@@ -6,7 +6,7 @@ import OrderDetails from "./OrderDetails";
 
 const AdminDashBoard = () => {
   return (
-    <div className="p-2">
+    <div className="p-2 ">
       <CountOverView />
       <QuickAdd />
       <OrderDetails />

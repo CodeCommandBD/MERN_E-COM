@@ -133,3 +133,19 @@
     -moz-appearance: none;
   }
 }
+
+/* .css-1c75kno-MuiButtonBase-root-MuiIconButton-root{
+  padding-left: 4px !important;
+  padding-right: 0px !important;
+  padding-top: 8px !important;
+  
+}
+
+@media only screen and (min-width: 768px) {
+  .css-1c75kno-MuiButtonBase-root-MuiIconButton-root{
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-top: 8px !important;
+  }
+} */
+
