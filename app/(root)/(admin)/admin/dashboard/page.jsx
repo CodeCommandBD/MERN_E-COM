@@ -10,6 +10,7 @@ const AdminDashBoard = () => {
       <CountOverView />
       <QuickAdd />
       <OrderDetails />
+      
     </div>
   );
 };
