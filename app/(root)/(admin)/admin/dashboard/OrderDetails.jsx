@@ -20,7 +20,7 @@ const OrderDetails = () => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent >
             <OrderOverView />
           </CardContent>
         </Card>
@@ -33,7 +33,7 @@ const OrderDetails = () => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent >
             <OrderStatus />
           </CardContent>
         </Card>
@@ -48,7 +48,7 @@ const OrderDetails = () => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className={'overflow-y-auto'}>
+          <CardContent className={'p-2 overflow-y-auto'}>
             <LatestOrder />
           </CardContent>
         </Card>
@@ -57,11 +57,11 @@ const OrderDetails = () => {
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Latest Review</span>
               <Button type="button" className="text-sm">
-                <Link href="/admin/orders/summary">View All</Link>
+                <Link href="">View All</Link>
               </Button>
             </div>
           </CardHeader>
-          <CardContent className={'overflow-y-auto'}>
+          <CardContent className={'p-2 overflow-y-auto'}>
             <LatestReview />  
           </CardContent>
         </Card>

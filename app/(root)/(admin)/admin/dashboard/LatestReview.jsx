@@ -31,7 +31,7 @@ const LatestReview = () => {
                   />
                   <AvatarFallback>PR</AvatarFallback>
                 </Avatar>
-                <span>Lorem ipsum dolor sit amet.</span>
+                <span className="line-clamp-1">Lorem ipsum dolor sit amet.</span>
               </div>
             </TableCell>
             <TableCell>
