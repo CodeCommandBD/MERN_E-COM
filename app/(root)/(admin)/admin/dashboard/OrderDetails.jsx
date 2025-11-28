@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { OrderOverView } from "./OrderOverView";
 import { OrderStatus } from "./OrderStatus";
 import LatestOrder from "./LatestOrder";
+import LatestReview from "./LatestReview";
 
 const OrderDetails = () => {
   return (
@@ -38,7 +39,7 @@ const OrderDetails = () => {
         </Card>
       </div>
       <div className="mt-10 flex lg:flex-nowrap flex-wrap gap-10">
-        <Card className="rounded-lg lg:w-[70%] w-full">
+        <Card className="rounded-lg lg:w-[70%] w-full h-[400px]">
           <CardHeader className="flex justify-between px-4  border-b ">
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Latest Order</span>
@@ -47,11 +48,11 @@ const OrderDetails = () => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className={'overflow-y-auto'}>
             <LatestOrder />
           </CardContent>
         </Card>
-        <Card className="rounded-lg lg:w-[30%] w-full">
+        <Card className="rounded-lg lg:w-[30%] w-full h-[400px] ">
           <CardHeader className="flex justify-between px-4 border-b">
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Latest Review</span>
@@ -60,7 +61,9 @@ const OrderDetails = () => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent></CardContent>
+          <CardContent className={'overflow-y-auto'}>
+            <LatestReview />  
+          </CardContent>
         </Card>
       </div>
     </div>
