@@ -23,7 +23,7 @@ const breadcrumbData = [
   },
   {
     href: '',
-    label: "Add Category"
+    label: "All Category"
   },
 
 ]
@@ -47,7 +47,7 @@ const ShowCategory = () => {
       <Card className='py-0 rounded shadow-sm border' suppressHydrationWarning={true}>
         <CardHeader className='pt-3 px-3 pb-1' style={{ borderBottom: '1px solid #e5e7eb' }} suppressHydrationWarning={true}>
           <div className='flex items-center justify-between'>
-            <h4 className='text-xl font-semibold'>Show Category</h4>
+            <h4 className='text-xl font-semibold'>All Category</h4>
             <Button >
               <FiPlus></FiPlus>
               <Link href={ADMIN_CATEGORY_ADD}>New Category</Link>

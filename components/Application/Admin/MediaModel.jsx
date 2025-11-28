@@ -67,7 +67,7 @@ const MediaModel = ({
       {children}
       <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
         <DialogContent className="p-0">
-          <div className="h-[90vh] bg-white p-3">
+          <div className="h-[90vh] bg-white dark:bg-gray-800 p-3">
             <div className="mb-3 pb-3 border-b">
               <DialogTitle className="p-0 text-lg font-semibold">
                 Media Selection

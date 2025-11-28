@@ -284,8 +284,13 @@ const DataTable = ({
             <ButtonLoading
               type="button"
               text={
-                <div className="semi-bold cursor-pointer">
-                  Export <FileDownloadIcon />
+                <div>
+                  <div className="semi-bold cursor-pointer hidden md:block">
+                    Export <FileDownloadIcon />
+                  </div>
+                  <div className="semi-bold cursor-pointer md:hidden">
+                    <FileDownloadIcon />
+                  </div>
                 </div>
               }
               loading={exportLoading}
@@ -293,11 +298,6 @@ const DataTable = ({
             ></ButtonLoading>
           </Tooltip>
         )}
-        <Tooltip arrow title="Refresh Data">
-          <IconButton onClick={() => refetch()} sx={{ ml: 1 }}>
-            <RefreshIcon />
-          </IconButton>
-        </Tooltip>
       </div>
     ),
   });
