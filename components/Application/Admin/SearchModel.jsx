@@ -66,6 +66,13 @@ const SearchModel = ({ open, setOpen }) => {
                     </li>
                 ))
             }
+            {
+                result.length === 0 && (
+                    <li className="py-2 px-3">
+                        <p className="text-sm text-muted-foreground">No results found</p>
+                    </li>
+                )
+            }
           </ul>
 
         </DialogContent>
