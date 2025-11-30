@@ -17,7 +17,7 @@ import { TiSocialFacebook } from "react-icons/ti";
 const Footer = () => {
   return (
     <div>
-      <footer className="bg-gray-50 border-t border-gray-200">
+      <footer className="bg-gray-50 border-t border-gray-200 mt-5">
         <div className="text-gray-600 py-4 px-4 lg:py-12 lg:px-32 ">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
             <div className="lg:col-span-1 md:col-span-2 col-span-1">
