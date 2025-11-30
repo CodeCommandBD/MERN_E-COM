@@ -128,7 +128,14 @@ const Header = () => {
       >
         {/* Mobile Menu Header */}
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Menu</h2>
+          <Image
+            className="lg:w-32 w-24"
+            src={logo_black}
+            alt="logo"
+            width={300}
+            height={150}
+            priority
+          />
           <button
             onClick={closeMobileMenu}
             className="p-2 hover:text-primary transition-colors"
