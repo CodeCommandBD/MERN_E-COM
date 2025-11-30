@@ -12,7 +12,8 @@ import sliderFour from './assets/images/slider-4.png'
 import bannerOne from './assets/images/banner1.png'
 import bannerTwo from './assets/images/banner2.png'
 import advertisingBanner from './assets/images/advertising-banner.png'
+import pageTitle from './assets/images/page-title.png'
 
 
 
-export {logo_white, logo_black, verified_gif, verification_fail, loader, imagePlaceholder, userIcon, sliderOne, sliderTwo, sliderThree, sliderFour, bannerOne, bannerTwo, advertisingBanner}
+export {logo_white, logo_black, verified_gif, verification_fail, loader, imagePlaceholder, userIcon, sliderOne, sliderTwo, sliderThree, sliderFour, bannerOne, bannerTwo, advertisingBanner, pageTitle}
