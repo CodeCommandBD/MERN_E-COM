@@ -28,7 +28,7 @@ const ProductBox = ({ product }) => {
               currencyDisplay: "narrowSymbol",
             })}
           </span>
-          <span className="text-primary font-semibold mt-2">
+          <span className="text-primary font-semibold ">
             {product?.sellingPrice.toLocaleString("BD", {
               currency: "BDT",
               style: "currency",
