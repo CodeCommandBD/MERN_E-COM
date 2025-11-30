@@ -4,6 +4,7 @@ import {
   USER_DASHBOARD,
   WEBSITE_HOME,
   WEBSITE_LOGIN,
+  WEBSITE_SHOP,
 } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
 import Link from "next/link";
@@ -57,7 +58,7 @@ const Header = () => {
               </Link>
             </li>
             <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-              <Link href={WEBSITE_HOME} className="py-2 px-4">
+              <Link href={WEBSITE_SHOP} className="py-2 px-4">
                 Shop
               </Link>
             </li>
@@ -170,7 +171,7 @@ const Header = () => {
               </li>
               <li className="border-b">
                 <Link
-                  href={WEBSITE_HOME}
+                  href={WEBSITE_SHOP}
                   className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                   onClick={closeMobileMenu}
                 >
