@@ -123,6 +123,7 @@ const Filter = () => {
                         currency: "BDT",
                         style: "currency",
                         currencyDisplay: "narrowSymbol",
+
                       })}
                     </span>
                   </div>
@@ -132,7 +133,6 @@ const Filter = () => {
             </div>
             <div className="mt-4">
               <ButtonLoading type="button" text={'Filter Price'} className="bg-primary text-primary-foreground px-4 py-2 rounded-md">
-                Apply
               </ButtonLoading>
             </div>
           </AccordionContent>
