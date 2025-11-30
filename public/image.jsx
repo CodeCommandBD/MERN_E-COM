@@ -11,7 +11,8 @@ import sliderThree from './assets/images/slider-3.png'
 import sliderFour from './assets/images/slider-4.png'
 import bannerOne from './assets/images/banner1.png'
 import bannerTwo from './assets/images/banner2.png'
+import advertisingBanner from './assets/images/advertising-banner.png'
 
 
 
-export {logo_white, logo_black, verified_gif, verification_fail, loader, imagePlaceholder, userIcon, sliderOne, sliderTwo, sliderThree, sliderFour, bannerOne, bannerTwo}
+export {logo_white, logo_black, verified_gif, verification_fail, loader, imagePlaceholder, userIcon, sliderOne, sliderTwo, sliderThree, sliderFour, bannerOne, bannerTwo, advertisingBanner}
