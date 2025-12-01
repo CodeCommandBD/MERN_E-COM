@@ -7,6 +7,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { sorts } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { IoFilter } from "react-icons/io5";
 
 
 
@@ -20,6 +22,10 @@ const Sorting = ({
 }) => {
   return (
     <div className="flex justify-between items-center flex-wrap bg-gray-50 p-4 gap-2">
+    <Button className={'lg:hidden'} type="button" onClick={() => setMobileFilterOpen(!mobileFilterOpen)}>
+        <IoFilter className=""></IoFilter>
+        Filter
+    </Button>
       <ul className="flex gap-4">
         <li className="font-semibold">Show</li>
         {[9, 18, 27, 36, 45].map((item) => (
