@@ -1,6 +1,6 @@
 "use client";
 import useFetch from "@/hooks/useFetch";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -10,9 +10,17 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { ButtonLoading } from "../ButtonLoading";
+import { useSearchParams, useRouter } from "next/navigation";
+import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const Filter = () => {
-  const [priceRange, setPriceRange] = React.useState({ min: 0, max: 10000 });
+  const searchParams = useSearchParams();
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
   const { data: categoryData } = useFetch("/api/category/get-category");
   const { data: colorsData } = useFetch("/api/product-variant/colors");
   const { data: sizesData } = useFetch("/api/product-variant/sizes");
@@ -21,8 +29,90 @@ const Filter = () => {
     setPriceRange({ min: value[0], max: value[1] });
   };
 
+  const urlSearchParams = new URLSearchParams(searchParams.toString());
+  const router = useRouter();
+
+  const handleCategoryChange = (categorySlug) => {
+    let newSelectedCategory = [...selectedCategory];
+    if (newSelectedCategory.includes(categorySlug)) {
+      newSelectedCategory = newSelectedCategory.filter(
+        (category) => category !== categorySlug
+      );
+    } else {
+      newSelectedCategory.push(categorySlug);
+    }
+    setSelectedCategory(newSelectedCategory);
+
+    newSelectedCategory.length > 0
+      ? urlSearchParams.set("category", newSelectedCategory.join(","))
+      : urlSearchParams.delete("category");
+
+    router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
+  };
+  const handleColorsChange = (color) => {
+    let newSelectedColors = [...selectedColors];
+    if (newSelectedColors.includes(color)) {
+      newSelectedColors = newSelectedColors.filter((c) => c !== color);
+    } else {
+      newSelectedColors.push(color);
+    }
+    setSelectedColors(newSelectedColors);
+
+    newSelectedColors.length > 0
+      ? urlSearchParams.set("color", newSelectedColors.join(","))
+      : urlSearchParams.delete("color");
+
+    router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
+  };
+
+  const handleSizesChange = (size) => {
+    let newSelectedSizes = [...selectedSizes];
+    if (newSelectedSizes.includes(size)) {
+      newSelectedSizes = newSelectedSizes.filter((s) => s !== size);
+    } else {
+      newSelectedSizes.push(size);
+    }
+    setSelectedSizes(newSelectedSizes);
+
+    newSelectedSizes.length > 0
+      ? urlSearchParams.set("size", newSelectedSizes.join(","))
+      : urlSearchParams.delete("size");
+
+    router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
+  };
+
+  useEffect(() => {
+    searchParams.get("category")
+      ? setSelectedCategory(searchParams.get("category").split(","))
+      : setSelectedCategory([]);
+    searchParams.get("color")
+      ? setSelectedColors(searchParams.get("color").split(","))
+      : setSelectedColors([]);
+    searchParams.get("size")
+      ? setSelectedSizes(searchParams.get("size").split(","))
+      : setSelectedSizes([]);
+    searchParams.get("price")
+      ? setPriceRange(JSON.parse(searchParams.get("price")))
+      : setPriceRange({ min: 0, max: 10000 });
+  }, [searchParams]);
+
+  const handlePriceChange = () => {
+    urlSearchParams.set("price", JSON.stringify(priceRange));
+    router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
+  };
+
   return (
     <div>
+      {searchParams.size > 0 && 
+        <Button
+          type="button"
+          asChild
+          className="w-full bg-red-500 hover:bg-red-600 text-white"
+          variant={'destructive'}
+        >
+        <Link href={WEBSITE_SHOP} className="text-white">Clear Filter</Link>
+        </Button>
+      }
       <Accordion type="multiple" defaultValue={["1", "2", "3", "4"]}>
         <AccordionItem value="1">
           <AccordionTrigger className="uppercase font-semibold hover:no-underline">
@@ -39,7 +129,13 @@ const Filter = () => {
                         htmlFor={category._id}
                         className="flex items-center gap-2 cursor-pointer"
                       >
-                        <Checkbox id={category._id} />
+                        <Checkbox
+                          id={category._id}
+                          onCheckedChange={() =>
+                            handleCategoryChange(category.slug)
+                          }
+                          checked={selectedCategory.includes(category.slug)}
+                        />
                         {category.name}
                       </label>
                     </li>
@@ -63,7 +159,11 @@ const Filter = () => {
                         htmlFor={color}
                         className="flex items-center gap-2 cursor-pointer"
                       >
-                        <Checkbox id={color} />
+                        <Checkbox
+                          id={color}
+                          onCheckedChange={() => handleColorsChange(color)}
+                          checked={selectedColors.includes(color)}
+                        />
                         {color}
                       </label>
                     </li>
@@ -87,7 +187,11 @@ const Filter = () => {
                         htmlFor={size}
                         className="flex items-center gap-2 cursor-pointer"
                       >
-                        <Checkbox id={size} />
+                        <Checkbox
+                          id={size}
+                          onCheckedChange={() => handleSizesChange(size)}
+                          checked={selectedSizes.includes(size)}
+                        />
                         {size}
                       </label>
                     </li>
@@ -112,28 +216,30 @@ const Filter = () => {
                   />
                   <div className="flex justify-between items-center pt-2">
                     <span>
-                      {priceRange.min.toLocaleString("BD", {
+                      {priceRange?.min?.toLocaleString("BD", {
                         currency: "BDT",
                         style: "currency",
                         currencyDisplay: "narrowSymbol",
                       })}
                     </span>
                     <span>
-                      {priceRange.max.toLocaleString("BD", {
+                      {priceRange?.max?.toLocaleString("BD", {
                         currency: "BDT",
                         style: "currency",
                         currencyDisplay: "narrowSymbol",
-
                       })}
                     </span>
                   </div>
-
                 </li>
               </ul>
             </div>
             <div className="mt-4">
-              <ButtonLoading type="button" text={'Filter Price'} className="bg-primary text-primary-foreground px-4 py-2 rounded-md">
-              </ButtonLoading>
+              <ButtonLoading
+                type="button"
+                text={"Filter Price"}
+                onClick={handlePriceChange}
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
+              ></ButtonLoading>
             </div>
           </AccordionContent>
         </AccordionItem>
