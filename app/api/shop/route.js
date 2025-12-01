@@ -51,7 +51,7 @@ export async function GET(request) {
     }
 
     // match stage
-    let matchStage = {};
+    let matchStage = { deletedAt: null };
     if (categoryId) {
       matchStage.category = categoryId;
     }
@@ -60,6 +60,10 @@ export async function GET(request) {
     }
 
     // aggregation pipeline
+    // console.log("Match Stage:", JSON.stringify(matchStage, null, 2));
+    // console.log("Sort Query:", JSON.stringify(sortQuery, null, 2));
+    // console.log("Skip:", skip, "Limit:", limit);
+
     const products = await ProductModel.aggregate([
       {
         $match: matchStage,
@@ -105,11 +109,12 @@ export async function GET(request) {
           },
         },
       },
-      {
-        $match: {
-          "variants.0": { $exists: true },
-        },
-      },
+      // Temporarily commented out to allow products without variants
+      // {
+      //   $match: {
+      //     "variants.0": { $exists: true }
+      //   }
+      // },
       {
         $lookup: {
           from: "medias",
@@ -142,13 +147,17 @@ export async function GET(request) {
       },
     ]);
 
+
     // check if more data exists
     let nextpage = null;
     if (products.length > limit) {
       nextpage = page + 1;
       products.pop();
     }
-    return res(true, 200, "Products fetched successfully", products, nextpage);
+    return res(true, 200, "Products fetched successfully", {
+      products,
+      nextpage,
+    });
   } catch (error) {
     return catchError(error);
   }
