@@ -2,6 +2,7 @@ import { imagePlaceholder } from "@/public/image";
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
+import { WEBSITE_PRODUCT_DETAILS } from "@/Routes/WebsiteRoute";
 const ProductBox = ({ product }) => {
   // Get first media item from array
   const mediaItem = product?.media?.[0];
@@ -9,7 +10,7 @@ const ProductBox = ({ product }) => {
 
   return (
     <div className="h-full flex flex-col rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer">
-    <Link href={`/product/${product?._id}`}>
+    <Link href={WEBSITE_PRODUCT_DETAILS(product?.slug)}>
       <Image
         src={imageSrc}
         alt={mediaItem?.alt || product?.name}
