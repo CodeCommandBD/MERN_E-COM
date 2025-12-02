@@ -90,15 +90,17 @@ const Search = ({ isShow, setIsSearchOpen }) => {
   return (
     <div
       ref={searchRef}
-      className={`absolute border-t transition-all duration-300 left-0 py-6 md:py-8 px-4 md:px-32 z-50 bg-white/95 backdrop-blur-md w-full shadow-2xl ${
-        isShow ? "top-18 opacity-100" : "-top-full opacity-0"
+      className={`fixed md:absolute border-t transition-all duration-300 left-0 top-0 md:top-auto py-4 md:py-8 px-4 md:px-32 z-50 bg-white/98 backdrop-blur-md w-full shadow-2xl ${
+        isShow
+          ? "translate-y-[72px] md:translate-y-0 md:top-18 opacity-100"
+          : "-translate-y-full md:-top-full opacity-0"
       }`}
     >
       <div className="max-w-4xl mx-auto relative">
         <div className="flex justify-between items-center relative">
           <Input
-            className="w-full rounded-full md:h-14 h-12 ps-6 pe-14 border-2 border-primary/20 focus:border-primary shadow-lg text-base md:text-lg transition-all duration-200 focus:shadow-xl"
-            placeholder="Search for products, categories, brands..."
+            className="w-full rounded-full md:h-14 h-11 ps-5 md:ps-6 pe-12 md:pe-14 border-2 border-primary/20 focus:border-primary shadow-lg text-sm md:text-lg transition-all duration-200 focus:shadow-xl"
+            placeholder="Search products..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -107,9 +109,9 @@ const Search = ({ isShow, setIsSearchOpen }) => {
           <button
             type="button"
             onClick={handleSearch}
-            className="absolute right-3 cursor-pointer bg-primary hover:bg-primary/90 text-white rounded-full p-2.5 md:p-3 transition-all duration-200 hover:scale-105 active:scale-95"
+            className="absolute right-2 md:right-3 cursor-pointer bg-primary hover:bg-primary/90 text-white rounded-full p-2 md:p-3 transition-all duration-200 hover:scale-105 active:scale-95"
           >
-            <IoSearchOutline size={20} />
+            <IoSearchOutline size={18} className="md:w-5 md:h-5" />
           </button>
         </div>
 
@@ -144,10 +146,10 @@ const Search = ({ isShow, setIsSearchOpen }) => {
                         <Link
                           href={`/product/${product.slug}`}
                           onClick={handleSuggestionClick}
-                          className="flex items-center gap-4 p-4 hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent transition-all duration-200 group"
+                          className="flex items-center gap-3 md:gap-4 p-3 md:p-4 hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent transition-all duration-200 group"
                         >
                           {product.media && product.media[0] && (
-                            <div className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 ring-2 ring-gray-100 group-hover:ring-primary/20 transition-all duration-200">
+                            <div className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-xl overflow-hidden bg-gray-100 ring-2 ring-gray-100 group-hover:ring-primary/20 transition-all duration-200">
                               <Image
                                 src={product.media[0].secure_url}
                                 alt={product.media[0].alt || product.name}
@@ -157,11 +159,11 @@ const Search = ({ isShow, setIsSearchOpen }) => {
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-gray-800 truncate group-hover:text-primary transition-colors duration-200">
+                            <h4 className="font-semibold text-sm md:text-base text-gray-800 truncate group-hover:text-primary transition-colors duration-200">
                               {product.name}
                             </h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <p className="text-primary font-bold text-lg">
+                            <div className="flex items-center gap-1.5 md:gap-2 mt-1 flex-wrap">
+                              <p className="text-primary font-bold text-base md:text-lg">
                                 ৳{product.sellingPrice.toLocaleString()}
                               </p>
                               {product.mrp > product.sellingPrice && (
