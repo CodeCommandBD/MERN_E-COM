@@ -91,28 +91,51 @@ const Filter = () => {
     searchParams.get("size")
       ? setSelectedSizes(searchParams.get("size").split(","))
       : setSelectedSizes([]);
-    searchParams.get("price")
-      ? setPriceRange(JSON.parse(searchParams.get("price")))
-      : setPriceRange({ min: 0, max: 10000 });
+
+    // Handle minPrice and maxPrice as separate parameters
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    if (minPrice || maxPrice) {
+      setPriceRange({
+        min: minPrice ? parseInt(minPrice) : 0,
+        max: maxPrice ? parseInt(maxPrice) : 10000,
+      });
+    } else {
+      setPriceRange({ min: 0, max: 10000 });
+    }
   }, [searchParams]);
 
   const handlePriceChange = () => {
-    urlSearchParams.set("price", JSON.stringify(priceRange));
+    // Set minPrice and maxPrice as separate parameters
+    if (priceRange.min > 0) {
+      urlSearchParams.set("minPrice", priceRange.min);
+    } else {
+      urlSearchParams.delete("minPrice");
+    }
+
+    if (priceRange.max < 10000) {
+      urlSearchParams.set("maxPrice", priceRange.max);
+    } else {
+      urlSearchParams.delete("maxPrice");
+    }
+
     router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
   };
 
   return (
     <div>
-      {searchParams.size > 0 && 
+      {searchParams.size > 0 && (
         <Button
           type="button"
           asChild
           className="w-full bg-red-500 hover:bg-red-600 text-white"
-          variant={'destructive'}
+          variant={"destructive"}
         >
-        <Link href={WEBSITE_SHOP} className="text-white">Clear Filter</Link>
+          <Link href={WEBSITE_SHOP} className="text-white">
+            Clear Filter
+          </Link>
         </Button>
-      }
+      )}
       <Accordion type="multiple" defaultValue={["1", "2", "3", "4"]}>
         <AccordionItem value="1">
           <AccordionTrigger className="uppercase font-semibold hover:no-underline">
