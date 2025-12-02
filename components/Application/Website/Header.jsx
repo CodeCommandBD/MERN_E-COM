@@ -16,10 +16,12 @@ import { useSelector } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
+import Search from "./Search";
 
 const Header = () => {
   const auth = useSelector((store) => store.authStore.auth);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -84,7 +86,8 @@ const Header = () => {
         <div className="flex items-center gap-3 lg:gap-8">
           {/* Search Icon - Always visible */}
           <button type="button">
-            <IoIosSearch
+            <IoIosSearch 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
               size={24}
               className="hover:text-primary cursor-pointer transition-colors"
             />
@@ -218,6 +221,7 @@ const Header = () => {
           aria-label="Close menu overlay"
         />
       )}
+      {isSearchOpen && <Search isShow={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />}
     </div>
   );
 };
