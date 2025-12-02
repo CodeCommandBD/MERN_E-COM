@@ -12,9 +12,19 @@ const productVariantSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
+      required: true,
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: true,
     },
 
@@ -34,6 +44,11 @@ const productVariantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
     media: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -51,6 +66,7 @@ const productVariantSchema = new mongoose.Schema(
 );
 
 productVariantSchema.index({ product: 1 });
+productVariantSchema.index({ category: 1 });
 
 const ProductVariantModel =
   mongoose.models.ProductVariant ||

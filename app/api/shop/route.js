@@ -26,9 +26,9 @@ export async function GET(request) {
     } else if (sort === "desc") {
       sortQuery = { name: -1 };
     } else if (sort === "price_asc") {
-      sortQuery = { price: 1 };
+      sortQuery = { sellingPrice: 1 };
     } else if (sort === "price_desc") {
-      sortQuery = { price: -1 };
+      sortQuery = { sellingPrice: -1 };
     }
 
     // Pagination
@@ -37,49 +37,45 @@ export async function GET(request) {
     const skip = page * limit;
 
     // find category by slug
-    let categoryId = null;
+    let categoryId = [];
     if (categorySlug) {
-      const categoryData = await CategoryModel.findOne({
+      const slugs = categorySlug.split(",");
+      const categoryData = await CategoryModel.find({
         deletedAt: null,
-        slug: categorySlug,
+        slug: { $in: slugs },
       })
         .select("_id")
         .lean();
-      if (categoryData) {
-        categoryId = categoryData._id;
-      }
+      categoryId = categoryData.map((category) => category._id);
     }
 
     // match stage
     let matchStage = { deletedAt: null };
-    if (categoryId) {
-      matchStage.category = categoryId;
+    if (categoryId.length > 0) {
+      matchStage.category = { $in: categoryId };
     }
     if (search) {
       matchStage.name = { $regex: search, $options: "i" };
     }
 
-    // aggregation pipeline
-    // console.log("Match Stage:", JSON.stringify(matchStage, null, 2));
-    // console.log("Sort Query:", JSON.stringify(sortQuery, null, 2));
-    // console.log("Skip:", skip, "Limit:", limit);
+    // Add price filter to matchStage for better performance
+    if (minPrice > 0 || maxPrice > 0) {
+      matchStage.sellingPrice = {};
+      if (minPrice > 0) matchStage.sellingPrice.$gte = minPrice;
+      if (maxPrice > 0) matchStage.sellingPrice.$lte = maxPrice;
+    }
 
-    const products = await ProductModel.aggregate([
+    // aggregation pipeline
+    const hasColorOrSizeFilter = size || color;
+    const hasPriceFilter = minPrice > 0 || maxPrice > 0;
+
+    const pipeline = [
       {
         $match: matchStage,
       },
       {
-        $sort: sortQuery,
-      },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: limit + 1,
-      },
-      {
         $lookup: {
-          from: "productvariants",
+          from: "productVariants",
           localField: "_id",
           foreignField: "product",
           as: "variants",
@@ -93,9 +89,11 @@ export async function GET(request) {
               as: "variant",
               cond: {
                 $and: [
-                  size ? { $eq: ["$$variant.size", size] } : { $literal: true },
+                  size
+                    ? { $in: ["$$variant.size", size.split(",")] }
+                    : { $literal: true },
                   color
-                    ? { $eq: ["$$variant.color", color] }
+                    ? { $in: ["$$variant.color", color.split(",")] }
                     : { $literal: true },
                   minPrice > 0
                     ? { $gte: ["$$variant.sellingPrice", minPrice] }
@@ -109,18 +107,80 @@ export async function GET(request) {
           },
         },
       },
-      // Temporarily commented out to allow products without variants
-      // {
-      //   $match: {
-      //     "variants.0": { $exists: true }
-      //   }
-      // },
+    ];
+
+    // Only require matching variants if color/size filters are selected
+    // Note: We are NOT enforcing variant price match to exclude the product if the main product matched.
+    // But if you want to strictly show products where variants match the filter, uncomment the price check below.
+    if (hasColorOrSizeFilter) {
+      pipeline.push({
+        $match: {
+          "variants.0": { $exists: true },
+        },
+      });
+    }
+
+    pipeline.push(
+      {
+        $sort: sortQuery,
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit + 1,
+      },
       {
         $lookup: {
           from: "medias",
           localField: "media",
           foreignField: "_id",
           as: "media",
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+      {
+        $addFields: {
+          variants: {
+            $map: {
+              input: "$variants",
+              as: "variant",
+              in: {
+                $mergeObjects: [
+                  "$$variant",
+                  {
+                    categoryName: {
+                      $arrayElemAt: [
+                        {
+                          $map: {
+                            input: {
+                              $filter: {
+                                input: "$categoryInfo",
+                                as: "cat",
+                                cond: {
+                                  $eq: ["$$cat._id", "$$variant.category"],
+                                },
+                              },
+                            },
+                            as: "matchedCat",
+                            in: "$$matchedCat.name",
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
       },
       {
@@ -142,11 +202,13 @@ export async function GET(request) {
             sellingPrice: 1,
             discountPercentage: 1,
             mrp: 1,
+            categoryName: 1,
           },
         },
-      },
-    ]);
+      }
+    );
 
+    const products = await ProductModel.aggregate(pipeline);
 
     // check if more data exists
     let nextpage = null;

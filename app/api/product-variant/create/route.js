@@ -32,11 +32,15 @@ export async function POST(request) {
     }
     const variantData = validate.data;
 
-    const existingProductVariant = await ProductVariantModel.findOne({
+    // Import ProductModel to fetch the product
+    const ProductModel = (await import("@/Models/Product.model")).default;
+
+    const existingProduct = await ProductModel.findOne({
       _id: variantData.product,
+      deletedAt: null,
     });
-    if (!existingProductVariant) {
-      return res(false, 200, "Product variant not found.");
+    if (!existingProduct) {
+      return res(false, 404, "Product not found.");
     }
 
     const newProductVariant = new ProductVariantModel({
@@ -44,6 +48,7 @@ export async function POST(request) {
       sku: variantData.sku,
       size: variantData.size,
       product: variantData.product,
+      category: existingProduct.category,
       mrp: variantData.mrp,
       sellingPrice: variantData.sellingPrice,
       discountPercentage: variantData.discountPercentage,

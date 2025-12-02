@@ -13,17 +13,21 @@ export async function PUT(request) {
     await connectDB();
     const payload = await request.json();
 
-    const schema = zSchema.pick({
-      _id: true,
-      color: true,
-      sku: true,
-      size: true,
-      product: true,
-      mrp: true,
-      sellingPrice: true,
-      discountPercentage: true,
-      media: true,
-    });
+    const schema = zSchema
+      .pick({
+        _id: true,
+        color: true,
+        sku: true,
+        size: true,
+        product: true,
+        mrp: true,
+        sellingPrice: true,
+        discountPercentage: true,
+        media: true,
+        category: true,
+      })
+      .partial({ category: true });
+
     const validate = schema.safeParse(payload);
     if (!validate.success) {
       return res(false, 400, "Invalid or missing fields.", validate.error);
@@ -46,6 +50,12 @@ export async function PUT(request) {
     getProductVariant.sellingPrice = validateData.sellingPrice;
     getProductVariant.discountPercentage = validateData.discountPercentage;
     getProductVariant.media = validateData.media;
+
+    // Update category if provided
+    if (validateData.category) {
+      getProductVariant.category = validateData.category;
+    }
+
     await getProductVariant.save();
     return res(true, 200, "Product variant updated successfully.");
   } catch (error) {

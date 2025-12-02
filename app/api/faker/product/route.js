@@ -66,6 +66,8 @@ export async function POST(req) {
             variants.push({
               _id: new mongoose.Types.ObjectId(),
               product: productId,
+              category: category._id,
+              name: product.name,
               color,
               size,
               mrp: product.mrp,
