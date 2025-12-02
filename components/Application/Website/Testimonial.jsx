@@ -1,11 +1,8 @@
 "use client";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
-import Image from "next/image";
-import { sliderFour, sliderOne, sliderThree, sliderTwo } from "@/public/image";
-import { LuChevronRight } from "react-icons/lu";
-import { LuChevronLeft } from "react-icons/lu";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 import { FaStar } from "react-icons/fa";
 import { BsChatQuote } from "react-icons/bs";
 
@@ -73,58 +70,102 @@ const testimonial = [
 ];
 
 const Testimonial = () => {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    autoplay: true,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          dots: true,
-          infinite: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          dots: false,
-        },
-      },
-    ],
-  };
   return (
-    <div className="">
-      <h2 className="sm:text-4xl text-2xl font-bold text-center mb-10">
-        Customer Reviews
+    <div className="py-8 md:py-12 px-4 md:px-6 lg:px-16 bg-white">
+      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-900">
+        Customer Review
       </h2>
-      <Slider {...settings}>
-        {testimonial.map((item, index) => {
-          return (
-            <div key={index} className="px-5">
-              <div className="p-4 border border-gray-200 rounded-lg shadow-md bg-gray-50">
-                <BsChatQuote size={25} className="text-2xl text-gray-600 mb-2"></BsChatQuote>
-                <p className="text-md text-gray-600">{item.review}</p>
-                <h2 className="font-bold mb-1 mt-3">{item.name}</h2>
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: item.rating }, (_, index) => (
-                    <span key={index} className="text-yellow-400">
-                      <FaStar />
-                    </span>
-                  ))}
+      <div className="testimonial-slider max-w-6xl mx-auto pb-12">
+        <Swiper
+          modules={[Pagination, Autoplay]}
+          spaceBetween={20}
+          slidesPerView={1}
+          pagination={{
+            clickable: true,
+            dynamicBullets: false,
+          }}
+          autoplay={{
+            delay: 4000,
+            disableOnInteraction: false,
+          }}
+          loop={true}
+          speed={500}
+          breakpoints={{
+            768: {
+              slidesPerView: 1,
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 2,
+              spaceBetween: 24,
+            },
+            1280: {
+              slidesPerView: 3,
+              spaceBetween: 30,
+            },
+          }}
+        >
+          {testimonial.map((item, index) => (
+            <SwiperSlide key={index}>
+              <div className="pb-2">
+                <div className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 md:p-7 mx-auto max-w-lg h-full">
+                  {/* Quote Icon */}
+                  <div className="mb-5">
+                    <BsChatQuote size={32} className="text-gray-800" />
+                  </div>
+
+                  {/* Review Text */}
+                  <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-6 min-h-[100px] md:min-h-[120px]">
+                    {item.review}
+                  </p>
+
+                  {/* Author Info */}
+                  <div className="pt-2">
+                    <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2">
+                      {item.name}
+                    </h3>
+
+                    {/* Star Rating */}
+                    <div className="flex items-center gap-0.5">
+                      {Array.from(
+                        { length: Math.floor(item.rating) },
+                        (_, index) => (
+                          <span key={index} className="text-yellow-400">
+                            <FaStar size={16} />
+                          </span>
+                        )
+                      )}
+                      {item.rating % 1 !== 0 && (
+                        <span className="text-yellow-400">
+                          <FaStar size={16} className="opacity-50" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </Slider>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
+      {/* Custom Pagination Styling */}
+      <style jsx global>{`
+        .testimonial-slider .swiper-pagination {
+          bottom: 0;
+        }
+
+        .testimonial-slider .swiper-pagination-bullet {
+          width: 10px;
+          height: 10px;
+          background: #d1d5db;
+          opacity: 1;
+        }
+
+        .testimonial-slider .swiper-pagination-bullet-active {
+          background: #000;
+        }
+      `}</style>
     </div>
   );
 };
