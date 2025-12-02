@@ -8,3 +8,6 @@ export const USER_DASHBOARD = "/my-account";
 
 // shop route
 export const WEBSITE_SHOP = "/shop";
+
+// product route
+export const WEBSITE_PRODUCT_DETAILS = (slug) => slug ? `/product/${slug}` : "/product"
