@@ -33,12 +33,12 @@ const MainSlider = () => {
           dynamicBullets: false,
         }}
         autoplay={{
-          delay: 2000,
+          delay: 3000,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
         loop={true}
-        speed={500}
+        speed={600}
         breakpoints={{
           0: {
             pagination: {
@@ -60,23 +60,24 @@ const MainSlider = () => {
               width={slide.src.width}
               height={slide.src.height}
               priority={index === 0}
+              className="w-full h-auto"
             />
           </SwiperSlide>
         ))}
       </Swiper>
 
-      {/* Custom Navigation Arrows - Hidden on mobile */}
+      {/* Custom Navigation Arrows - Clean border design */}
       <button
         type="button"
-        className="swiper-button-prev-custom w-14 h-14 hidden sm:flex items-center justify-center absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full hover:bg-white/80 transition-all duration-300 ease-in-out cursor-pointer"
+        className="swiper-button-prev-custom w-12 h-12 hidden sm:flex items-center justify-center absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-primary/30 rounded-lg cursor-pointer"
       >
-        <LuChevronLeft size={24} />
+        <LuChevronLeft size={20} className="text-primary" />
       </button>
       <button
         type="button"
-        className="swiper-button-next-custom w-14 h-14 hidden sm:flex items-center justify-center absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full hover:bg-white/80 transition-all duration-300 ease-in-out cursor-pointer"
+        className="swiper-button-next-custom w-12 h-12 hidden sm:flex items-center justify-center absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-primary/30 rounded-lg cursor-pointer"
       >
-        <LuChevronRight size={24} />
+        <LuChevronRight size={20} className="text-primary" />
       </button>
 
       {/* Custom Pagination Styling */}
@@ -86,15 +87,17 @@ const MainSlider = () => {
         }
 
         .main-slider .swiper-pagination-bullet {
-          width: 10px;
-          height: 10px;
+          width: 12px;
+          height: 12px;
           background: #fff;
-          opacity: 0.7;
+          opacity: 0.6;
+          border: 2px solid rgba(255, 255, 255, 0.8);
         }
 
         .main-slider .swiper-pagination-bullet-active {
-          background: #fff;
+          background: hsl(var(--primary));
           opacity: 1;
+          border-color: hsl(var(--primary));
         }
 
         @media (max-width: 600px) {

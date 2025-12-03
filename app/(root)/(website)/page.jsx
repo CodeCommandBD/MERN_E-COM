@@ -10,67 +10,99 @@ import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
 
 const page = () => {
+  const features = [
+    {
+      icon: GiReturnArrow,
+      title: "7-Days Return Policy",
+      description: "If not satisfied, return within 7 days for a full refund.",
+    },
+    {
+      icon: FaShippingFast,
+      title: "Free Shipping",
+      description: "No extra costs, just the price you see.",
+    },
+    {
+      icon: BiSupport,
+      title: "24/7 Support",
+      description: "24/7 support, always here just for you.",
+    },
+    {
+      icon: TbRosetteDiscountFilled,
+      title: "Member Discounts",
+      description: "Get exclusive discounts and rewards for being a member.",
+    },
+  ];
+
   return (
-    <div>
+    <div className="bg-white">
+      {/* Hero Slider */}
       <section>
         <MainSlider />
       </section>
+
+      {/* Banner Section */}
       <section>
         <Banner />
       </section>
+
+      {/* Featured Products */}
       <section>
         <FeaturedProduct />
       </section>
-      <section className="lg:px-32 px-4 py-5 sm:py-10">
-        <Image
-          src={advertisingBanner}
-          alt="advertisingBanner"
-          width={advertisingBanner.width}
-          height={advertisingBanner.height}
-          className="w-full h-[150px] sm:h-[200px] md:h-[250px] lg:h-[300px] object-cover rounded-lg"
-        />
+
+      {/* Advertising Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
+        <div className="border-2 border-primary/20 rounded-lg overflow-hidden">
+          <Image
+            src={advertisingBanner}
+            alt="advertisingBanner"
+            width={advertisingBanner.width}
+            height={advertisingBanner.height}
+            className="w-full h-auto object-cover"
+          />
+        </div>
       </section>
-      <section className="lg:px-32 px-4 py-5 sm:py-10">
+
+      {/* Testimonials */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
         <Testimonial />
       </section>
 
-      <section className="lg:px-32 px-4 py-5 sm:py-10">
-        <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-10">
-          <div className="text-center flex flex-col items-center">
-            <p className="flex justify-center  items-center mb-3">
-              <GiReturnArrow size={30} />
+      {/* Features Section */}
+      <section className="bg-primary/5 py-8 sm:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-8 sm:mb-14">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3">
+              Why Choose Us
+            </h2>
+            <div className="w-20 h-1 bg-primary mx-auto mb-4"></div>
+            <p className="text-foreground/60 text-sm sm:text-base max-w-2xl mx-auto">
+              We're committed to providing you with the best shopping experience
             </p>
-            <span className="text-xl font-semibold">7-Days Return Policy</span>
-            <span className="text-gray-600">
-              If not satisfied, return within 7 days for a full refund.
-            </span>
           </div>
-          <div className="text-center flex flex-col items-center">
-            <p className="flex justify-center  items-center mb-3">
-              <FaShippingFast size={30} />
-            </p>
-            <span className="text-xl font-semibold">Free Shipping</span>
-            <span className="text-gray-600">
-              No extra costs, just the price you see.
-            </span>
-          </div>
-          <div className="text-center flex flex-col items-center">
-            <p className="flex justify-center  items-center mb-3">
-              <BiSupport size={30} />
-            </p>
-            <span className="text-xl font-semibold">24/7 Support</span>
-            <span className="text-gray-600">
-              24/7 support, alway here just for you.
-            </span>
-          </div>
-          <div className="text-center flex flex-col items-center">
-            <p className="flex justify-center  items-center mb-3">
-              <TbRosetteDiscountFilled size={30} />
-            </p>
-            <span className="text-xl font-semibold">Member Discounts</span>
-            <span className="text-gray-600">
-              Get exclusive discounts and rewards for being a member.
-            </span>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className="bg-white border-2 border-primary/20 rounded-lg p-6 text-center"
+                >
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                    <Icon className="text-primary" size={32} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-foreground/60 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

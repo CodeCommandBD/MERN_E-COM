@@ -38,7 +38,7 @@ const ProductReview = ({ product }) => {
   const [isReview, setIsReview] = useState(false);
   const [reviewsCount, setReviewsCount] = useState({});
 
-  const { data: reviewDetails } = useFetch(
+  const { data: reviewDetails, refetch: refetchReviewDetails } = useFetch(
     `/api/review/details?productId=${product._id}`
   );
 
@@ -95,6 +95,7 @@ const ProductReview = ({ product }) => {
       queryClient.invalidateQueries({
         queryKey: ["reviews", product._id],
       });
+      refetchReviewDetails();
       showToast("success", response.message);
     } catch (error) {
       showToast("error", error.message);
