@@ -23,10 +23,22 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Rating } from "@mui/material";
+import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
+import Link from "next/link";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import ReviewList from "./ReviewList";
 
 const ProductReview = ({ product }) => {
-  const auth = useSelector((state) => state.auth);
+  const auth = useSelector((state) => state.authStore.auth);
   const [loading, setLoading] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState("");
+  const [isReview, setIsReview] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(window.location.href);
+    }
+  }, []);
 
   // TODO:##### Form valid
   // TODO:##### Form valid
@@ -50,6 +62,10 @@ const ProductReview = ({ product }) => {
     },
   });
 
+  useEffect(() => {
+    form.setValue("userId", auth?._id);
+  }, [auth]);
+
   const handleReviewSubmit = async (value) => {
     // TODO: Implement category submission
     setLoading(true);
@@ -68,6 +84,33 @@ const ProductReview = ({ product }) => {
       setLoading(false);
     }
   };
+  const fetchReview = async (pageParam) => {
+    const { data: response } = await axios.get(`/api/review/get?productId=${product._id}&page=${pageParam}`);
+
+    if (!response.success) {
+      return
+    }
+    return response.data;
+  };
+
+  const {error, data, isFetching, fetchNextPage, hasNextPage} = useInfiniteQuery({
+    queryKey: ["reviews", product._id],
+    initialPageParam: 0,
+    queryFn: async ({pageParam }) => await fetchReview(pageParam),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.nextPage) {
+        return lastPage.nextPage;
+      }
+      return undefined;
+    },
+  });
+
+
+
+
+
+
+
   return (
     <div className="">
       <div className="mb-10">
@@ -113,91 +156,136 @@ const ProductReview = ({ product }) => {
                 </div>
               </div>
               <div className="w-fit md:text-end text-center">
-                <Button type="button" className="md:w-fit py-6 px-10">
+                <Button
+                  onClick={() => setIsReview(!isReview)}
+                  type="button"
+                  className="md:w-fit py-6 px-10"
+                >
                   Write a Review
                 </Button>
               </div>
             </div>
-            <div>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(handleReviewSubmit)}
-                  className="space-y-8"
-                >
-                  <p className="text-center text-xl font-semibold">
-                    Write a Review
-                  </p>
-                  <div className="mb-5">
-                    <FormField
-                      control={form.control}
-                      name="rating"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Rating
-                              value={field.value}
-                              size="large"
-                              onChange={(e) => field.onChange(e.target.value)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+            {isReview && (
+              <div className="w-full mt-10">
+                <hr className="mb-5"/>
+                <p className="text-start text-xl font-semibold">
+                  Write a Review
+                </p>
+                {!auth ? (
+                  <>
+                    <p
+                      className="text-sm font-semibold
+                  my-5"
+                    >
+                      Please Login to Write a Review
+                    </p>
+                    <Button
+                      type="button"
+                      asChild
+                      className="text-center text-lg font-semibold"
+                    >
+                      <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>
+                        Login
+                      </Link>
+                    </Button>
+                  </>
+                ) : (
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(handleReviewSubmit)}
+                      className="space-y-8"
+                    >
+                      <div className="mb-5">
+                        <FormField
+                          control={form.control}
+                          name="rating"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Rating
+                                  value={field.value}
+                                  size="large"
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value)
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="mb-5">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Title</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="Review Title"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="mb-5">
-                    <FormField
-                      control={form.control}
-                      name="review"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Review</FormLabel>
-                          <FormControl>
-                            <textarea
-                              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                              placeholder="Write your review here..."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                      <div className="mb-5">
+                        <FormField
+                          control={form.control}
+                          name="title"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Title</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="Review Title"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="mb-5">
+                        <FormField
+                          control={form.control}
+                          name="review"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Review</FormLabel>
+                              <FormControl>
+                                <textarea
+                                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                  placeholder="Write your review here..."
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="mt-5">
-                    <ButtonLoading
-                      loading={loading}
-                      type={"submit"}
-                      text={"Submit Review"}
-                      className={"cursor-pointer duration-300"}
-                    ></ButtonLoading>
-                  </div>
-                </form>
-              </Form>
-            </div>
+                      <div className="mt-5">
+                        <ButtonLoading
+                          loading={loading}
+                          type={"submit"}
+                          text={"Submit Review"}
+                          className={"cursor-pointer duration-300"}
+                        ></ButtonLoading>
+                      </div>
+                    </form>
+                  </Form>
+                )}
+              </div>
+            )}
           </div>
         </div>
+
+        <div className="mt-10 border-t pt-5">
+            <h5 className="text-xl font-semibold">{data?.pages[0]?.totalReviews || 0} Reviews</h5>
+            <div className="mt-10">
+              {
+                data && data.pages.map((page) => (
+                  page.reviews.map((review) => (
+                    <div key={review._id} className="mb-5">
+                        <ReviewList review={review}/>
+                    </div>
+                  ))
+                ))
+              }
+            </div>
+        </div>
+
       </div>
     </div>
   );
