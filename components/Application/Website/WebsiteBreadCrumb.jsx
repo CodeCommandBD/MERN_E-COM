@@ -15,7 +15,9 @@ const WebsiteBreadCrumb = ({ props }) => {
         <ul className="flex gap-2 justify-center">
           <li>
             {WEBSITE_HOME ? (
-              <Link href={WEBSITE_HOME} className="">Home</Link>
+              <Link href={WEBSITE_HOME} className="">
+                Home
+              </Link>
             ) : (
               <span className="">Home</span>
             )}
@@ -24,7 +26,9 @@ const WebsiteBreadCrumb = ({ props }) => {
             <li key={index}>
               <span className="text-primary me-1">/</span>
               {item.href ? (
-                <Link href={item.href} className="font-semibold">{item.label}</Link>
+                <Link href={item.href} className="font-semibold">
+                  {item.label}
+                </Link>
               ) : (
                 <span className="font-semibold">{item.label}</span>
               )}

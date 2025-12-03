@@ -9,7 +9,7 @@ export async function GET(request) {
     const searchParams = request.nextUrl.searchParams;
     const productId = searchParams.get("productId");
     const page = searchParams.get("page");
-    const limit = 10;
+    const limit = 3;
     const skip = page * limit;
 
     let matchQuery = {

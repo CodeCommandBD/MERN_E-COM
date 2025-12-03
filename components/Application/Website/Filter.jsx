@@ -123,129 +123,250 @@ const Filter = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-4">
+      {/* Clear Filter Button */}
       {searchParams.size > 0 && (
         <Button
           type="button"
           asChild
-          className="w-full bg-red-500 hover:bg-red-600 text-white"
-          variant={"destructive"}
+          className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground border-2 border-destructive"
+          variant="destructive"
         >
-          <Link href={WEBSITE_SHOP} className="text-white">
-            Clear Filter
+          <Link
+            href={WEBSITE_SHOP}
+            className="text-destructive-foreground flex items-center justify-center gap-2"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            Clear All Filters
           </Link>
         </Button>
       )}
-      <Accordion type="multiple" defaultValue={["1", "2", "3", "4"]}>
-        <AccordionItem value="1">
-          <AccordionTrigger className="uppercase font-semibold hover:no-underline">
-            Category
+
+      {/* Filter Accordion */}
+      <Accordion
+        type="multiple"
+        defaultValue={["1", "2", "3", "4"]}
+        className="space-y-2"
+      >
+        {/* Category Filter */}
+        <AccordionItem
+          value="1"
+          className="border-2 border-primary/20 rounded-lg overflow-hidden"
+        >
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5 font-semibold text-foreground">
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                />
+              </svg>
+              <span>CATEGORY</span>
+              {selectedCategory.length > 0 && (
+                <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                  {selectedCategory.length}
+                </span>
+              )}
+            </div>
           </AccordionTrigger>
-          <AccordionContent>
-            <div className="max-h-48 overflow-auto ">
-              <ul className="flex flex-col gap-2">
-                {categoryData &&
-                  categoryData.success &&
-                  categoryData.data?.map((category) => (
-                    <li key={category._id}>
-                      <label
-                        htmlFor={category._id}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Checkbox
-                          id={category._id}
-                          onCheckedChange={() =>
-                            handleCategoryChange(category.slug)
-                          }
-                          checked={selectedCategory.includes(category.slug)}
-                        />
-                        {category.name}
-                      </label>
-                    </li>
-                  ))}
-              </ul>
+          <AccordionContent className="px-4 pb-4">
+            <div className="max-h-48 overflow-auto space-y-2">
+              {categoryData &&
+                categoryData.success &&
+                categoryData.data?.map((category) => (
+                  <label
+                    key={category._id}
+                    htmlFor={category._id}
+                    className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-primary/5 transition-colors"
+                  >
+                    <Checkbox
+                      id={category._id}
+                      onCheckedChange={() =>
+                        handleCategoryChange(category.slug)
+                      }
+                      checked={selectedCategory.includes(category.slug)}
+                      className="border-2 border-primary/40"
+                    />
+                    <span className="text-sm text-foreground">
+                      {category.name}
+                    </span>
+                  </label>
+                ))}
             </div>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="2">
-          <AccordionTrigger className="uppercase font-semibold hover:no-underline">
-            Colors
+
+        {/* Colors Filter */}
+        <AccordionItem
+          value="2"
+          className="border-2 border-primary/20 rounded-lg overflow-hidden"
+        >
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5 font-semibold text-foreground">
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                />
+              </svg>
+              <span>COLORS</span>
+              {selectedColors.length > 0 && (
+                <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                  {selectedColors.length}
+                </span>
+              )}
+            </div>
           </AccordionTrigger>
-          <AccordionContent>
-            <div className="max-h-48 overflow-auto">
-              <ul className="flex flex-col gap-2">
-                {colorsData &&
-                  colorsData.success &&
-                  colorsData.data?.map((color) => (
-                    <li key={color}>
-                      <label
-                        htmlFor={color}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Checkbox
-                          id={color}
-                          onCheckedChange={() => handleColorsChange(color)}
-                          checked={selectedColors.includes(color)}
-                        />
-                        {color}
-                      </label>
-                    </li>
-                  ))}
-              </ul>
+          <AccordionContent className="px-4 pb-4">
+            <div className="max-h-48 overflow-auto space-y-2">
+              {colorsData &&
+                colorsData.success &&
+                colorsData.data?.map((color) => (
+                  <label
+                    key={color}
+                    htmlFor={color}
+                    className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-primary/5 transition-colors"
+                  >
+                    <Checkbox
+                      id={color}
+                      onCheckedChange={() => handleColorsChange(color)}
+                      checked={selectedColors.includes(color)}
+                      className="border-2 border-primary/40"
+                    />
+                    <span className="text-sm text-foreground capitalize">
+                      {color}
+                    </span>
+                  </label>
+                ))}
             </div>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="3">
-          <AccordionTrigger className="uppercase font-semibold hover:no-underline">
-            Sizes
+
+        {/* Sizes Filter */}
+        <AccordionItem
+          value="3"
+          className="border-2 border-primary/20 rounded-lg overflow-hidden"
+        >
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5 font-semibold text-foreground">
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                />
+              </svg>
+              <span>SIZES</span>
+              {selectedSizes.length > 0 && (
+                <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                  {selectedSizes.length}
+                </span>
+              )}
+            </div>
           </AccordionTrigger>
-          <AccordionContent>
-            <div className="max-h-48 overflow-auto">
-              <ul className="flex flex-col gap-2">
-                {sizesData &&
-                  sizesData.success &&
-                  sizesData.data?.map((size) => (
-                    <li key={size}>
-                      <label
-                        htmlFor={size}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Checkbox
-                          id={size}
-                          onCheckedChange={() => handleSizesChange(size)}
-                          checked={selectedSizes.includes(size)}
-                        />
-                        {size}
-                      </label>
-                    </li>
-                  ))}
-              </ul>
+          <AccordionContent className="px-4 pb-4">
+            <div className="max-h-48 overflow-auto space-y-2">
+              {sizesData &&
+                sizesData.success &&
+                sizesData.data?.map((size) => (
+                  <label
+                    key={size}
+                    htmlFor={size}
+                    className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-primary/5 transition-colors"
+                  >
+                    <Checkbox
+                      id={size}
+                      onCheckedChange={() => handleSizesChange(size)}
+                      checked={selectedSizes.includes(size)}
+                      className="border-2 border-primary/40"
+                    />
+                    <span className="text-sm text-foreground uppercase">
+                      {size}
+                    </span>
+                  </label>
+                ))}
             </div>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="4">
-          <AccordionTrigger className="uppercase font-semibold hover:no-underline">
-            Price
+
+        {/* Price Filter */}
+        <AccordionItem
+          value="4"
+          className="border-2 border-primary/20 rounded-lg overflow-hidden"
+        >
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5 font-semibold text-foreground">
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>PRICE RANGE</span>
+            </div>
           </AccordionTrigger>
-          <AccordionContent>
-            <div className="max-h-48 overflow-auto p-4">
-              <ul className="flex flex-col gap-2">
-                <li>
-                  <Slider
-                    defaultValue={[0, 3000]}
-                    max={3000}
-                    step={1}
-                    onValueChange={handlePriceRange}
-                  />
-                  <div className="flex justify-between items-center pt-2">
-                    <span>
+          <AccordionContent className="px-4 pb-4">
+            <div className="space-y-4">
+              <div className="pt-2">
+                <Slider
+                  defaultValue={[0, 3000]}
+                  max={3000}
+                  step={1}
+                  onValueChange={handlePriceRange}
+                  className="cursor-pointer"
+                />
+                <div className="flex justify-between items-center pt-4">
+                  <div className="bg-primary/10 px-3 py-2 rounded-md border-2 border-primary/20">
+                    <span className="text-sm font-semibold text-primary">
                       {priceRange?.min?.toLocaleString("BD", {
                         currency: "BDT",
                         style: "currency",
                         currencyDisplay: "narrowSymbol",
                       })}
                     </span>
-                    <span>
+                  </div>
+                  <div className="text-foreground/40">—</div>
+                  <div className="bg-primary/10 px-3 py-2 rounded-md border-2 border-primary/20">
+                    <span className="text-sm font-semibold text-primary">
                       {priceRange?.max?.toLocaleString("BD", {
                         currency: "BDT",
                         style: "currency",
@@ -253,16 +374,14 @@ const Filter = () => {
                       })}
                     </span>
                   </div>
-                </li>
-              </ul>
-            </div>
-            <div className="mt-4">
+                </div>
+              </div>
               <ButtonLoading
                 type="button"
-                text={"Filter Price"}
+                text="Apply Price Filter"
                 onClick={handlePriceChange}
-                className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
-              ></ButtonLoading>
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2.5 rounded-md font-medium"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>

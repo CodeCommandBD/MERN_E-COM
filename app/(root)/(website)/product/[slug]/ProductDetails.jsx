@@ -101,7 +101,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
 
       {/* Breadcrumb */}
       <div className="my-10">
-        <div className="bg-white/80 backdrop-blur-md rounded-xl px-5 py-3 border border-gray-200 shadow-md inline-block">
+        <div className="bg-white/80 backdrop-blur-md rounded-xl px-5 py-3 border border-gray-200 inline-block">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -144,8 +144,8 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
                 onClick={() => handleThumbClick(item.secure_url)}
                 className={`relative group cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${
                   item.secure_url.trim() === activeThumb
-                    ? "ring-4 ring-gray-400 shadow-md scale-105"
-                    : "ring-2 ring-gray-200 hover:ring-gray-300 hover:shadow-md"
+                    ? "ring-4 ring-gray-400 scale-105"
+                    : "ring-2 ring-gray-200 hover:ring-gray-300"
                 }`}
               >
                 <Image
@@ -161,7 +161,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
 
           {/* Main Image */}
           <div className="xl:flex-1 relative group">
-            <div className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 shadow-lg border border-gray-200">
+            <div className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 border border-gray-200">
               <Image
                 src={activeThumb || imagePlaceholder.src}
                 alt={product.name}
@@ -172,7 +172,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
               {/* Discount Badge */}
               {product.discountPercentage > 0 && (
                 <div className="absolute top-6 right-6 z-20">
-                  <div className="bg-red-500 text-white px-5 py-3 rounded-2xl font-bold text-lg shadow-md">
+                  <div className="bg-red-500 text-white px-5 py-3 rounded-2xl font-bold text-lg">
                     -{product.discountPercentage}% OFF
                   </div>
                 </div>
@@ -204,7 +204,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
           </div>
 
           {/* Single Unified Card */}
-          <div className="bg-white rounded-3xl border border-gray-200 shadow-md overflow-hidden mb-6">
+          <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden mb-6">
             {/* Price Section */}
             <div className="p-6">
               <div className="flex items-center gap-3 flex-wrap">
@@ -265,7 +265,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
                     key={index}
                     className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
                       item === variant?.color
-                        ? "bg-primary text-white shadow-sm"
+                        ? "bg-primary text-white"
                         : "bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-400"
                     }`}
                   >
@@ -294,7 +294,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
                     key={index}
                     className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
                       item === variant?.size
-                        ? "bg-primary text-white shadow-sm"
+                        ? "bg-primary text-white"
                         : "bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-400"
                     }`}
                   >
@@ -343,7 +343,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
                 onClick={handleAddToCart}
                 type="button"
                 text="Add to Cart"
-                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-primary hover:bg-primary/80 shadow-md"
+                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-primary hover:bg-primary/80"
               ></ButtonLoading>
             </div>
           ) : (
@@ -351,7 +351,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
               <Button
                 asChild
                 type="button"
-                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-green-600 hover:bg-green-700 shadow-md"
+                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-green-600 hover:bg-green-700"
               >
                 <Link href={WEBSITE_CART}>Go to Cart</Link>
               </Button>
@@ -362,7 +362,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
 
       {/* Product Description Section */}
       <div className="mb-20">
-        <div className="rounded-3xl bg-white border border-gray-200 shadow-lg">
+        <div className="rounded-3xl bg-white border border-gray-200">
           {/* Header */}
           <div className="p-6 bg-gray-50 border-b border-gray-200">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -381,7 +381,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
       </div>
 
       {/* Product Review Section */}
-      <ProductReview product={product}  />
+      <ProductReview product={product} />
     </div>
   );
 };

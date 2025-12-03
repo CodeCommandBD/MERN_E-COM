@@ -83,74 +83,166 @@ const Shop = () => {
   const allProducts =
     data?.pages?.flatMap((page) => page?.products || []).filter(Boolean) || [];
 
-  // Debug logging
-  console.log("Query data:", data);
-  console.log("All products:", allProducts);
-
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       <WebsiteBreadCrumb props={breadcrumb} />
-      <section className="lg:flex lg:px-32 my-20">
-        {windowSize.width > 1024 ? (
-          <div className="w-72 me-4">
-            <div className="sticky top-20 bg-gray-50 p-4 rounded">
-              <Filter></Filter>
-            </div>
-          </div>
-        ) : (
-          <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
-            <SheetContent className=" block" side="left">
-              <SheetHeader>
-                <SheetTitle>Filter</SheetTitle>
-              </SheetHeader>
-              <div className="p-4 h-[calc(100vh-4rem)] overflow-auto">
-                <Filter></Filter>
+
+      {/* Main Shop Container */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="lg:flex lg:gap-8">
+          {/* Desktop Filter Sidebar */}
+          {windowSize.width > 1024 ? (
+            <aside className="w-full lg:w-64 flex-shrink-0">
+              <div className="sticky top-24">
+                <div className="border-2 border-primary/20 rounded-lg overflow-hidden">
+                  <div className="bg-primary px-4 py-3">
+                    <h2 className="text-lg font-semibold text-primary-foreground">
+                      Filters
+                    </h2>
+                  </div>
+                  <div className="bg-white p-4">
+                    <Filter />
+                  </div>
+                </div>
               </div>
-            </SheetContent>
-          </Sheet>
-        )}
-        <div className="lg:w-[calc(100%-18rem)]">
-            <Sorting
-              limit={limit}
-              setLimit={setLimit}
-              sorting={sorting}
-              setSorting={setSorting}
-              mobileFilterOpen={mobileFilterOpen}
-              setMobileFilterOpen={setMobileFilterOpen}
-            ></Sorting>
-
-          {isFetching && allProducts.length === 0 && (
-            <div className="text-center py-10">Loading products...</div>
+            </aside>
+          ) : (
+            /* Mobile Filter Sheet */
+            <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
+              <SheetContent
+                className="block w-[300px] sm:w-[400px]"
+                side="left"
+              >
+                <SheetHeader className="border-b border-primary/20 pb-4">
+                  <SheetTitle className="text-primary text-xl">
+                    Filters
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="py-4 h-[calc(100vh-5rem)] overflow-auto">
+                  <Filter />
+                </div>
+              </SheetContent>
+            </Sheet>
           )}
 
-          {!isFetching && allProducts.length === 0 && (
-            <div className="text-center py-10">No products found</div>
-          )}
-
-          {error && (
-            <div className="text-center py-10 text-red-600">
-              Error loading products. Please try again.
-            </div>
-          )}
-
-          {allProducts.length > 0 && (
-            <div className="grid grid-cols-2 lg:grid-cols-3 lg:gap-10 gap-5 mt-6">
-              {allProducts.map((product) => (
-                <ProductBox key={product._id} product={product} />
-              ))}
-            </div>
-          )}
-
-          {hasNextPage && (
-            <div className="text-center mt-8">
-              <ButtonLoading
-                type={"button"}
-                loading={isFetching}
-                text="Load More"
-                onClick={() => fetchNextPage()}
+          {/* Products Section */}
+          <main className="flex-1 min-w-0">
+            {/* Sorting & Controls Bar */}
+            <div className="mb-6">
+              <Sorting
+                limit={limit}
+                setLimit={setLimit}
+                sorting={sorting}
+                setSorting={setSorting}
+                mobileFilterOpen={mobileFilterOpen}
+                setMobileFilterOpen={setMobileFilterOpen}
               />
             </div>
-          )}
+
+            {/* Loading State */}
+            {isFetching && allProducts.length === 0 && (
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="text-lg text-foreground/70">
+                    Loading products...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* No Products State */}
+            {!isFetching && allProducts.length === 0 && (
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-4 border-4 border-primary/20 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-12 h-12 text-primary/40"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    No products found
+                  </h3>
+                  <p className="text-foreground/60">
+                    Try adjusting your filters or search criteria
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-4 border-4 border-destructive/20 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-12 h-12 text-destructive"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-destructive mb-2">
+                    Error loading products
+                  </h3>
+                  <p className="text-foreground/60">Please try again later</p>
+                </div>
+              </div>
+            )}
+
+            {/* Products Grid */}
+            {allProducts.length > 0 && (
+              <>
+                {/* Products Count */}
+                <div className="mb-4">
+                  <p className="text-sm text-foreground/60">
+                    Showing{" "}
+                    <span className="font-semibold text-primary">
+                      {allProducts.length}
+                    </span>{" "}
+                    products
+                  </p>
+                </div>
+
+                {/* Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                  {allProducts.map((product) => (
+                    <ProductBox key={product._id} product={product} />
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {hasNextPage && (
+                  <div className="flex justify-center mt-10">
+                    <ButtonLoading
+                      type="button"
+                      loading={isFetching}
+                      text="Load More Products"
+                      onClick={() => fetchNextPage()}
+                      className="px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-medium"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </main>
         </div>
       </section>
     </div>

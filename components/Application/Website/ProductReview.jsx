@@ -27,12 +27,27 @@ import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
 import Link from "next/link";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import ReviewList from "./ReviewList";
+import { useQueryClient } from "@tanstack/react-query";
+import useFetch from "@/hooks/useFetch";
 
 const ProductReview = ({ product }) => {
+  const queryClient = useQueryClient();
   const auth = useSelector((state) => state.authStore.auth);
   const [loading, setLoading] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("");
   const [isReview, setIsReview] = useState(false);
+  const [reviewsCount, setReviewsCount] = useState({});
+
+  const { data: reviewDetails } = useFetch(
+    `/api/review/details?productId=${product._id}`
+  );
+
+  useEffect(() => {
+    if (reviewDetails && reviewDetails.success) {
+      const reviewData = reviewDetails.data;
+      setReviewsCount(reviewData || {});
+    }
+  }, [reviewDetails]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,6 +92,9 @@ const ProductReview = ({ product }) => {
         throw new Error(response.message);
       }
       form.reset();
+      queryClient.invalidateQueries({
+        queryKey: ["reviews", product._id],
+      });
       showToast("success", response.message);
     } catch (error) {
       showToast("error", error.message);
@@ -85,123 +103,162 @@ const ProductReview = ({ product }) => {
     }
   };
   const fetchReview = async (pageParam) => {
-    const { data: response } = await axios.get(`/api/review/get?productId=${product._id}&page=${pageParam}`);
+    const { data: response } = await axios.get(
+      `/api/review/get?productId=${product._id}&page=${pageParam}`
+    );
 
     if (!response.success) {
-      return
+      return;
     }
     return response.data;
   };
 
-  const {error, data, isFetching, fetchNextPage, hasNextPage} = useInfiniteQuery({
-    queryKey: ["reviews", product._id],
-    initialPageParam: 0,
-    queryFn: async ({pageParam }) => await fetchReview(pageParam),
-    getNextPageParam: (lastPage) => {
-      if (lastPage.nextPage) {
-        return lastPage.nextPage;
-      }
-      return undefined;
-    },
-  });
-
-
-
-
-
-
+  const { error, data, isFetching, fetchNextPage, hasNextPage } =
+    useInfiniteQuery({
+      queryKey: ["reviews", product._id],
+      initialPageParam: 0,
+      queryFn: async ({ pageParam }) => await fetchReview(pageParam),
+      getNextPageParam: (lastPage) => {
+        if (lastPage.nextPage) {
+          return lastPage.nextPage;
+        }
+        return undefined;
+      },
+    });
 
   return (
-    <div className="">
-      <div className="mb-10">
-        <div className="rounded-3xl bg-white border border-gray-200 shadow-lg">
-          <div className="p-6 bg-gray-50 border-b border-gray-200">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Rating & Reviews
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="flex justify-between flex-wrap items-center gap-5 ">
-              <div>
-                <h2 className="md:w-1/2 w-full">{product.rating}</h2>
-                <div className="md:flex md:gap-10 md:mb-0 mb-5">
-                  <div className="md:w-[400px] w-full md:mb-0 mb-5">
-                    <h4 className="font-semibold text-center text-8xl">0.0</h4>
-                    <div className="flex justify-center gap-2">
-                      <IoStar className="text-yellow-500 text-xl"></IoStar>
-                      <IoStar className="text-yellow-500 text-xl"></IoStar>
-                      <IoStar className="text-yellow-500 text-xl"></IoStar>
-                      <IoStar className="text-yellow-500 text-xl"></IoStar>
-                      <IoStar className="text-yellow-500 text-xl"></IoStar>
-                    </div>
-                    <p className="text-center mt-3">(00 Ratings & Reviews)</p>
-                  </div>
-                  <div className="md:w-[calc(100%-200px)] flex items-center ">
-                    <div className="w-full">
-                      {[5, 4, 3, 2, 1].map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2 mb-2"
-                        >
-                          <div className="flex items-center gap-1">
-                            <p className="w-3">{item}</p>
-                            <IoStar className=""></IoStar>
-                          </div>
-                          <Progress value={20} />
-                          <span className="text-sm">20</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+    <div className=" mx-auto">
+      {/* Main Reviews Card */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-slate-50 to-gray-50 px-6 py-5 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Customer Ratings & Reviews
+          </h2>
+        </div>
+
+        {/* Rating Overview Section */}
+        <div className="p-8">
+          <div className="grid lg:grid-cols-12 gap-8 items-start">
+            {/* Left: Overall Rating */}
+            <div className="lg:col-span-4">
+              <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="mb-3">
+                  <span className="text-6xl font-bold text-gray-900">
+                    {reviewsCount?.averageRating || "0.0"}
+                  </span>
+                  <span className="text-2xl text-gray-500">/5</span>
                 </div>
-              </div>
-              <div className="w-fit md:text-end text-center">
-                <Button
-                  onClick={() => setIsReview(!isReview)}
-                  type="button"
-                  className="md:w-fit py-6 px-10"
-                >
-                  Write a Review
-                </Button>
+                <div className="flex justify-center gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <IoStar
+                      key={star}
+                      className={`text-2xl ${
+                        star <= Math.round(reviewsCount?.averageRating || 0)
+                          ? "text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 font-medium">
+                  Based on {reviewsCount?.totalReviews || 0} reviews
+                </p>
               </div>
             </div>
-            {isReview && (
-              <div className="w-full mt-10">
-                <hr className="mb-5"/>
-                <p className="text-start text-xl font-semibold">
-                  Write a Review
-                </p>
+
+            {/* Middle: Rating Distribution */}
+            <div className="lg:col-span-5">
+              <div className="space-y-3">
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <div key={rating} className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 min-w-[60px]">
+                      <span className="text-sm font-medium text-gray-700 w-3">
+                        {rating}
+                      </span>
+                      <IoStar className="text-yellow-400 text-base" />
+                    </div>
+                    <div className="flex-1">
+                      <Progress
+                        value={reviewsCount?.percentage?.[rating] || 0}
+                        className="h-2.5"
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600 min-w-[45px] text-right">
+                      {reviewsCount?.rating?.[rating] || 0}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Write Review Button */}
+            <div className="lg:col-span-3 flex lg:justify-end justify-center">
+              <Button
+                onClick={() => setIsReview(!isReview)}
+                type="button"
+                className="px-8 py-6 text-base font-semibold w-full lg:w-auto"
+              >
+                Write a Review
+              </Button>
+            </div>
+          </div>
+
+          {/* Write Review Form */}
+          {isReview && (
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">
+                  Share Your Experience
+                </h3>
+
                 {!auth ? (
-                  <>
-                    <p
-                      className="text-sm font-semibold
-                  my-5"
-                    >
-                      Please Login to Write a Review
+                  <div className="text-center py-8">
+                    <div className="mb-4">
+                      <svg
+                        className="mx-auto h-12 w-12 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-gray-700 font-medium mb-4">
+                      Please login to write a review
                     </p>
                     <Button
                       type="button"
                       asChild
-                      className="text-center text-lg font-semibold"
+                      className="px-8 py-6 text-base font-semibold"
                     >
                       <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>
-                        Login
+                        Login to Continue
                       </Link>
                     </Button>
-                  </>
+                  </div>
                 ) : (
                   <Form {...form}>
                     <form
                       onSubmit={form.handleSubmit(handleReviewSubmit)}
-                      className="space-y-8"
+                      className="space-y-6"
                     >
-                      <div className="mb-5">
-                        <FormField
-                          control={form.control}
-                          name="rating"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
+                      {/* Rating Field */}
+                      <FormField
+                        control={form.control}
+                        name="rating"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-semibold text-gray-900">
+                              Your Rating
+                            </FormLabel>
+                            <FormControl>
+                              <div className="py-2">
                                 <Rating
                                   value={field.value}
                                   size="large"
@@ -209,83 +266,153 @@ const ProductReview = ({ product }) => {
                                     field.onChange(e.target.value)
                                   }
                                 />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                      <div className="mb-5">
-                        <FormField
-                          control={form.control}
-                          name="title"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Title</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="text"
-                                  placeholder="Review Title"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <FormField
-                          control={form.control}
-                          name="review"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Review</FormLabel>
-                              <FormControl>
-                                <textarea
-                                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                  placeholder="Write your review here..."
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      {/* Title Field */}
+                      <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-semibold text-gray-900">
+                              Review Title
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Summarize your experience"
+                                className="h-12 text-base"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                      <div className="mt-5">
+                      {/* Review Field */}
+                      <FormField
+                        control={form.control}
+                        name="review"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-semibold text-gray-900">
+                              Your Review
+                            </FormLabel>
+                            <FormControl>
+                              <textarea
+                                className="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-base ring-offset-background placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder="Tell us what you think about this product..."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Submit Button */}
+                      <div className="pt-2">
                         <ButtonLoading
                           loading={loading}
-                          type={"submit"}
-                          text={"Submit Review"}
-                          className={"cursor-pointer duration-300"}
-                        ></ButtonLoading>
+                          type="submit"
+                          text="Submit Review"
+                          className="px-8 py-6 text-base font-semibold"
+                        />
                       </div>
                     </form>
                   </Form>
                 )}
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Reviews List Section */}
+      <div className="mt-8">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
+            <h3 className="text-xl font-bold text-gray-900">
+              All Reviews ({data?.pages[0]?.totalReviews || 0})
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {data && data.pages.length > 0 ? (
+              data.pages.map((page) =>
+                page.reviews.map((review) => (
+                  <div key={review._id} className="p-6">
+                    <ReviewList review={review} />
+                  </div>
+                ))
+              )
+            ) : (
+              <div className="p-12 text-center">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                  />
+                </svg>
+                <p className="mt-4 text-gray-500 font-medium">
+                  No reviews yet. Be the first to review this product!
+                </p>
+              </div>
             )}
           </div>
-        </div>
 
-        <div className="mt-10 border-t pt-5">
-            <h5 className="text-xl font-semibold">{data?.pages[0]?.totalReviews || 0} Reviews</h5>
-            <div className="mt-10">
-              {
-                data && data.pages.map((page) => (
-                  page.reviews.map((review) => (
-                    <div key={review._id} className="mb-5">
-                        <ReviewList review={review}/>
-                    </div>
-                  ))
-                ))
-              }
+          {/* Load More Button */}
+          {hasNextPage && (
+            <div className="px-6 py-5 border-t border-gray-200 bg-gray-50">
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetching}
+                className="w-full py-6 text-base font-semibold"
+                variant="outline"
+              >
+                {isFetching ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Loading...
+                  </span>
+                ) : (
+                  "Load More Reviews"
+                )}
+              </Button>
             </div>
+          )}
         </div>
-
       </div>
     </div>
   );

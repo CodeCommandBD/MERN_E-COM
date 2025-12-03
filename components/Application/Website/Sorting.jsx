@@ -10,8 +10,6 @@ import { sorts } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { IoFilter } from "react-icons/io5";
 
-
-
 const Sorting = ({
   limit,
   setLimit,
@@ -21,44 +19,64 @@ const Sorting = ({
   setMobileFilterOpen,
 }) => {
   return (
-    <div className="flex justify-between items-center flex-wrap bg-gray-50 p-4 gap-2">
-    <Button className={'lg:hidden'} type="button" onClick={() => setMobileFilterOpen(!mobileFilterOpen)}>
-        <IoFilter className=""></IoFilter>
-        Filter
-    </Button>
-      <ul className="flex gap-4">
-        <li className="font-semibold">Show</li>
-        {[9, 18, 27, 36, 45].map((item) => (
-          <li
-            key={item}
-            className="cursor-pointer"
-            onClick={() => setLimit(item)}
-          >
-            <button
-              type="button"
-              className={` w-8 h-8 ${
-                item === limit
-                  ? "bg-primary  flex items-center justify-center text-white rounded-full cursor-pointer"
-                  : ""
-              }`}
-            >
-              {item}
-            </button>
-          </li>
-        ))}
-      </ul>
-      <Select value={sorting} onValueChange={(value) => setSorting(value)}>
-        <SelectTrigger   className={"md:w-[180px] w-full bg-white"}>
-          <SelectValue placeholder="Default Sorting" />
-        </SelectTrigger>
-        <SelectContent>
-          {sorts.map((item,index) => (
-            <SelectItem key={index} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="bg-white border-2 border-primary/20 rounded-lg p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Mobile Filter Button */}
+        <Button
+          className="lg:hidden bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2 w-full sm:w-auto"
+          type="button"
+          onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+        >
+          <IoFilter className="w-4 h-4" />
+          <span>Show Filters</span>
+        </Button>
+
+        {/* Items Per Page */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-sm font-semibold text-foreground whitespace-nowrap">
+            Items per page:
+          </span>
+          <div className="flex gap-2">
+            {[9, 18, 27, 36, 45].map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setLimit(item)}
+                className={`
+                  w-10 h-10 rounded-lg font-medium text-sm
+                  transition-colors duration-200
+                  ${
+                    item === limit
+                      ? "bg-primary text-primary-foreground border-2 border-primary"
+                      : "bg-white text-foreground border-2 border-primary/20 hover:border-primary/40"
+                  }
+                `}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sort Dropdown */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-semibold text-foreground whitespace-nowrap hidden sm:block">
+            Sort by:
+          </span>
+          <Select value={sorting} onValueChange={(value) => setSorting(value)}>
+            <SelectTrigger className="w-full sm:w-[200px] bg-white border-2 border-primary/20 hover:border-primary/40 focus:border-primary">
+              <SelectValue placeholder="Default Sorting" />
+            </SelectTrigger>
+            <SelectContent>
+              {sorts.map((item, index) => (
+                <SelectItem key={index} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
     </div>
   );
 };
