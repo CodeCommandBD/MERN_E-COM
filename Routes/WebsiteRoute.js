@@ -10,4 +10,7 @@ export const USER_DASHBOARD = "/my-account";
 export const WEBSITE_SHOP = "/shop";
 
 // product route
-export const WEBSITE_PRODUCT_DETAILS = (slug) => slug ? `/product/${slug}` : "/product"
+export const WEBSITE_PRODUCT_DETAILS = (slug) => slug ? `/product/${slug}` : "/product";
+
+// cart route
+export const WEBSITE_CART = "/cart";

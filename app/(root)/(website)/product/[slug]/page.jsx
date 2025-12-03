@@ -21,7 +21,7 @@ const ProductPage = async ({ params, searchParams }) => {
           variant={getProduct.data.variant}
           Color={getProduct.data.getColor}
           Size={getProduct.data.getSize}
-          Count={getProduct.data.reviewCount}
+          reviewCount={getProduct.data.reviewCount}
         />
       </div>
     );
