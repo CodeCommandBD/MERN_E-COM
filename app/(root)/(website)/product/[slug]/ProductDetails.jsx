@@ -381,7 +381,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
       </div>
 
       {/* Product Review Section */}
-      <ProductReview product={product} />
+      <ProductReview product={product}  />
     </div>
   );
 };
