@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
-import Cart from "./cart";
+import Cart from "./Cart";
 import { VscAccount } from "react-icons/vsc";
 import { useSelector } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";

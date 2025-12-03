@@ -93,7 +93,7 @@ const Shop = () => {
       <section className="lg:flex lg:px-32 my-20">
         {windowSize.width > 1024 ? (
           <div className="w-72 me-4">
-            <div className="sticky top-0 bg-gray-50 p-4 rounded">
+            <div className="sticky top-20 bg-gray-50 p-4 rounded">
               <Filter></Filter>
             </div>
           </div>
@@ -110,14 +110,14 @@ const Shop = () => {
           </Sheet>
         )}
         <div className="lg:w-[calc(100%-18rem)]">
-          <Sorting
-            limit={limit}
-            setLimit={setLimit}
-            sorting={sorting}
-            setSorting={setSorting}
-            mobileFilterOpen={mobileFilterOpen}
-            setMobileFilterOpen={setMobileFilterOpen}
-          ></Sorting>
+            <Sorting
+              limit={limit}
+              setLimit={setLimit}
+              sorting={sorting}
+              setSorting={setSorting}
+              mobileFilterOpen={mobileFilterOpen}
+              setMobileFilterOpen={setMobileFilterOpen}
+            ></Sorting>
 
           {isFetching && allProducts.length === 0 && (
             <div className="text-center py-10">Loading products...</div>
@@ -148,7 +148,6 @@ const Shop = () => {
                 loading={isFetching}
                 text="Load More"
                 onClick={() => fetchNextPage()}
-                
               />
             </div>
           )}
