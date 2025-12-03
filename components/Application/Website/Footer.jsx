@@ -15,145 +15,176 @@ import { MdOutlineEmail, MdOutlinePhone } from "react-icons/md";
 import { TiSocialFacebook } from "react-icons/ti";
 
 const Footer = () => {
+  const categories = [
+    { name: "T-shirt", href: "/" },
+    { name: "Hoodies", href: "/" },
+    { name: "Oversized", href: "/" },
+    { name: "Full Sleeve", href: "/" },
+    { name: "Polo", href: "/" },
+  ];
+
+  const usefulLinks = [
+    { name: "Home", href: WEBSITE_HOME },
+    { name: "Shop", href: "" },
+    { name: "About", href: "" },
+    { name: "Register", href: WEBSITE_REGISTER },
+    { name: "Login", href: WEBSITE_LOGIN },
+  ];
+
+  const helpLinks = [
+    { name: "Register", href: "" },
+    { name: "Login", href: "" },
+    { name: "My Account", href: "" },
+    { name: "Privacy Policy", href: "" },
+    { name: "Terms & Conditions", href: "" },
+  ];
+
+  const socialLinks = [
+    { icon: AiOutlineYoutube, href: "", label: "YouTube" },
+    { icon: FaInstagram, href: "", label: "Instagram" },
+    { icon: FaWhatsapp, href: "", label: "WhatsApp" },
+    { icon: TiSocialFacebook, href: "", label: "Facebook" },
+    { icon: FiTwitter, href: "", label: "Twitter" },
+  ];
+
   return (
-    <div>
-      <footer className="bg-gray-50 border-t border-gray-200 mt-5">
-        <div className="text-gray-600 py-4 px-4 lg:py-12 lg:px-32 ">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-            <div className="lg:col-span-1 md:col-span-2 col-span-1">
-              <Image src={logo_black} alt="Logo" width={100} height={100} />
-              <p className="w-full my-2">
-                E-store is your trusted destination for quality and convenience.
-                From fashion to essentials, we bring everything you need right
-                to your doorstep. Shop smart, live better — only at E-store
-              </p>
-            </div>
+    <footer className="bg-white border-t-2 border-primary/20 mt-12">
+      {/* Main Footer Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
+          {/* Brand Section */}
+          <div className="lg:col-span-2 md:col-span-2">
+            <Image
+              src={logo_black}
+              alt="E-Store Logo"
+              width={120}
+              height={60}
+              className="mb-4"
+            />
+            <p className="text-foreground/70 text-sm leading-relaxed mb-6">
+              E-store is your trusted destination for quality and convenience.
+              From fashion to essentials, we bring everything you need right to
+              your doorstep. Shop smart, live better — only at E-store.
+            </p>
+
+            {/* Social Media Links */}
             <div>
-              <h2 className="text-xl font-bold mb-5 uppercase">Category</h2>
-              <ul className="text-gray-600 space-y-2">
-                <li>
-                  <Link href="/">T-shirt</Link>
-                </li>
-                <li>
-                  <Link href="/">Hoodies</Link>
-                </li>
-                <li>
-                  <Link href="/">Oversized</Link>
-                </li>
-                <li>
-                  <Link href="/">Full Sleeve</Link>
-                </li>
-                <li>
-                  <Link href="/">Polo</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold mb-5 uppercase">
-                Userfull Links
-              </h2>
-              <ul className="text-gray-600 space-y-2">
-                <li>
-                  <Link href={WEBSITE_HOME}>Home</Link>
-                </li>
-                <li>
-                  <Link href={""}>Shop</Link>
-                </li>
-                <li>
-                  <Link href={""}>About</Link>
-                </li>
-                <li>
-                  <Link href={WEBSITE_REGISTER}>Register</Link>
-                </li>
-                <li>
-                  <Link href={WEBSITE_LOGIN}>Login</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold mb-5 uppercase">Help Center</h2>
-              <ul className="text-gray-600 space-y-2">
-                <li>
-                  <Link href={""}>Register</Link>
-                </li>
-                <li>
-                  <Link href={""}>Login</Link>
-                </li>
-                <li>
-                  <Link href={""}>My Account</Link>
-                </li>
-                <li>
-                  <Link href={""}>Privacy Policy</Link>
-                </li>
-                <li>
-                  <Link href={""}>Terms & Conditions</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold mb-5 uppercase">Contact Us</h2>
-              <ul className="text-gray-600 space-y-2">
-                <li className="flex items-center">
-                  <IoLocationOutline className="inline-block mr-2 text-xl" />
-                  <span className="text-sm">
-                    E-Store market uttara dhaka 1207
-                  </span>
-                </li>
-                <li className="flex items-center">
-                  <MdOutlinePhone className="inline-block mr-2 text-xl" />
-                  <Link href={"tel:+8801777777777"}>
-                    <span className="text-sm">+8801777777777</span>
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <MdOutlineEmail className="inline-block mr-2 text-xl" />
-                  <Link href={"mailto:support@estore.com"}>
-                    <span className="text-sm">support@estore.com</span>
-                  </Link>
-                </li>
-              </ul>
-              <div className="flex items-center gap-2 mt-5">
-                <Link href={""}>
-                  <AiOutlineYoutube
-                    size={25}
-                    className="text-xl text-gray-600 hover:text-primary transition-all duration-300"
-                  />
-                </Link>
-                <Link href={""}>
-                  <FaInstagram
-                    size={25}
-                    className="text-xl text-gray-600 hover:text-primary transition-all duration-300"
-                  />
-                </Link>
-                <Link href={""}>
-                  <FaWhatsapp
-                    size={25}
-                    className="text-xl text-gray-600 hover:text-primary transition-all duration-300"
-                  />
-                </Link>
-                <Link href={""}>
-                  <TiSocialFacebook
-                    size={25}
-                    className="text-xl text-gray-600 hover:text-primary transition-all duration-300"
-                  />
-                </Link>
-                <Link href={""}>
-                  <FiTwitter
-                    size={25}
-                    className="text-xl text-gray-600 hover:text-primary transition-all duration-300"
-                  />
-                </Link>
+              <h3 className="text-sm font-semibold text-foreground mb-3 uppercase">
+                Follow Us
+              </h3>
+              <div className="flex items-center gap-3">
+                {socialLinks.map((social, index) => {
+                  const Icon = social.icon;
+                  return (
+                    <Link
+                      key={index}
+                      href={social.href}
+                      aria-label={social.label}
+                      className="w-10 h-10 flex items-center justify-center border-2 border-primary/30 rounded-lg text-primary"
+                    >
+                      <Icon size={20} />
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>
+
+          {/* Category Links */}
+          <div>
+            <h3 className="text-base font-bold text-foreground mb-4 uppercase">
+              Category
+            </h3>
+            <div className="w-12 h-0.5 bg-primary mb-4"></div>
+            <ul className="space-y-2.5">
+              {categories.map((category, index) => (
+                <li key={index}>
+                  <Link
+                    href={category.href}
+                    className="text-sm text-foreground/70 hover:text-primary"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Useful Links */}
+          <div>
+            <h3 className="text-base font-bold text-foreground mb-4 uppercase">
+              Useful Links
+            </h3>
+            <div className="w-12 h-0.5 bg-primary mb-4"></div>
+            <ul className="space-y-2.5">
+              {usefulLinks.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-foreground/70 hover:text-primary"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact & Help */}
+          <div>
+            <h3 className="text-base font-bold text-foreground mb-4 uppercase">
+              Contact Us
+            </h3>
+            <div className="w-12 h-0.5 bg-primary mb-4"></div>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2">
+                <IoLocationOutline
+                  className="text-primary mt-0.5 flex-shrink-0"
+                  size={18}
+                />
+                <span className="text-sm text-foreground/70">
+                  E-Store market uttara dhaka 1207
+                </span>
+              </li>
+              <li className="flex items-center gap-2">
+                <MdOutlinePhone
+                  className="text-primary flex-shrink-0"
+                  size={18}
+                />
+                <Link
+                  href="tel:+8801777777777"
+                  className="text-sm text-foreground/70 hover:text-primary"
+                >
+                  +8801777777777
+                </Link>
+              </li>
+              <li className="flex items-center gap-2">
+                <MdOutlineEmail
+                  className="text-primary flex-shrink-0"
+                  size={18}
+                />
+                <Link
+                  href="mailto:support@estore.com"
+                  className="text-sm text-foreground/70 hover:text-primary"
+                >
+                  support@estore.com
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="text-center py-5 bg-gray-100 ">
-          <p className="text-gray-600  text-md font-semibold ">
-            © 2025 E-Store. All rights reserved.
+      </div>
+
+      {/* Footer Bottom */}
+      <div className="border-t-2 border-primary/20 bg-primary/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <p className="text-center text-sm text-foreground/70">
+            © 2025 <span className="font-semibold text-primary">E-Store</span>.
+            All rights reserved.
           </p>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
   );
 };
 
