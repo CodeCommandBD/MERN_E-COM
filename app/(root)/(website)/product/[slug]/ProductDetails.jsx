@@ -25,6 +25,7 @@ import { showToast } from "@/lib/showToast";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import Loading from "@/components/Application/Loading";
+import ProductReview from "@/components/Application/Website/ProductReview";
 
 const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
   const dispatch = useDispatch();
@@ -91,178 +92,266 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
   };
 
   return (
-    <div className="lg:px-32 px-4">
+    <div className="lg:px-32 px-4 relative">
       {isProductLoading && (
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 z-50 bg-black/20">
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 z-50 bg-black/20 backdrop-blur-sm">
           <Loading></Loading>
         </div>
       )}
+
+      {/* Breadcrumb */}
       <div className="my-10">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={WEBSITE_SHOP}>Product</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{product.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>{" "}
+        <div className="bg-white/80 backdrop-blur-md rounded-xl px-5 py-3 border border-gray-200 shadow-md inline-block">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  href="/"
+                  className="hover:text-gray-700 transition-colors"
+                >
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  href={WEBSITE_SHOP}
+                  className="hover:text-gray-700 transition-colors"
+                >
+                  Product
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="font-semibold text-gray-900">
+                  {product.name}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
       </div>
+
+      {/* Main Product Section */}
       <div className="md:flex justify-between items-start lg:gap-10 gap-5 mb-20">
-        <div className="md:w-1/2 xl:flex xl:justify-center xl:-gap-5 md:sticky md:top-0">
-          <div className="xl:order-last xl:mb-0 mb-5 xl:[calc(100%-144px)]">
-            <Image
-              src={activeThumb || imagePlaceholder.src}
-              alt={product.name}
-              width={500}
-              height={500}
-              className="w-full h-full object-contain border border-gray-200 rounded-md"
-            ></Image>
-          </div>
-          <div className="flex xl:flex-col items-center xl:gap-5 gap-3 xl:w-36 overflow-auto xl:pb-0 pb-2 max-h-[600px]">
+        {/* Image Gallery Section */}
+        <div className="md:w-1/2 xl:flex xl:justify-center xl:gap-5 md:sticky md:top-20">
+          {/* Thumbnail Images */}
+          <div className="flex xl:flex-col items-center xl:gap-4 gap-3 xl:w-28 overflow-auto xl:pb-0 p-3 max-h-[600px] xl:order-first order-last xl:mt-0 mt-5">
             {variant?.media?.map((item, index) => (
-              <Image
-                onClick={() => handleThumbClick(item.secure_url)}
+              <div
                 key={index}
-                src={item.secure_url || imagePlaceholder.src}
-                alt={product.name}
-                width={100}
-                height={100}
-                className={`md:max-w-full max-w-16 rounded cursor-pointer ${
+                onClick={() => handleThumbClick(item.secure_url)}
+                className={`relative group cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${
                   item.secure_url.trim() === activeThumb
-                    ? "border border-gray-200"
-                    : ""
+                    ? "ring-4 ring-gray-400 shadow-md scale-105"
+                    : "ring-2 ring-gray-200 hover:ring-gray-300 hover:shadow-md"
                 }`}
-              ></Image>
+              >
+                <Image
+                  src={item.secure_url || imagePlaceholder.src}
+                  alt={product.name}
+                  width={100}
+                  height={100}
+                  className="md:max-w-full max-w-16 object-cover aspect-square"
+                />
+              </div>
             ))}
+          </div>
+
+          {/* Main Image */}
+          <div className="xl:flex-1 relative group">
+            <div className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 shadow-lg border border-gray-200">
+              <Image
+                src={activeThumb || imagePlaceholder.src}
+                alt={product.name}
+                width={600}
+                height={600}
+                className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105"
+              />
+              {/* Discount Badge */}
+              {product.discountPercentage > 0 && (
+                <div className="absolute top-6 right-6 z-20">
+                  <div className="bg-red-500 text-white px-5 py-3 rounded-2xl font-bold text-lg shadow-md">
+                    -{product.discountPercentage}% OFF
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        <div className="md:w-1/2 md:mt-0 mt-5">
-          <h2 className="text-3xl font-semibold mb-5">{product.name}</h2>
 
-          <div className="flex items-center gap-1 mb-5">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <IoStar key={index} className="text-yellow-500"></IoStar>
-            ))}
-            <span className="text-sm ps-2">({reviewCount} Reviews)</span>
-          </div>
+        {/* Product Info Section */}
+        <div className="md:w-1/2 md:mt-0 mt-8">
+          {/* Product Title */}
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 leading-tight">
+            {product.name}
+          </h1>
 
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl font-semibold">
-              {product.sellingPrice.toLocaleString("BD", {
-                currency: "BDT",
-                style: "currency",
-                currencyDisplay: "narrowSymbol",
-              })}
-            </span>
-            <span className="text-lg text-gray-500 line-through">
-              {product.mrp.toLocaleString("BD", {
-                currency: "BDT",
-                style: "currency",
-                currencyDisplay: "narrowSymbol",
-              })}
-            </span>
-            <span className="text-lg bg-red-500 text-white px-2 py-1 rounded">
-              -{product.discountPercentage}% off
-            </span>
-          </div>
-          <div
-            className="line-clamp-3"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          ></div>
-
-          <div className="mt-5">
-            <h2 className="text-xl font-semibold mb-2">
-              Color: <span className="font-normal">{variant?.color}</span>
-            </h2>
-            <div className="flex items-center gap-2">
-              {Color.map((item, index) => (
-                <Link
-                  onClick={() => setIsProductLoading(true)}
-                  href={`${WEBSITE_PRODUCT_DETAILS(
-                    product.slug
-                  )}?color=${item}&size=${variant?.size}`}
+          {/* Rating Section */}
+          <div className="flex items-center gap-2 mb-6 bg-yellow-50 px-4 py-2 rounded-xl border border-yellow-200 w-fit">
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <IoStar
                   key={index}
-                  className={`duration-300 border cursor-pointer border-gray-200 px-2 py-1 rounded-lg hover:bg-primary hover:text-white ${
-                    item === variant?.color ? "bg-primary text-white" : ""
-                  }`}
-                >
-                  {item}
-                </Link>
+                  className="text-yellow-500 text-lg"
+                ></IoStar>
               ))}
             </div>
+            <span className="text-sm font-medium text-gray-700">
+              ({reviewCount} Reviews)
+            </span>
           </div>
 
-          <div className="mt-5">
-            <h2 className="text-xl font-semibold mb-2">
-              Size: <span className="font-normal">{variant?.size}</span>
-            </h2>
-            <div className="flex items-center gap-2">
-              {Size.map((item, index) => (
-                <Link
-                  onClick={() => setIsProductLoading(true)}
-                  href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${
-                    variant?.color
-                  }&size=${item}`}
-                  key={index}
-                  className={`duration-300 border cursor-pointer border-gray-200 px-2 py-1 rounded-lg hover:bg-primary hover:text-white ${
-                    item === variant?.size ? "bg-primary text-white" : ""
-                  }`}
+          {/* Single Unified Card */}
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-md overflow-hidden mb-6">
+            {/* Price Section */}
+            <div className="p-6">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-2xl font-bold text-green-600">
+                  {product.sellingPrice.toLocaleString("BD", {
+                    currency: "BDT",
+                    style: "currency",
+                    currencyDisplay: "narrowSymbol",
+                  })}
+                </span>
+                <span className="text-lg text-gray-400 line-through">
+                  {product.mrp.toLocaleString("BD", {
+                    currency: "BDT",
+                    style: "currency",
+                    currencyDisplay: "narrowSymbol",
+                  })}
+                </span>
+                <div className="">
+                  <div className="bg-green-500 text-white px-4 py-1 rounded-xl font-bold text-sm">
+                    Save{" "}
+                    {(product.mrp - product.sellingPrice).toLocaleString("BD", {
+                      currency: "BDT",
+                      style: "currency",
+                      currencyDisplay: "narrowSymbol",
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200"></div>
+
+            {/* Description Preview */}
+            <div className="p-6 bg-gray-50">
+              <div
+                className="text-gray-700 leading-relaxed text-sm line-clamp-2"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              ></div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200"></div>
+
+            {/* Color Selection */}
+            <div className="p-6">
+              <h3 className="text-base font-bold mb-3">
+                <span className="text-gray-900">Color: </span>
+                <span className="text-gray-600">{variant?.color}</span>
+              </h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                {Color.map((item, index) => (
+                  <Link
+                    onClick={() => setIsProductLoading(true)}
+                    href={`${WEBSITE_PRODUCT_DETAILS(
+                      product.slug
+                    )}?color=${item}&size=${variant?.size}`}
+                    key={index}
+                    className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                      item === variant?.color
+                        ? "bg-primary text-white shadow-sm"
+                        : "bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-400"
+                    }`}
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200"></div>
+
+            {/* Size Selection */}
+            <div className="p-6">
+              <h3 className="text-base font-bold mb-3">
+                <span className="text-gray-900">Size: </span>
+                <span className="text-gray-600">{variant?.size}</span>
+              </h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                {Size.map((item, index) => (
+                  <Link
+                    onClick={() => setIsProductLoading(true)}
+                    href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${
+                      variant?.color
+                    }&size=${item}`}
+                    key={index}
+                    className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                      item === variant?.size
+                        ? "bg-primary text-white shadow-sm"
+                        : "bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-400"
+                    }`}
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200"></div>
+
+            {/* Quantity Selector */}
+            <div className="p-6">
+              <p className="text-base font-bold mb-3 text-gray-900">
+                Quantity:
+              </p>
+              <div className="flex items-center h-12 bg-white border-2 border-gray-200 w-fit rounded-xl overflow-hidden">
+                <button
+                  onClick={() => handleQuantityChange("dec")}
+                  className="w-12 h-full flex items-center justify-center border-r-2 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
                 >
-                  {item}
-                </Link>
-              ))}
+                  <HiMinus className="text-gray-700 text-lg" />
+                </button>
+                <input
+                  readOnly
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  type="number"
+                  className="w-16 h-full flex items-center justify-center text-center text-lg font-bold text-gray-900 outline-none"
+                />
+                <button
+                  onClick={() => handleQuantityChange("inc")}
+                  className="w-12 h-full flex items-center justify-center border-l-2 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <HiPlus className="text-gray-700 text-lg" />
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="mt-5">
-            <p className="font-bold mb-2">Quantity:</p>
-            <div className="flex items-center h-10 border w-fit rounded-full">
-              <button
-                onClick={() => handleQuantityChange("dec")}
-                className="w-10 h-full flex items-center justify-center border-r border-gray-200 cursor-pointer"
-              >
-                <HiMinus />
-              </button>
-              <input
-                readOnly
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                type="number"
-                className="w-20 h-full flex items-center justify-center border-r text-center border-gray-200"
-              />
-
-              <button
-                onClick={() => handleQuantityChange("inc")}
-                className="w-10 h-full flex items-center justify-center border-gray-200 cursor-pointer"
-              >
-                <HiPlus />
-              </button>
-            </div>
-          </div>
-
+          {/* Add to Cart / Go to Cart Button */}
           {!isAddedIntocart ? (
-            <div className="mt-5">
+            <div>
               <ButtonLoading
                 onClick={handleAddToCart}
                 type="button"
                 text="Add to Cart"
-                className="w-full cursor-pointer py-6 text-md"
+                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-primary hover:bg-primary/80 shadow-md"
               ></ButtonLoading>
             </div>
           ) : (
-            <div className="mt-5">
+            <div>
               <Button
-                onClick={handleAddToCart}
                 asChild
                 type="button"
-                className="w-full cursor-pointer py-6 text-md"
+                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-green-600 hover:bg-green-700 shadow-md"
               >
                 <Link href={WEBSITE_CART}>Go to Cart</Link>
               </Button>
@@ -270,29 +359,29 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
           )}
         </div>
       </div>
+
+      {/* Product Description Section */}
       <div className="mb-20">
-        <div className="shadow rounded border">
-          <div className="p-5 bg-gray-50 border-b">
-            <h2 className="text-2xl font-semibold ">Product Details</h2>
+        <div className="rounded-3xl bg-white border border-gray-200 shadow-lg">
+          {/* Header */}
+          <div className="p-6 bg-gray-50 border-b border-gray-200">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Product Description
+            </h2>
           </div>
-          <div className="p-5">
+
+          {/* Content */}
+          <div className="p-8">
             <div
+              className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: product.description }}
             ></div>
           </div>
         </div>
       </div>
 
-      <div className="mb-20">
-        <div className="shadow rounded border">
-          <div className="p-5 bg-gray-50 border-b">
-            <h2 className="text-2xl font-semibold ">Product Details</h2>
-          </div>
-          <div className="p-5">
-            
-          </div>
-        </div>
-      </div>
+      {/* Product Review Section */}
+      <ProductReview product={product} />
     </div>
   );
 };
