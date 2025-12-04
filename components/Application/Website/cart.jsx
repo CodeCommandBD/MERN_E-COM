@@ -25,106 +25,156 @@ const Cart = () => {
   const cart = useSelector((state) => state.cartStore);
   const dispatch = useDispatch();
   const [subTotal, setSubTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
-
 
   useEffect(() => {
     const cartProduct = cart.products;
-    const totalAmount = cartProduct.reduce((total, item) => {
+
+    // Subtotal = MRP total (original price)
+    const mrpTotal = cartProduct.reduce((total, item) => {
+      return total + item.quantity * item.mrp;
+    }, 0);
+
+    // Total = Selling Price total (what customer actually pays)
+    const sellingPriceTotal = cartProduct.reduce((total, item) => {
       return total + item.quantity * item.sellingPrice;
     }, 0);
 
-    const discountAmount = cartProduct.reduce((total, item) => {
-      return total + ((item.mrp - item.sellingPrice) * item.quantity);
-    }, 0);
-    
-    setSubTotal(totalAmount);
+    // Discount = difference between MRP and Selling Price
+    const discountAmount = mrpTotal - sellingPriceTotal;
+
+    setSubTotal(mrpTotal);
+    setTotal(sellingPriceTotal);
     setDiscount(discountAmount);
   }, [cart.products]);
+
   return (
     <div>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger>
           <div className="cursor-pointer hover:text-primary transition-colors relative">
             <BsCart2 size={24} className=" " />
-            <span className="text-xs absolute top-0 -right-1 bg-primary text-white w-4 h-4 flex items-center justify-center rounded-full">{cart.count}</span>
+            <span className="text-[10px] absolute -top-1 -right-1 bg-primary text-white w-4 h-4 flex items-center justify-center rounded-full font-bold">
+              {cart.count}
+            </span>
           </div>
         </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle className="text-lg font-semibold">Cart</SheetTitle>
-            <SheetDescription>
-              {cart.products.length} items in cart
+        <SheetContent className="border-l border-border sm:max-w-md w-full p-0 flex flex-col gap-0">
+          <SheetHeader className="px-6 py-4 border-b border-border">
+            <SheetTitle className="text-xl font-bold text-primary">
+              Shopping Cart
+            </SheetTitle>
+            <SheetDescription className="text-muted-foreground">
+              You have {cart.products.length} items in your cart
             </SheetDescription>
           </SheetHeader>
-          <div className="h-[calc(100vh-3rem)] pb-10 pt-2 p-4">
-            <div className="h-[calc(100%-6rem)] overflow-y-auto">
-              {cart.count === 0 ? (
-                <p className="text-center">Your cart is empty.</p>
-              ) : (
-                cart.products.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex border-b pb-4 justify-between mb-4 items-center gap-6"
-                  >
-                    <div className="flex items-center gap-4">
+
+          <div className="flex-1 overflow-y-auto p-6">
+            {cart.count === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center space-y-4 text-muted-foreground">
+                <BsCart2 size={48} className="opacity-20" />
+                <p>Your cart is currently empty.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {cart.products.map((item, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="shrink-0 border border-border rounded-md overflow-hidden w-24 h-24">
                       <Image
                         src={item?.media || imagePlaceholder.src}
                         alt={item?.name}
-                        className="w-24 h-24 rounded-lg object-cover"
+                        className="w-full h-full object-cover"
                         width={100}
                         height={100}
                       />
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <h3 className="font-semibold">{item?.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {item?.size}/{item?.color}
-                      </p>
-                    </div>
+                    <div className="flex flex-col flex-1 justify-between py-1">
+                      <div className="space-y-1">
+                        <h3 className="font-semibold text-base line-clamp-2 leading-tight">
+                          {item?.name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                          {item?.size} / {item?.color}
+                        </p>
+                      </div>
 
-                    <div className="flex flex-col items-center ">
-                      <button
-                        onClick={() =>
-                          dispatch(
-                            removeProduct({
-                              productId: item.productId,
-                              variantId: item.variantId,
-                            })
-                          )
-                        }
-                        className="text-red-500 underline-offset-1 mb-1 flex items-center cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                      <p className="font-semibold">
-                        {item?.quantity} X{" "}
-                        {item?.sellingPrice.toLocaleString("BD", {
-                          currency: "BDT",
-                          style: "currency",
-                          currencyDisplay: "narrowSymbol",
-                        })}
-                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="font-semibold text-primary">
+                          {item?.sellingPrice.toLocaleString("BD", {
+                            currency: "BDT",
+                            style: "currency",
+                            currencyDisplay: "narrowSymbol",
+                          })}
+                          <span className="text-muted-foreground text-xs font-normal ml-1">
+                            x {item?.quantity}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              removeProduct({
+                                productId: item.productId,
+                                variantId: item.variantId,
+                              })
+                            )
+                          }
+                          className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors uppercase tracking-wider"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-            <div className=" border-t pt-4">
-              <h2 className="flex justify-between font-semibold text-lg">
-                <span>Subtotal:</span> <span>{subTotal.toLocaleString("BD", { currency: "BDT", style: "currency", currencyDisplay: "narrowSymbol" })}</span>
-              </h2>
+                ))}
+              </div>
+            )}
+          </div>
 
-              <h2 className="flex justify-between font-semibold text-lg">
-                <span>Discount:</span> <span>{discount.toLocaleString("BD", { currency: "BDT", style: "currency", currencyDisplay: "narrowSymbol" })}</span>
-              </h2>
-              <div className="flex justify-between gap-10">
+          {cart.count > 0 && (
+            <div className="p-6 bg-secondary/20 border-t border-border space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total MRP</span>
+                  <span className="font-semibold">
+                    {subTotal.toLocaleString("BD", {
+                      currency: "BDT",
+                      style: "currency",
+                      currencyDisplay: "narrowSymbol",
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Discount</span>
+                  <span className="font-semibold text-green-600">
+                    -
+                    {discount.toLocaleString("BD", {
+                      currency: "BDT",
+                      style: "currency",
+                      currencyDisplay: "narrowSymbol",
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-base font-bold text-primary pt-2 border-t border-border/50">
+                  <span>Total Amount</span>
+                  <span>
+                    {total.toLocaleString("BD", {
+                      currency: "BDT",
+                      style: "currency",
+                      currencyDisplay: "narrowSymbol",
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
                 <Button
                   onClick={() => setOpen(false)}
                   type="button"
                   asChild
-                  variant={"secondary"}
-                  className=""
+                  variant={"outline"}
+                  className="w-full border-primary text-primary hover:bg-primary hover:text-white transition-colors rounded-none"
                 >
                   <Link href={WEBSITE_CART}>View Cart</Link>
                 </Button>
@@ -132,7 +182,7 @@ const Cart = () => {
                   onClick={() => setOpen(false)}
                   type="button"
                   asChild
-                  className=""
+                  className="w-full bg-primary text-white hover:bg-primary/90 transition-colors rounded-none shadow-none"
                 >
                   {cart.count ? (
                     <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
@@ -147,7 +197,7 @@ const Cart = () => {
                 </Button>
               </div>
             </div>
-          </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>

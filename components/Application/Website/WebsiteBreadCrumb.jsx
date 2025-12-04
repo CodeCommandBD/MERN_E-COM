@@ -9,7 +9,7 @@ const WebsiteBreadCrumb = ({ props }) => {
       style={{ backgroundImage: `url(${pageTitle.src})` }}
     >
       <div>
-        <h1 className="text-2xl mb-2 text-center font-bold text-white">
+        <h1 className="text-2xl mb-2 text-center font-bold text-black">
           {props.title}
         </h1>
         <ul className="flex gap-2 justify-center">
