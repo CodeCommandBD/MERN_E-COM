@@ -234,45 +234,8 @@ const Cart = () => {
                               <div className="mt-4 flex justify-end">
                                 <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 w-full sm:w-auto sm:min-w-[250px]">
                                   <div className="space-y-2">
-                                    {/* Total MRP */}
-                                    <div className="flex justify-between items-center text-sm">
-                                      <span className="text-gray-600">
-                                        MRP:
-                                      </span>
-                                      <span className="font-semibold text-gray-900">
-                                        {(
-                                          product.mrp * product.quantity
-                                        ).toLocaleString("BD", {
-                                          currency: "BDT",
-                                          style: "currency",
-                                          currencyDisplay: "narrowSymbol",
-                                        })}
-                                      </span>
-                                    </div>
-
-                                    {/* Discount */}
-                                    {product.mrp > product.sellingPrice && (
-                                      <div className="flex justify-between items-center text-sm">
-                                        <span className="text-green-600">
-                                          Discount:
-                                        </span>
-                                        <span className="font-semibold text-green-600">
-                                          -
-                                          {(
-                                            (product.mrp -
-                                              product.sellingPrice) *
-                                            product.quantity
-                                          ).toLocaleString("BD", {
-                                            currency: "BDT",
-                                            style: "currency",
-                                            currencyDisplay: "narrowSymbol",
-                                          })}
-                                        </span>
-                                      </div>
-                                    )}
-
                                     {/* Divider */}
-                                    <div className="border-t-2 border-gray-300 pt-2">
+                                    <div className="pt-2">
                                       <div className="flex justify-between items-center">
                                         <span className="text-sm font-bold text-gray-900">
                                           Sub Total:
@@ -315,17 +278,14 @@ const Cart = () => {
                 {/* Summary Details */}
                 <div className="p-6">
                   <div className="space-y-4 mb-6">
-                    <span className="text-gray-700 font-medium ">
-                      Subtotal ({cart.count} items)
-                    </span>
+                      <span className="text-gray-700 font-medium ">
+                        Subtotal ({cart.count} items)
+                      </span>
                     {/* Total MRP */}
                     <div className="flex justify-between items-center mt-5">
-                      <div className="flex items-center gap-2">
-                        <Receipt className="w-4 h-4 text-gray-600" />
-                        <span className="text-gray-700 font-medium">
-                          Total MRP
-                        </span>
-                      </div>
+                     <span className="text-gray-700 font-medium ">
+                        Original Price
+                      </span>
                       <span className="text-gray-900 font-semibold">
                         {subTotal.toLocaleString("BD", {
                           currency: "BDT",
