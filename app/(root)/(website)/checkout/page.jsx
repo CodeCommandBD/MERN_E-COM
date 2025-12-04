@@ -120,7 +120,9 @@ const Checkout = () => {
       console.log("API Response:", response);
 
       if (!response.success) {
-        throw new Error(response.message);
+        showToast("error", response.message);
+        setCouponLoading(false);
+        return;
       }
 
       const discountPercentage = response.data.discountPercent;
@@ -225,20 +227,18 @@ const Checkout = () => {
               <div>
                 <div className="p-6">
                   <div className="space-y-4 mb-6">
-                    <span className="text-gray-700 font-medium ">
-                      Subtotal ({cart.count} items)
-                    </span>
+                    
                     {/* Total MRP */}
                     <div className="flex justify-between items-center mt-5">
-                      <div className="flex items-center gap-2">
-                        <Receipt className="w-4 h-4 text-gray-600" />
-                        <span className="text-gray-700 font-medium">
-                          MRP
+                      <span className="text-gray-700 font-medium ">
+                        Subtotal ({cart.count} items)
+                      </span>
+                      <div className="flex gap-2">
+                        <span className="text-gray-500 font-medium line-through">৳{subTotal.toFixed(2)}</span>
+                        <span className="text-gray-900 font-semibold">
+                          ৳{total.toFixed(2)}
                         </span>
                       </div>
-                      <span className="text-gray-900 font-semibold">
-                        ৳{subTotal.toFixed(2)}
-                      </span>
                     </div>
 
                     {/* Discount */}

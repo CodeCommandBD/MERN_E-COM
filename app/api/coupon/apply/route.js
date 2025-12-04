@@ -21,13 +21,17 @@ export async function POST(req) {
     const coupon = await couponModel.findOne({ code }).lean();
 
     if (!coupon) {
-      return res(false, "400", "Invalid coupon code or coupon expired");
+      return res(false, "200", "Invalid coupon code or coupon expired");
     }
     if (new Date() > coupon.validity) {
-      return res(false, "400", "coupon code expired");
+      return res(false, "200", "Coupon code has expired");
     }
     if (coupon.miniShoppingAmount > miniShoppingAmount) {
-      return res(false, "400", "coupon code not applicable for this order");
+      return res(
+        false,
+        "200",
+        `Minimum order amount of ৳${coupon.miniShoppingAmount} required to apply this coupon`
+      );
     }
     return res(true, "200", "Coupon applied successfully", {
       discountPercent: coupon.discountPercentage,
