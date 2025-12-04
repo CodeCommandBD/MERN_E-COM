@@ -14,3 +14,7 @@ export const WEBSITE_PRODUCT_DETAILS = (slug) => slug ? `/product/${slug}` : "/p
 
 // cart route
 export const WEBSITE_CART = "/cart";
+
+// checkout route
+export const WEBSITE_CHECKOUT = "/checkout";
+
