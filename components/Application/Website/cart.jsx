@@ -82,7 +82,7 @@ const Cart = () => {
                   <div key={i} className="flex gap-4">
                     <div className="shrink-0 border border-border rounded-md overflow-hidden w-24 h-24">
                       <Image
-                        src={item?.media || imagePlaceholder.src}
+                        src={item?.image || imagePlaceholder.src}
                         alt={item?.name}
                         className="w-full h-full object-cover"
                         width={100}
@@ -136,7 +136,7 @@ const Cart = () => {
             <div className="p-6 bg-secondary/20 border-t border-border space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total MRP</span>
+                  <span className="text-muted-foreground">MRP</span>
                   <span className="font-semibold">
                     {subTotal.toLocaleString("BD", {
                       currency: "BDT",

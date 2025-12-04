@@ -12,7 +12,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { HiMinus, HiPlus, HiShoppingCart } from "react-icons/hi";
-import { Trash2, ShoppingBag, Tag } from "lucide-react";
+import { Trash2, ShoppingBag, Tag, Receipt } from "lucide-react";
 import { useDispatch } from "react-redux";
 import {
   increseQuantity,
@@ -105,9 +105,9 @@ const Cart = () => {
                           href={WEBSITE_PRODUCT_DETAILS(product.url)}
                           className="flex-shrink-0"
                         >
-                          <div className="w-full sm:w-32 h-32 bg-gray-100 border-2 border-gray-200 rounded-xl overflow-hidden">
+                          <div className="w-32 h-32  bg-gray-100 border-2 border-gray-200 rounded-xl overflow-hidden">
                             <Image
-                              src={product.media || imagePlaceholder.src}
+                              src={product.image || imagePlaceholder.src}
                               alt={product.name}
                               width={128}
                               height={128}
@@ -237,7 +237,7 @@ const Cart = () => {
                                     {/* Total MRP */}
                                     <div className="flex justify-between items-center text-sm">
                                       <span className="text-gray-600">
-                                        Total MRP:
+                                        MRP:
                                       </span>
                                       <span className="font-semibold text-gray-900">
                                         {(
@@ -275,7 +275,7 @@ const Cart = () => {
                                     <div className="border-t-2 border-gray-300 pt-2">
                                       <div className="flex justify-between items-center">
                                         <span className="text-sm font-bold text-gray-900">
-                                          Total:
+                                          Sub Total:
                                         </span>
                                         <span className="text-lg font-bold text-primary">
                                           {(
@@ -315,11 +315,17 @@ const Cart = () => {
                 {/* Summary Details */}
                 <div className="p-6">
                   <div className="space-y-4 mb-6">
-                    {/* Subtotal */}
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-700 font-medium">
-                        Subtotal ({cart.count} items)
-                      </span>
+                    <span className="text-gray-700 font-medium ">
+                      Subtotal ({cart.count} items)
+                    </span>
+                    {/* Total MRP */}
+                    <div className="flex justify-between items-center mt-5">
+                      <div className="flex items-center gap-2">
+                        <Receipt className="w-4 h-4 text-gray-600" />
+                        <span className="text-gray-700 font-medium">
+                          Total MRP
+                        </span>
+                      </div>
                       <span className="text-gray-900 font-semibold">
                         {subTotal.toLocaleString("BD", {
                           currency: "BDT",
