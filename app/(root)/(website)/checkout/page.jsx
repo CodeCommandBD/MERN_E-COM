@@ -15,8 +15,6 @@ import useFetch from "@/hooks/useFetch";
 import { useDispatch } from "react-redux";
 import { addIntoCart, clearCart } from "@/store/reducer/cartReducer";
 import Image from "next/image";
-import { Receipt } from "lucide-react";
-import { Tag } from "lucide-react";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,13 +24,15 @@ import { FormControl } from "@mui/material";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { showToast } from "@/lib/showToast";
 import axios from "axios";
-
+import { z } from "zod";
+import { Tag } from "lucide-react";
 const Checkout = () => {
   const bredCrumb = {
     title: "Checkout",
     links: [{ label: "Checkout" }],
   };
   const cart = useSelector((state) => state.cartStore);
+  const auth = useSelector((state) => state.authStore);
   const [verfiyCartData, setVerfiyCartData] = useState([]);
   const { data: getVerfiyCartData } = useFetch(
     "/api/cart-verification",
@@ -48,6 +48,7 @@ const Checkout = () => {
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponDiscountAmount, setCouponDiscountAmount] = useState(0);
+  const [placingOrder, setPlacingOrder] = useState(false);
 
   useEffect(() => {
     if (getVerfiyCartData && getVerfiyCartData.success) {
@@ -150,14 +151,64 @@ const Checkout = () => {
     couponForm.reset();
     showToast("info", "Coupon removed");
   };
+
+  // order
+  const orderFormSchema = zSchema
+    .pick({
+      name: true,
+      email: true,
+      phone: true,
+      country: true,
+      state: true,
+      city: true,
+      pincode: true,
+      landmark: true,
+      paymentMethod: true,
+    })
+    .extend({
+      userId: z.string().optional(),
+      orderNote: z.string().optional(),
+    });
+
+  const orderForm = useForm({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      city: "",
+      landmark: "",
+      pincode: "",
+      country: "",
+      state: "",
+      orderNote: "",
+      paymentMethod: "",
+      userId: auth?._id,
+    },
+  });
+
+  const placeOrder = async (formData) => {
+    setPlacingOrder(true);
+    try {
+      const response = await axios.post("/api/order", formData);
+      console.log(response.data);
+      showToast("success", response.data.message);
+    } catch (error) {
+      console.log(error);
+      showToast("error", error.response.data.message);
+    } finally {
+      setPlacingOrder(false);
+    }
+  };
+
   return (
     <div>
       <WebsiteBreadCrumb props={bredCrumb} />
       {cart.count === 0 ? (
         <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="max-w-md mx-auto text-center bg-white border-2 border-gray-200 rounded-2xl p-8 md:p-12">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <HiShoppingCart className="w-12 h-12 text-gray-400" />
+          <div className="max-w-md mx-auto text-center bg-white border border-gray-300 rounded-lg p-8 md:p-12">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gray-50 border border-gray-300 rounded-lg flex items-center justify-center">
+              <HiShoppingCart className="w-10 h-10 text-gray-500" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
               Your Cart is Empty
@@ -168,7 +219,7 @@ const Checkout = () => {
             <Button
               type="button"
               asChild
-              className="w-full md:w-auto px-8 py-6 text-base"
+              className="w-full md:w-auto px-8 py-3 text-base bg-primary hover:bg-primary/90 text-white border-0"
             >
               <Link href={WEBSITE_SHOP}>
                 <ShoppingBag className="w-5 h-5 mr-2" />
@@ -178,116 +229,504 @@ const Checkout = () => {
           </div>
         </div>
       ) : (
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            <div className="w-full lg:w-[60%]"></div>
-            <div className="w-full lg:w-[40%]">
-              <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden sticky top-6">
-                {/* Header */}
-                <div className="bg-gray-100 px-6 py-4 border-b-2 border-gray-200">
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Order Summary
-                  </h3>
+        <div className="bg-gray-50 min-h-screen">
+          <div className="container mx-auto px-4 py-8 md:py-12">
+            <div className="flex flex-col-reverse lg:flex-row gap-6">
+              {/* Left Side - Checkout Form */}
+              <div className="w-full lg:w-[58%]">
+                <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+                  {/* Header */}
+                  <div className="bg-white border-b border-gray-300 px-6 py-4">
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Checkout Information
+                    </h2>
+                  </div>
+
+                  <Form {...orderForm}>
+                    <form onSubmit={orderForm.handleSubmit(placeOrder)}>
+                      <div className="p-6">
+                        {/* Contact Info Section */}
+                        <div className="mb-8">
+                          <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                            Contact Information
+                          </h3>
+                          <div className="space-y-4">
+                            <FormField
+                              control={orderForm.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Full Name
+                                  </label>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="text"
+                                      placeholder="Enter your full name"
+                                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={orderForm.control}
+                                name="email"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                      Email Address
+                                    </label>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="email"
+                                        placeholder="your@email.com"
+                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={orderForm.control}
+                                name="phone"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                      Phone Number
+                                    </label>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="tel"
+                                        placeholder="01XXXXXXXXX"
+                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Shipping Info Section */}
+                        <div className="mb-8">
+                          <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                            Shipping Information
+                          </h3>
+                          <div className="space-y-4">
+                            <FormField
+                              control={orderForm.control}
+                              name="landmark"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Detailed Address
+                                  </label>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="text"
+                                      placeholder="House, Street, Area"
+                                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={orderForm.control}
+                                name="country"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                      Country
+                                    </label>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="text"
+                                        placeholder="Bangladesh"
+                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={orderForm.control}
+                                name="state"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                      State/Division
+                                    </label>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="text"
+                                        placeholder="Dhaka"
+                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={orderForm.control}
+                                name="city"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                      City
+                                    </label>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="text"
+                                        placeholder="Select City"
+                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={orderForm.control}
+                                name="pincode"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                      Postal Code
+                                    </label>
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        type="text"
+                                        placeholder="1200"
+                                        className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <FormField
+                              control={orderForm.control}
+                              name="orderNote"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Delivery Note (Optional)
+                                  </label>
+                                  <FormControl>
+                                    <textarea
+                                      {...field}
+                                      placeholder="Any special instructions for delivery"
+                                      rows="2"
+                                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary resize-none"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Payment Options */}
+                        <FormField
+                          control={orderForm.control}
+                          name="paymentMethod"
+                          render={({ field }) => (
+                            <FormItem className="mb-8">
+                              <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                                Payment Method
+                              </h3>
+                              <FormControl>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                  {/* Cash on Delivery */}
+                                  <label className="relative cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      {...field}
+                                      value="cash"
+                                      checked={field.value === "cash"}
+                                      onChange={() => field.onChange("cash")}
+                                      className="peer sr-only"
+                                    />
+                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-4 text-center">
+                                      <div className="flex justify-center mb-2">
+                                        <div className="bg-orange-500 text-white px-3 py-1 rounded text-xs font-bold">
+                                          CASH
+                                        </div>
+                                      </div>
+                                      <p className="text-xs text-gray-600 font-medium">
+                                        On Delivery
+                                      </p>
+                                    </div>
+                                  </label>
+
+                                  {/* Card Payment */}
+                                  <label className="relative cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      {...field}
+                                      value="card"
+                                      checked={field.value === "card"}
+                                      onChange={() => field.onChange("card")}
+                                      className="peer sr-only"
+                                    />
+                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-4 text-center">
+                                      <div className="flex justify-center gap-1.5 mb-2">
+                                        <div className="w-7 h-5 bg-blue-600 rounded flex items-center justify-center">
+                                          <span className="text-white text-[9px] font-bold">
+                                            VISA
+                                          </span>
+                                        </div>
+                                        <div className="w-7 h-5 bg-red-600 rounded flex items-center justify-center">
+                                          <span className="text-white text-[9px] font-bold">
+                                            MC
+                                          </span>
+                                        </div>
+                                        <div className="w-7 h-5 bg-blue-400 rounded flex items-center justify-center">
+                                          <span className="text-white text-[9px] font-bold">
+                                            AMEX
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <p className="text-xs text-gray-600 font-medium">
+                                        Card Payment
+                                      </p>
+                                    </div>
+                                  </label>
+
+                                  {/* bKash Payment */}
+                                  <label className="relative cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      {...field}
+                                      value="bkash"
+                                      checked={field.value === "bkash"}
+                                      onChange={() => field.onChange("bkash")}
+                                      className="peer sr-only"
+                                    />
+                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-4 text-center">
+                                      <div className="flex justify-center mb-2">
+                                        <div className="bg-pink-500 text-white px-3 py-1 rounded text-xs font-bold">
+                                          bKash
+                                        </div>
+                                      </div>
+                                      <p className="text-xs text-pink-600 font-bold">
+                                        10% Cashback
+                                      </p>
+                                    </div>
+                                  </label>
+                                </div>
+                              </FormControl>
+                              <p className="text-xs text-gray-500 mt-3 bg-gray-50 p-3 rounded border border-gray-200">
+                                <span className="font-semibold text-gray-700">
+                                  Note:
+                                </span>{" "}
+                                bKash offers 10% cashback up to BDT 100 on
+                                purchases over BDT 600 during the campaign
+                                period.
+                              </p>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Order Summary Box */}
+                        <div className="mb-6 bg-gray-50 border border-gray-300 rounded-md p-5">
+                          <div className="text-center mb-4">
+                            <p className="text-sm text-gray-600 mb-1">
+                              Total Payable Amount
+                            </p>
+                            <p className="text-3xl font-bold text-primary">
+                              ৳{total.toFixed(0)}
+                            </p>
+                          </div>
+                          <div className="border-t border-gray-300 pt-3 space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">
+                                Product Total
+                              </span>
+                              <span className="text-gray-900 font-medium">
+                                ৳{total.toFixed(0)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">
+                                Shipping Fee
+                              </span>
+                              <span className="text-green-600 font-medium">
+                                Free
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 text-center mt-4 pt-3 border-t border-gray-300">
+                            Estimated delivery:{" "}
+                            <span className="font-semibold text-gray-700">
+                              2-3 business days
+                            </span>
+                          </p>
+                        </div>
+
+                        {/* Proceed Button */}
+                        <ButtonLoading
+                          type="submit"
+                          loading={placingOrder}
+                          text="Proceed to Payment"
+                          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-md text-base"
+                        />
+                      </div>
+                    </form>
+                  </Form>
                 </div>
-                {verfiyCartData &&
-                  verfiyCartData?.map((item) => (
-                    <div key={item.variantId}>
-                      <div className="p-3 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+              </div>
+
+              {/* Right Side - Order Summary */}
+              <div className="w-full lg:w-[42%]">
+                <div className="bg-white border border-gray-300 rounded-lg overflow-hidden lg:sticky lg:top-24">
+                  {/* Header */}
+                  <div className="bg-white border-b border-gray-300 px-6 py-4">
+                    <h3 className="text-xl font-bold text-gray-900">
+                      Order Summary
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {cart.count} {cart.count === 1 ? "item" : "items"}
+                    </p>
+                  </div>
+
+                  {/* Cart Items */}
+                  <div className="max-h-[400px] overflow-y-auto">
+                    {verfiyCartData &&
+                      verfiyCartData?.map((item, index) => (
+                        <div
+                          key={item.variantId}
+                          className={`p-4 flex gap-4 ${
+                            index !== verfiyCartData.length - 1
+                              ? "border-b border-gray-200"
+                              : ""
+                          }`}
+                        >
                           <Image
                             src={item.image}
-                            alt={item.variantId}
-                            width={100}
-                            height={100}
-                            className="w-20 h-20 object-cover rounded-lg"
-                          ></Image>
-                          <div>
+                            alt={item.name}
+                            width={80}
+                            height={80}
+                            className="w-20 h-20 object-cover rounded-md border border-gray-200"
+                          />
+                          <div className="flex-1 min-w-0">
                             <Link href={WEBSITE_PRODUCT_DETAILS(item.url)}>
-                              <h3 className="text-lg font-semibold text-gray-900">
+                              <h4 className="text-sm font-semibold text-gray-900 mb-1 hover:text-primary line-clamp-2">
                                 {item.name}
-                              </h3>
+                              </h4>
                             </Link>
-                            <p className="text-sm text-gray-600">
-                              Color: {item.color}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Size: {item.size}
+                            <div className="text-xs text-gray-600 space-y-0.5">
+                              <p>Color: {item.color}</p>
+                              <p>Size: {item.size}</p>
+                              <p className="font-medium text-gray-900">
+                                Qty: {item.quantity}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900">
+                              ৳{(item.sellingPrice * item.quantity).toFixed(0)}
                             </p>
                           </div>
                         </div>
-                        <div>
-                          <p className="text-md font-semibold text-gray-900">
-                            {item.quantity} X ৳{item.sellingPrice.toFixed(2)}
-                          </p>
+                      ))}
+                  </div>
+
+                  {/* Price Breakdown */}
+                  <div className="border-t border-gray-300 p-6">
+                    <div className="space-y-3 mb-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          Subtotal ({cart.count} items)
+                        </span>
+                        <div className="text-right">
+                          <span className="text-gray-400 line-through text-xs mr-2">
+                            ৳{subTotal.toFixed(0)}
+                          </span>
+                          <span className="text-gray-900 font-semibold">
+                            ৳
+                            {(
+                              subTotal -
+                              discount -
+                              couponDiscountAmount
+                            ).toFixed(0)}
+                          </span>
                         </div>
                       </div>
-                    </div>
-                  ))}
-              </div>
-              <div>
-                <div className="p-6">
-                  <div className="space-y-4 mb-6">
-                    
-                    {/* Total MRP */}
-                    <div className="flex justify-between items-center mt-5">
-                      <span className="text-gray-700 font-medium ">
-                        Subtotal ({cart.count} items)
-                      </span>
-                      <div className="flex gap-2">
-                        <span className="text-gray-500 font-medium line-through">৳{subTotal.toFixed(2)}</span>
-                        <span className="text-gray-900 font-semibold">
-                          ৳{total.toFixed(2)}
+
+                      {discount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-700 font-medium">
+                            Product Discount
+                          </span>
+                          <span className="text-green-700 font-semibold">
+                            -৳{discount.toFixed(0)}
+                          </span>
+                        </div>
+                      )}
+
+                      {couponDiscountAmount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-700 font-medium">
+                            Coupon Discount
+                          </span>
+                          <span className="text-green-700 font-semibold">
+                            -৳{couponDiscountAmount.toFixed(0)}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Shipping</span>
+                        <span className="text-green-600 font-semibold">
+                          Free
                         </span>
                       </div>
                     </div>
 
-                    {/* Discount */}
-
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-green-600" />
-                        <span className="text-green-700 font-medium">
-                          Discount
-                        </span>
-                      </div>
-                      <span className="text-green-700 font-semibold">
-                        -৳{discount.toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Coupon Discount */}
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-green-600" />
-                        <span className="text-green-700 font-medium">
-                          Coupon Discount
-                        </span>
-                      </div>
-                      <span className="text-green-700 font-semibold">
-                        -৳{(Number(couponDiscountAmount) || 0).toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="border-t-2 border-gray-200 pt-4">
+                    <div className="border-t-2 border-gray-300 pt-4 mb-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-gray-900">
+                        <span className="text-base font-bold text-gray-900">
                           Total Amount
                         </span>
                         <span className="text-2xl font-bold text-primary">
-                          ৳{total.toFixed(2)}
+                          ৳{total.toFixed(0)}
                         </span>
                       </div>
                     </div>
 
-                    {/* coupon code*/}
+                    {/* Coupon Code */}
                     {!isCouponApplied ? (
                       <Form {...couponForm}>
                         <form
-                          className="flex justify-between items-center gap-2"
+                          className="flex gap-2"
                           onSubmit={couponForm.handleSubmit(applyCoupon)}
                         >
-                          <div className="w-[calc(100%-100px)] ">
+                          <div className="flex-1">
                             <FormField
                               control={couponForm.control}
                               name="code"
@@ -297,36 +736,33 @@ const Checkout = () => {
                                     <Input
                                       {...field}
                                       placeholder="Enter coupon code"
-                                      className="w-full"
+                                      className="h-10 border-gray-300 focus:border-primary"
                                     />
                                   </FormControl>
-                                  <FormMessage></FormMessage>
+                                  <FormMessage />
                                 </FormItem>
                               )}
-                            ></FormField>
+                            />
                           </div>
                           <ButtonLoading
                             type="submit"
-                            text="Apply Coupon"
-                            className={"w-fit"}
+                            text="Apply"
+                            className="h-10 px-6 bg-primary hover:bg-primary/90"
                             loading={couponLoading}
                           />
                         </form>
                       </Form>
                     ) : (
-                      <div className="flex justify-between items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Tag className="w-4 h-4 text-green-600" />
-                          <span className="text-green-700 font-medium">
-                            Coupon Applied
-                          </span>
-                        </div>
+                      <div className="flex justify-between items-center p-3 bg-green-50 border border-green-300 rounded-md">
+                        <span className="text-green-700 font-medium text-sm">
+                          Coupon Applied
+                        </span>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           onClick={removeCoupon}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8"
                         >
                           Remove
                         </Button>
