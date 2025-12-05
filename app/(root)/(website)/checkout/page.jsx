@@ -190,13 +190,61 @@ const Checkout = () => {
   const placeOrder = async (formData) => {
     setPlacingOrder(true);
     try {
-      const response = await axios.post("/api/order", formData);
-      console.log(response.data);
-      showToast("success", response.data.message);
+      // Prepare order data
+      const orderData = {
+        userId: formData.userId,
+        customerInfo: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+        },
+        shippingAddress: {
+          landmark: formData.landmark,
+          city: formData.city,
+          state: formData.state,
+          country: formData.country,
+          pincode: formData.pincode,
+        },
+        items: cart.products,
+        pricing: {
+          subtotal: subTotal,
+          discount: discount,
+          couponDiscount: couponDiscountAmount,
+          shippingFee: 0,
+          total: total,
+        },
+        paymentMethod: formData.paymentMethod,
+        orderNote: formData.orderNote,
+        couponCode: isCouponApplied ? couponForm.getValues("code") : null,
+      };
+
+      // If payment method is card, redirect to Stripe
+      if (formData.paymentMethod === "card") {
+        const response = await axios.post(
+          "/api/stripe/create-checkout-session",
+          orderData
+        );
+
+        if (response.data.success) {
+          // Redirect to Stripe Checkout
+          window.location.href = response.data.data.url;
+        } else {
+          showToast("error", response.data.message);
+          setPlacingOrder(false);
+        }
+      } else {
+        // For cash and bKash, use regular order creation
+        const response = await axios.post("/api/order/create", orderData);
+        console.log(response.data);
+        showToast("success", response.data.message);
+        setPlacingOrder(false);
+      }
     } catch (error) {
       console.log(error);
-      showToast("error", error.response.data.message);
-    } finally {
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to place order"
+      );
       setPlacingOrder(false);
     }
   };
@@ -459,7 +507,7 @@ const Checkout = () => {
                                 Payment Method
                               </h3>
                               <FormControl>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                   {/* Cash on Delivery */}
                                   <label className="relative cursor-pointer">
                                     <input
@@ -470,14 +518,18 @@ const Checkout = () => {
                                       onChange={() => field.onChange("cash")}
                                       className="peer sr-only"
                                     />
-                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-4 text-center">
-                                      <div className="flex justify-center mb-2">
-                                        <div className="bg-orange-500 text-white px-3 py-1 rounded text-xs font-bold">
+                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-5 text-center transition-all">
+                                      <div className="flex justify-center mb-3">
+                                        <div className="bg-orange-500 text-white px-4 py-2 rounded text-sm font-bold">
                                           CASH
                                         </div>
                                       </div>
-                                      <p className="text-xs text-gray-600 font-medium">
-                                        On Delivery
+                                      <p className="text-sm text-gray-900 font-semibold mb-1">
+                                        Cash on Delivery
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        Pay when your order is delivered to your
+                                        doorstep
                                       </p>
                                     </div>
                                   </label>
@@ -492,61 +544,35 @@ const Checkout = () => {
                                       onChange={() => field.onChange("card")}
                                       className="peer sr-only"
                                     />
-                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-4 text-center">
-                                      <div className="flex justify-center gap-1.5 mb-2">
-                                        <div className="w-7 h-5 bg-blue-600 rounded flex items-center justify-center">
-                                          <span className="text-white text-[9px] font-bold">
+                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-5 text-center transition-all">
+                                      <div className="flex justify-center gap-2 mb-3">
+                                        <div className="w-8 h-6 bg-blue-600 rounded flex items-center justify-center">
+                                          <span className="text-white text-[10px] font-bold">
                                             VISA
                                           </span>
                                         </div>
-                                        <div className="w-7 h-5 bg-red-600 rounded flex items-center justify-center">
-                                          <span className="text-white text-[9px] font-bold">
+                                        <div className="w-8 h-6 bg-red-600 rounded flex items-center justify-center">
+                                          <span className="text-white text-[10px] font-bold">
                                             MC
                                           </span>
                                         </div>
-                                        <div className="w-7 h-5 bg-blue-400 rounded flex items-center justify-center">
-                                          <span className="text-white text-[9px] font-bold">
+                                        <div className="w-8 h-6 bg-blue-400 rounded flex items-center justify-center">
+                                          <span className="text-white text-[10px] font-bold">
                                             AMEX
                                           </span>
                                         </div>
                                       </div>
-                                      <p className="text-xs text-gray-600 font-medium">
-                                        Card Payment
+                                      <p className="text-sm text-gray-900 font-semibold mb-1">
+                                        Credit/Debit Card
                                       </p>
-                                    </div>
-                                  </label>
-
-                                  {/* bKash Payment */}
-                                  <label className="relative cursor-pointer">
-                                    <input
-                                      type="radio"
-                                      {...field}
-                                      value="bkash"
-                                      checked={field.value === "bkash"}
-                                      onChange={() => field.onChange("bkash")}
-                                      className="peer sr-only"
-                                    />
-                                    <div className="border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 rounded-md p-4 text-center">
-                                      <div className="flex justify-center mb-2">
-                                        <div className="bg-pink-500 text-white px-3 py-1 rounded text-xs font-bold">
-                                          bKash
-                                        </div>
-                                      </div>
-                                      <p className="text-xs text-pink-600 font-bold">
-                                        10% Cashback
+                                      <p className="text-xs text-gray-500">
+                                        Pay securely with credit or debit card
+                                        via Stripe
                                       </p>
                                     </div>
                                   </label>
                                 </div>
                               </FormControl>
-                              <p className="text-xs text-gray-500 mt-3 bg-gray-50 p-3 rounded border border-gray-200">
-                                <span className="font-semibold text-gray-700">
-                                  Note:
-                                </span>{" "}
-                                bKash offers 10% cashback up to BDT 100 on
-                                purchases over BDT 600 during the campaign
-                                period.
-                              </p>
                               <FormMessage />
                             </FormItem>
                           )}

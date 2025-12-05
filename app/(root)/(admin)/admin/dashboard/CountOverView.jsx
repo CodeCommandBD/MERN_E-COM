@@ -1,6 +1,10 @@
-'use client'
+"use client";
 import useFetch from "@/hooks/useFetch";
-import { ADMIN_CATEGORY_SHOW, ADMIN_CUSTOMER_SHOW, ADMIN_PRODUCT_SHOW } from "@/Routes/AdminPanelRoute";
+import {
+  ADMIN_CATEGORY_SHOW,
+  ADMIN_CUSTOMER_SHOW,
+  ADMIN_PRODUCT_SHOW,
+} from "@/Routes/AdminPanelRoute";
 import Link from "next/link";
 import React from "react";
 import { BiCategory } from "react-icons/bi";
@@ -9,8 +13,20 @@ import { LuUserRound } from "react-icons/lu";
 import { MdOutlineShoppingCart } from "react-icons/md";
 
 const CountOverView = () => {
-  const {data: count} = useFetch('/api/dashboard/admin/count')
-  console.log(count)
+  const { data: count } = useFetch("/api/dashboard/admin/count");
+
+  React.useEffect(() => {
+    // Trigger auto-confirm for orders > 12h
+    const triggerAutoConfirm = async () => {
+      try {
+        await fetch("/api/cron/auto-confirm");
+      } catch (err) {
+        console.error("Auto-confirm trigger failed:", err);
+      }
+    };
+    triggerAutoConfirm();
+  }, []);
+  console.log(count);
   return (
     <div className="grid lg:grid-cols-4 sm:grid-cols-2  sm:gap-10 gap-5">
       <Link href={ADMIN_CATEGORY_SHOW}>
@@ -64,7 +80,7 @@ const CountOverView = () => {
           </div>
         </div>
       </Link>
-      <Link href={''}>
+      <Link href={"/admin/orders"}>
         <div className="flex items-center justify-between p-3 border border-l-4 border-l-cyan-400 rounded-lg bg-white dark:bg-card dark:border-gray-800 dark:border-l-cyan-400 dark:text-white">
           <div>
             <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">

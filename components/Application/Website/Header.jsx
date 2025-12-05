@@ -4,6 +4,7 @@ import {
   USER_DASHBOARD,
   WEBSITE_HOME,
   WEBSITE_LOGIN,
+  WEBSITE_REGISTER,
   WEBSITE_SHOP,
 } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
@@ -17,11 +18,50 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import Search from "./Search";
+import { Package } from "lucide-react";
+import { useEffect } from "react";
+import axios from "axios";
 
 const Header = () => {
   const auth = useSelector((store) => store.authStore.auth);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [orderCount, setOrderCount] = useState(0);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Fetch active order count
+  useEffect(() => {
+    const fetchOrderCount = async () => {
+      if (!auth?._id) return;
+
+      try {
+        // Get user email
+        let userEmail = auth.email;
+        if (!userEmail) {
+          const userResponse = await axios.get(`/api/user/${auth._id}`);
+          if (userResponse.data.success) {
+            userEmail = userResponse.data.data.email;
+          }
+        }
+
+        // Fetch order count
+        let params = `userId=${auth._id}`;
+        if (userEmail) params += `&email=${userEmail}`;
+
+        const response = await axios.get(`/api/order/count?${params}`);
+        if (response.data.success) {
+          setOrderCount(response.data.count);
+        }
+      } catch (error) {
+        console.error("Failed to fetch order count:", error);
+      }
+    };
+
+    fetchOrderCount();
+    // Refresh count every 30 seconds
+    const interval = setInterval(fetchOrderCount, 30000);
+    return () => clearInterval(interval);
+  }, [auth]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -97,14 +137,53 @@ const Header = () => {
             {/* Cart - Always visible */}
             <Cart />
 
+            {/* My Orders - Always visible */}
+            <Link
+              href="/my-orders"
+              className="relative hover:text-primary transition-colors"
+              title="My Orders"
+            >
+              <Package size={24} className="cursor-pointer" />
+              {orderCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {orderCount}
+                </span>
+              )}
+            </Link>
+
             {/* User Account/Avatar - Always visible */}
             {!auth ? (
-              <Link href={WEBSITE_LOGIN}>
-                <VscAccount
-                  size={24}
-                  className="hover:text-primary cursor-pointer transition-colors"
-                />
-              </Link>
+              <div
+                className="relative"
+                onMouseEnter={() => setIsProfileOpen(true)}
+                onMouseLeave={() => setIsProfileOpen(false)}
+              >
+                <div className="p-2 cursor-pointer">
+                  <VscAccount
+                    size={24}
+                    className="hover:text-primary transition-colors"
+                  />
+                </div>
+                {/* Hover Dropdown */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 top-full pt-1 z-50">
+                    <div className="w-40 bg-white rounded-lg shadow-xl border py-2">
+                      <Link
+                        href={WEBSITE_LOGIN}
+                        className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        href={WEBSITE_REGISTER}
+                        className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
+                      >
+                        Sign Up
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link href={USER_DASHBOARD}>
                 <Avatar className="cursor-pointer w-8 h-8">
