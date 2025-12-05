@@ -42,3 +42,5 @@ export const ADMIN_CUSTOMER_SHOW = "/admin/customers";
 // Review routes
 export const ADMIN_REVIEW_SHOW = "/admin/reviews";
 
+// Order routes
+export const ADMIN_ORDER_SHOW = "/admin/orders";
