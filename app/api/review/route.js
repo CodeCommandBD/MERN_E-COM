@@ -2,8 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
-import ReviewModel from "@/Models/review.models";
-
+import ReviewModel from "@/Models/Review.model";
 
 export async function GET(request) {
   try {
@@ -45,15 +44,14 @@ export async function GET(request) {
     // Column filteration
 
     filters.forEach((element) => {
-      if(element.id === "productData"){
-        matchQuery["productData.name"] = { $regex: element.value, $options: "i" };
-      }
-      
-      else if(element.id === "user"){
+      if (element.id === "productData") {
+        matchQuery["productData.name"] = {
+          $regex: element.value,
+          $options: "i",
+        };
+      } else if (element.id === "user") {
         matchQuery["userData.name"] = { $regex: element.value, $options: "i" };
-      }
-      
-      else{
+      } else {
         matchQuery[element.id] = { $regex: element.value, $options: "i" };
       }
     });
@@ -76,7 +74,7 @@ export async function GET(request) {
         },
       },
       {
-        $unwind: {path: "productData", preserveNullAndEmptyArrays: true},
+        $unwind: { path: "$productData", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -87,7 +85,7 @@ export async function GET(request) {
         },
       },
       {
-        $unwind: {path: "userData", preserveNullAndEmptyArrays: true},
+        $unwind: { path: "$userData", preserveNullAndEmptyArrays: true },
       },
       { $match: matchQuery },
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
@@ -115,7 +113,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      data: getReviews, 
+      data: getReviews,
       meta: { totalRowCount },
     });
   } catch (error) {

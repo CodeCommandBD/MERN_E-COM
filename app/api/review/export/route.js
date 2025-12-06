@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import ReviewModel from "@/Models/review.models";
+import ReviewModel from "@/Models/Review.model";
 
 export async function GET(request) {
   try {

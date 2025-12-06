@@ -5,6 +5,7 @@ import CategoryModel from "@/Models/category.model";
 import ProductModel from "@/Models/Product.model";
 import UserModel from "@/Models/user.models";
 import OrderModel from "@/Models/Order.model";
+import ReviewModel from "@/Models/Review.model.js";
 
 export async function GET(params) {
   try {
@@ -18,11 +19,12 @@ export async function GET(params) {
     await connectDB();
 
     // get counts
-    const [category, product, customer, order] = await Promise.all([
+    const [category, product, customer, order, review] = await Promise.all([
       CategoryModel.countDocuments({ deletedAt: null }),
       ProductModel.countDocuments({ deletedAt: null }),
       UserModel.countDocuments({ deletedAt: null }),
       OrderModel.countDocuments(),
+      ReviewModel.countDocuments({ deletedAt: null }),
     ]);
 
     // return response
@@ -31,6 +33,7 @@ export async function GET(params) {
       product,
       customer,
       order,
+      review,
     });
   } catch (error) {
     return catchError(error);
