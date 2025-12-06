@@ -7,7 +7,6 @@ export async function PUT(request) {
   try {
     // Check authentication
     const auth = await isAuthenticated();
-    console.log("Cancel API Auth Result:", auth);
 
     if (!auth.isAuth) {
       const dbgMsg = auth.error ? auth.error.message : "No token found";

@@ -39,12 +39,9 @@ const Shop = () => {
   const fetchProducts = async (pageParam) => {
     try {
       const url = `/api/shop?page=${pageParam}&limit=${limit}&sort=${sorting}&${searchParams.toString()}`;
-      console.log("Fetching URL:", url);
 
       const response = await axios.get(url);
       const getProduct = response.data;
-
-      console.log("API Response:", getProduct);
 
       if (!getProduct.success) {
         return { products: [], nextpage: null };
@@ -55,14 +52,11 @@ const Shop = () => {
       const products = responseData.products || [];
       const nextpage = responseData.nextpage;
 
-      console.log("Extracted products length:", products.length);
-
       return {
         products,
         nextpage,
       };
     } catch (error) {
-      console.error("Error fetching products:", error);
       return { products: [], nextpage: null };
     }
   };

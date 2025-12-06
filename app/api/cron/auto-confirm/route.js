@@ -23,8 +23,6 @@ export async function GET(request) {
       }
     );
 
-    console.log(`Auto-confirmed ${result.modifiedCount} orders.`);
-
     return NextResponse.json(
       {
         success: true,
@@ -34,7 +32,6 @@ export async function GET(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Auto-confirm error:", error);
     return NextResponse.json(
       {
         success: false,

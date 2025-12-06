@@ -125,7 +125,6 @@ const LoginPage = () => {
               : router.push(WEBSITE_HOME);
           }
         } catch (redirectError) {
-          console.log("Redirect error:", redirectError);
           otpResponse.data.role === "admin"
             ? router.push(ADMIN_DASHBOARD)
             : router.push(WEBSITE_HOME);

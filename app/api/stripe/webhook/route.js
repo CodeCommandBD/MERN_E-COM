@@ -25,7 +25,6 @@ export async function POST(request) {
           process.env.STRIPE_WEBHOOK_SECRET
         );
       } catch (err) {
-        console.error("Webhook signature verification failed:", err.message);
         return NextResponse.json(
           { success: false, message: `Webhook Error: ${err.message}` },
           { status: 400 }
@@ -33,9 +32,7 @@ export async function POST(request) {
       }
     } else {
       // Development mode: parse event without verification
-      console.warn(
-        "⚠️  Webhook secret not configured - skipping signature verification (development only)"
-      );
+
       event = JSON.parse(body);
     }
 
@@ -69,8 +66,6 @@ export async function POST(request) {
         order.transactionId = session.payment_intent;
         order.paidAt = new Date();
         await order.save();
-
-        console.log(`Order ${order.orderNumber} payment confirmed`);
       }
     }
 
@@ -101,7 +96,6 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Webhook handler error:", error);
     return NextResponse.json(
       {
         success: false,
