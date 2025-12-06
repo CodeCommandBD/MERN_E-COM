@@ -1,4 +1,8 @@
-import { USER_DASHBOARD, WEBSITE_LOGIN } from "./Routes/WebsiteRoute";
+import {
+  USER_DASHBOARD,
+  WEBSITE_LOGIN,
+  WEBSITE_HOME,
+} from "./Routes/WebsiteRoute";
 import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 import { ADMIN_DASHBOARD } from "./Routes/AdminPanelRoute";

@@ -6,11 +6,15 @@ import { WEBSITE_HOME, WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
 const EmailVerification = ({ params }) => {
   const { token } = use(params);
   const [isVerified, setIsVerified] = useState(null);
+  const [countdown, setCountdown] = useState(3);
+  const router = useRouter();
+
   useEffect(() => {
     const verify = async () => {
       try {
@@ -25,6 +29,23 @@ const EmailVerification = ({ params }) => {
     };
     if (token) verify();
   }, [token]);
+
+  // Auto redirect to login after successful verification
+  useEffect(() => {
+    if (isVerified === true) {
+      const interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            router.push(WEBSITE_LOGIN);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isVerified, router]);
 
   return (
     <Card className={"w-[400px] mx-auto"}>
@@ -51,6 +72,9 @@ const EmailVerification = ({ params }) => {
               <h2 className="text-2xl text-green-500 font-bold my-5">
                 Email verification success!
               </h2>
+              <p className="text-gray-600 mb-4">
+                Redirecting to login in {countdown} seconds...
+              </p>
               <Button asChild>
                 <Link href={WEBSITE_LOGIN}>Login Now</Link>
               </Button>

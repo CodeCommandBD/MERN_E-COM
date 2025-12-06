@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -242,7 +243,9 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
             <div className="p-6 bg-gray-50">
               <div
                 className="text-gray-700 leading-relaxed text-sm line-clamp-2"
-                dangerouslySetInnerHTML={{ __html: product.description }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(product.description),
+                }}
               ></div>
             </div>
 
@@ -374,7 +377,9 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
           <div className="p-8">
             <div
               className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: product.description }}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(product.description),
+              }}
             ></div>
           </div>
         </div>

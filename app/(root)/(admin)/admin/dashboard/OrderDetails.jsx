@@ -6,6 +6,11 @@ import { OrderOverView } from "./OrderOverView";
 import { OrderStatus } from "./OrderStatus";
 import LatestOrder from "./LatestOrder";
 import LatestReview from "./LatestReview";
+import {
+  ADMIN_ORDER_SHOW,
+  ADMIN_ORDER_SUMMARY,
+  ADMIN_REVIEW_SHOW,
+} from "@/Routes/AdminPanelRoute";
 
 const OrderDetails = () => {
   return (
@@ -16,11 +21,11 @@ const OrderDetails = () => {
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Order Overview</span>
               <Button type="button" className="text-sm">
-                <Link href="/admin/orders">View All</Link>
+                <Link href={ADMIN_ORDER_SHOW}>View All</Link>
               </Button>
             </div>
           </CardHeader>
-          <CardContent >
+          <CardContent>
             <OrderOverView />
           </CardContent>
         </Card>
@@ -29,11 +34,11 @@ const OrderDetails = () => {
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Order Summary</span>
               <Button type="button" className="text-sm">
-                <Link href="/admin/orders/summary">View All</Link>
+                <Link href={ADMIN_ORDER_SUMMARY}>View All</Link>
               </Button>
             </div>
           </CardHeader>
-          <CardContent >
+          <CardContent>
             <OrderStatus />
           </CardContent>
         </Card>
@@ -44,11 +49,11 @@ const OrderDetails = () => {
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Latest Order</span>
               <Button type="button" className="text-sm">
-                <Link href="/admin/orders">View All</Link>
+                <Link href={ADMIN_ORDER_SHOW}>View All</Link>
               </Button>
             </div>
           </CardHeader>
-          <CardContent className={'p-2 overflow-y-auto'}>
+          <CardContent className={"p-2 overflow-y-auto"}>
             <LatestOrder />
           </CardContent>
         </Card>
@@ -57,12 +62,12 @@ const OrderDetails = () => {
             <div className="flex items-center justify-between w-full">
               <span className=" font-semibold">Latest Review</span>
               <Button type="button" className="text-sm">
-                <Link href="">View All</Link>
+                <Link href={ADMIN_REVIEW_SHOW}>View All</Link>
               </Button>
             </div>
           </CardHeader>
-          <CardContent className={'p-2 overflow-y-auto'}>
-            <LatestReview />  
+          <CardContent className={"p-2 overflow-y-auto"}>
+            <LatestReview />
           </CardContent>
         </Card>
       </div>

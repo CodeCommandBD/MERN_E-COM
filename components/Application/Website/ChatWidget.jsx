@@ -69,6 +69,10 @@ const ChatWidget = () => {
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
+      // If ticket not found (404), clear local storage to reset state
+      if (error.response && error.response.status === 404) {
+        handleEndChat();
+      }
     }
   };
 

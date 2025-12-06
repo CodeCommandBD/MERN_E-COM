@@ -3,6 +3,7 @@ import useFetch from "@/hooks/useFetch";
 import {
   ADMIN_CATEGORY_SHOW,
   ADMIN_CUSTOMER_SHOW,
+  ADMIN_ORDER_SHOW,
   ADMIN_PRODUCT_SHOW,
 } from "@/Routes/AdminPanelRoute";
 import Link from "next/link";
@@ -78,7 +79,7 @@ const CountOverView = () => {
           </div>
         </div>
       </Link>
-      <Link href={"/admin/orders"}>
+      <Link href={ADMIN_ORDER_SHOW}>
         <div className="flex items-center justify-between p-3 border border-l-4 border-l-cyan-400 rounded-lg bg-white dark:bg-card dark:border-gray-800 dark:border-l-cyan-400 dark:text-white">
           <div>
             <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">

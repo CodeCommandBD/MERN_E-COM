@@ -13,10 +13,12 @@ const Banner = () => {
         >
           <Image
             src={bannerOne}
-            alt="bannerOne"
+            alt="Shop New Arrivals at E-Store"
             width={bannerOne.width}
             height={bannerOne.height}
+            sizes="(max-width: 768px) 50vw, 45vw"
             className="w-full h-auto"
+            priority
           />
         </Link>
         <Link
@@ -25,10 +27,12 @@ const Banner = () => {
         >
           <Image
             src={bannerTwo}
-            alt="bannerTwo"
+            alt="Explore Fashion Collections"
             width={bannerTwo.width}
             height={bannerTwo.height}
+            sizes="(max-width: 768px) 50vw, 45vw"
             className="w-full h-auto"
+            priority
           />
         </Link>
       </div>

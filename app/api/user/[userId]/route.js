@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/dbConnection";
 import UserModel from "@/Models/user.models.js";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request, { params }) {
   try {
     await connectDB();

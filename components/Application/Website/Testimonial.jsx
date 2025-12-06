@@ -16,7 +16,7 @@ const testimonial = [
   {
     name: "Sarah Johnson",
     review:
-      "Amazing shopping experience! Fast delivery and the product quality exceeded my expectations. Will definitely shop again!",
+      "Amazing shopping experience! Fast delivery and the product quality exceeded my expectations.",
     rating: 5.0,
   },
   {
@@ -43,30 +43,6 @@ const testimonial = [
       "The product descriptions are accurate and detailed. Got exactly what I ordered. Very satisfied!",
     rating: 4.5,
   },
-  {
-    name: "James Wilson",
-    review:
-      "Fast shipping and secure packaging. The tracking system kept me updated throughout the delivery process.",
-    rating: 4.0,
-  },
-  {
-    name: "Lisa Anderson",
-    review:
-      "Best online shopping platform I have used! The deals and discounts are fantastic. Keep up the good work!",
-    rating: 5.0,
-  },
-  {
-    name: "Ahmed Hassan",
-    review:
-      "User-friendly interface with great product selection. The payment process is secure and convenient.",
-    rating: 4.5,
-  },
-  {
-    name: "Maria Garcia",
-    review:
-      "Impressed with the quality and authenticity of products. The return policy is also very fair and transparent.",
-    rating: 4.0,
-  },
 ];
 
 const Testimonial = () => {
@@ -80,57 +56,35 @@ const Testimonial = () => {
           modules={[Pagination, Autoplay]}
           spaceBetween={20}
           slidesPerView={1}
-          pagination={{
-            clickable: true,
-            dynamicBullets: false,
-          }}
-          autoplay={{
-            delay: 4000,
-            disableOnInteraction: false,
-          }}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
           loop={true}
           speed={500}
           breakpoints={{
-            768: {
-              slidesPerView: 1,
-              spaceBetween: 20,
-            },
-            1024: {
-              slidesPerView: 2,
-              spaceBetween: 24,
-            },
-            1280: {
-              slidesPerView: 3,
-              spaceBetween: 30,
-            },
+            768: { slidesPerView: 1, spaceBetween: 20 },
+            1024: { slidesPerView: 2, spaceBetween: 24 },
+            1280: { slidesPerView: 3, spaceBetween: 30 },
           }}
         >
           {testimonial.map((item, index) => (
             <SwiperSlide key={index}>
               <div className="pb-2">
-                <div className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 md:p-7 mx-auto max-w-lg h-full">
-                  {/* Quote Icon */}
+                <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-7 mx-auto max-w-lg h-full">
                   <div className="mb-5">
                     <BsChatQuote size={32} className="text-gray-800" />
                   </div>
-
-                  {/* Review Text */}
-                  <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-6 min-h-[100px] md:min-h-[120px]">
+                  <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-6 min-h-[100px]">
                     {item.review}
                   </p>
-
-                  {/* Author Info */}
                   <div className="pt-2">
                     <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2">
                       {item.name}
                     </h3>
-
-                    {/* Star Rating */}
                     <div className="flex items-center gap-0.5">
                       {Array.from(
                         { length: Math.floor(item.rating) },
-                        (_, index) => (
-                          <span key={index} className="text-yellow-400">
+                        (_, i) => (
+                          <span key={i} className="text-yellow-400">
                             <FaStar size={16} />
                           </span>
                         )
@@ -149,19 +103,16 @@ const Testimonial = () => {
         </Swiper>
       </div>
 
-      {/* Custom Pagination Styling */}
       <style jsx global>{`
         .testimonial-slider .swiper-pagination {
           bottom: 0;
         }
-
         .testimonial-slider .swiper-pagination-bullet {
           width: 10px;
           height: 10px;
           background: #d1d5db;
           opacity: 1;
         }
-
         .testimonial-slider .swiper-pagination-bullet-active {
           background: #000;
         }
