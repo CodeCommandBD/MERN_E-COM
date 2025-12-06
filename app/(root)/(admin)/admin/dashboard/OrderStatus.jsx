@@ -54,6 +54,27 @@ export function OrderStatus({ data = [] }) {
 
   const hasData = totalOrders > 0;
 
+  const getStatusColor = (status) => {
+    const colors = {
+      pending:
+        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+      processing:
+        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      shipped:
+        "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+      delivered:
+        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      cancelled: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+      confirmed: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+      unverified:
+        "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
+    };
+    return (
+      colors[status] ||
+      "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400"
+    );
+  };
+
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm h-full p-4 overflow-hidden flex flex-col">
       <div className="mb-4 flex-shrink-0">
@@ -112,22 +133,20 @@ export function OrderStatus({ data = [] }) {
           </ChartContainer>
         </div>
 
-        <div className="mt-4 flex-1 overflow-auto">
+        <div className="mt-4 flex-1 overflow-auto pr-2">
           <ul>
             {data.map((item) => (
               <li
                 key={item.status}
                 className="flex items-center justify-between mb-3 text-sm"
               >
-                <span className="capitalize">
+                <span className="capitalize text-muted-foreground font-medium">
                   {chartConfig[item.status]?.label || item.status}
                 </span>
                 <span
-                  className="rounded-full px-2 text-sm text-white"
-                  style={{
-                    backgroundColor:
-                      item.fill || chartConfig[item.status]?.color,
-                  }}
+                  className={`rounded-full px-3 py-0.5 text-xs font-bold ${getStatusColor(
+                    item.status
+                  )}`}
                 >
                   {item.count}
                 </span>

@@ -112,7 +112,7 @@ export default function AdminOrderDetails() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Order {order.orderNumber}
             </h1>
             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
@@ -304,8 +304,10 @@ export default function AdminOrderDetails() {
               </div>
               {order.transactionId && (
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Transaction ID</p>
-                  <p className="text-xs font-mono bg-gray-100 p-2 rounded border border-gray-200 break-all">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                    Transaction ID
+                  </p>
+                  <p className="text-xs font-mono bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-gray-100 p-2 rounded border border-gray-200 dark:border-gray-600 break-all">
                     {order.transactionId}
                   </p>
                 </div>

@@ -84,7 +84,7 @@ export async function GET(req) {
     // 3. Latest Orders
     const latestOrders = await OrderModel.find()
       .select(
-        "orderNumber transactionId items orderStatus pricing.total createdAt"
+        "orderNumber transactionId items orderStatus pricing.total createdAt paymentMethod"
       )
       .sort({ createdAt: -1 })
       .limit(10);
