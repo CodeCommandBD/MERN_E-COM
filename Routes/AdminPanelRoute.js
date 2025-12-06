@@ -44,3 +44,6 @@ export const ADMIN_REVIEW_SHOW = "/admin/reviews";
 
 // Order routes
 export const ADMIN_ORDER_SHOW = "/admin/orders";
+
+// Support routes
+export const ADMIN_SUPPORT_SHOW = "/admin/support";
