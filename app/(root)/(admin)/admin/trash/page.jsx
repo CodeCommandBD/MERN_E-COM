@@ -10,6 +10,7 @@ import {
   DT_COUPON_COLUMN,
   DT_CUSTOMER_COLUMN,
   DT_REVIEW_COLUMN,
+  DT_ORDER_COLUMN,
 } from "@/lib/column";
 import DeleteAction from "@/components/Application/Admin/DeleteAction";
 import RestoreAction from "@/components/Application/Admin/RestoreAction";
@@ -69,6 +70,13 @@ const TRASH_CONFIG = {
     fetchUrl: "/api/reviews",
     exportUrl: "/api/reviews/export",
     deleteUrl: "/api/reviews/delete",
+  },
+  order: {
+    title: "Order Trash",
+    columns: DT_ORDER_COLUMN,
+    fetchUrl: "/api/order",
+    exportUrl: null,
+    deleteUrl: "/api/order/delete",
   },
 };
 

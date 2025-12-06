@@ -26,7 +26,7 @@ const LatestOrder = ({ data = [] }) => {
           <TableHeader>
             <TableRow>
               <TableHead>Order ID</TableHead>
-              <TableHead>Payment Id</TableHead>
+              <TableHead>Payment Method</TableHead>
               <TableHead>Total Item</TableHead>
               <TableHead>status</TableHead>
               <TableHead>Amount</TableHead>
@@ -45,7 +45,9 @@ const LatestOrder = ({ data = [] }) => {
                   <TableCell className="font-medium">
                     {order.orderNumber}
                   </TableCell>
-                  <TableCell>{order.transactionId || "N/A"}</TableCell>
+                  <TableCell>
+                    {(order.paymentMethod || "CASH").toUpperCase()}
+                  </TableCell>
                   <TableCell>{order.items?.length || 0}</TableCell>
                   <TableCell>
                     <span
