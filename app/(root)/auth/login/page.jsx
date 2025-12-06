@@ -94,7 +94,12 @@ const LoginPage = () => {
         showToast("success", registerResponse.message);
       }
     } catch (error) {
-      showToast("error", error.message || "Login failed. Please try again.");
+      // Extract error message from API response
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed. Please try again.";
+      showToast("error", errorMessage);
     } finally {
       setLoading(false);
     }

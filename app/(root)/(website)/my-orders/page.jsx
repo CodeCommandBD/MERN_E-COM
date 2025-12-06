@@ -6,6 +6,17 @@ import Link from "next/link";
 import { Package, Eye, Calendar, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
+import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrumb";
+
+const breadcrumb = {
+  title: "My Orders",
+  links: [
+    {
+      label: "My Orders",
+      href: "/my-orders",
+    },
+  ],
+};
 
 import {
   Dialog,
@@ -162,182 +173,190 @@ export default function MyOrders() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 md:py-12">
-      <div className="container mx-auto px-4 max-w-6xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
-          <p className="text-gray-600">
-            Track and manage your orders ({orders.length} total)
-          </p>
-        </div>
-
-        {/* Orders List */}
-        {orders.length === 0 ? (
-          <div className="bg-white border border-gray-300 rounded-lg p-12 text-center">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              No orders yet
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Start shopping to see your orders here
+    <div className="min-h-screen bg-white">
+      <WebsiteBreadCrumb props={breadcrumb} />
+      <div className="bg-gray-50 py-8 md:py-12">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
+            <p className="text-gray-600">
+              Track and manage your orders ({orders.length} total)
             </p>
-            <Button asChild>
-              <Link href="/shop">Start Shopping</Link>
-            </Button>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div
-                key={order._id}
-                className="bg-white border border-gray-300 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  {/* Order Header */}
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 pb-4 border-b border-gray-200">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">
-                        Order #{order.orderNumber}
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          {new Date(order.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            }
-                          )}
+
+          {/* Orders List */}
+          {orders.length === 0 ? (
+            <div className="bg-white border border-gray-300 rounded-lg p-12 text-center">
+              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                No orders yet
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Start shopping to see your orders here
+              </p>
+              <Button asChild>
+                <Link href="/shop">Start Shopping</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div
+                  key={order._id}
+                  className="bg-white border border-gray-300 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="p-6">
+                    {/* Order Header */}
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 pb-4 border-b border-gray-200">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                          Order #{order.orderNumber}
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="w-4 h-4" />
+                          <span>
+                            {new Date(order.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-3 md:mt-0">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(
+                            order.orderStatus
+                          )}`}
+                        >
+                          {order.orderStatus.toUpperCase()}
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-bold ${getPaymentStatusColor(
+                            order.paymentStatus
+                          )}`}
+                        >
+                          {order.paymentStatus.toUpperCase()}
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2 mt-3 md:mt-0">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(
-                          order.orderStatus
-                        )}`}
-                      >
-                        {order.orderStatus.toUpperCase()}
-                      </span>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold ${getPaymentStatusColor(
-                          order.paymentStatus
-                        )}`}
-                      >
-                        {order.paymentStatus.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* Order Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Items</p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {order.items.length} item(s)
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Total Amount</p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        ৳{order.pricing.total.toFixed(0)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">
-                        Payment Method
-                      </p>
-                      <div className="flex items-center gap-1">
-                        <CreditCard className="w-4 h-4 text-gray-500" />
-                        <p className="text-sm font-semibold text-gray-900 capitalize">
-                          {order.paymentMethod === "card"
-                            ? "Card"
-                            : order.paymentMethod}
+                    {/* Order Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Items</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {order.items.length} item(s)
                         </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Total Amount
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          ৳{order.pricing.total.toFixed(0)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Payment Method
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <CreditCard className="w-4 h-4 text-gray-500" />
+                          <p className="text-sm font-semibold text-gray-900 capitalize">
+                            {order.paymentMethod === "card"
+                              ? "Card"
+                              : order.paymentMethod}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons & Helper Text */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-100">
+                      <div className="text-sm text-gray-500">
+                        {["pending", "confirmed"].includes(order.orderStatus) &&
+                          order.paymentStatus !== "paid" &&
+                          (new Date() - new Date(order.createdAt)) /
+                            (1000 * 60 * 60) <=
+                            12 && (
+                            <p>You can cancel this order within 12 hours.</p>
+                          )}
+                        {order.paymentStatus === "paid" &&
+                          ["pending", "confirmed"].includes(
+                            order.orderStatus
+                          ) && (
+                            <p className="text-amber-600">
+                              Paid orders cannot be cancelled online. Contact
+                              support for refunds.
+                            </p>
+                          )}
+                      </div>
+                      <div className="flex gap-3">
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="w-full md:w-auto"
+                        >
+                          <Link href={`/order/${order._id}`}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Link>
+                        </Button>
+
+                        {/* Cancel Button - Only for unpaid orders (COD) */}
+                        {["pending", "confirmed"].includes(order.orderStatus) &&
+                          order.paymentStatus !== "paid" &&
+                          (new Date() - new Date(order.createdAt)) /
+                            (1000 * 60 * 60) <=
+                            12 && (
+                            <Button
+                              variant="destructive"
+                              onClick={() => openCancelDialog(order)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Cancel Order
+                            </Button>
+                          )}
                       </div>
                     </div>
                   </div>
-
-                  {/* Action Buttons & Helper Text */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-100">
-                    <div className="text-sm text-gray-500">
-                      {["pending", "confirmed"].includes(order.orderStatus) &&
-                        order.paymentStatus !== "paid" &&
-                        (new Date() - new Date(order.createdAt)) /
-                          (1000 * 60 * 60) <=
-                          12 && (
-                          <p>You can cancel this order within 12 hours.</p>
-                        )}
-                      {order.paymentStatus === "paid" &&
-                        ["pending", "confirmed"].includes(
-                          order.orderStatus
-                        ) && (
-                          <p className="text-amber-600">
-                            Paid orders cannot be cancelled online. Contact
-                            support for refunds.
-                          </p>
-                        )}
-                    </div>
-                    <div className="flex gap-3">
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="w-full md:w-auto"
-                      >
-                        <Link href={`/order/${order._id}`}>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </Link>
-                      </Button>
-
-                      {/* Cancel Button - Only for unpaid orders (COD) */}
-                      {["pending", "confirmed"].includes(order.orderStatus) &&
-                        order.paymentStatus !== "paid" &&
-                        (new Date() - new Date(order.createdAt)) /
-                          (1000 * 60 * 60) <=
-                          12 && (
-                          <Button
-                            variant="destructive"
-                            onClick={() => openCancelDialog(order)}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            Cancel Order
-                          </Button>
-                        )}
-                    </div>
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Cancel Order</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to cancel this order? This action cannot
-                be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Keep Order
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleCancelOrder}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Yes, Cancel Order
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cancel Order</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to cancel this order? This action cannot
+                  be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Keep Order
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleCancelOrder}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Yes, Cancel Order
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     </div>
   );
