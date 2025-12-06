@@ -64,8 +64,8 @@ export async function POST(request) {
 
       if (order) {
         order.paymentStatus = "paid";
-        // Keep orderStatus as pending to allow 12h cancellation window
-        order.orderStatus = "pending";
+        // Auto-confirm order when payment is successful
+        order.orderStatus = "confirmed";
         order.transactionId = session.payment_intent;
         order.paidAt = new Date();
         await order.save();

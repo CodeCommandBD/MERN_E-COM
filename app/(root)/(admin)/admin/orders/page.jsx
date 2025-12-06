@@ -262,6 +262,14 @@ export default function AdminOrders() {
                         <p className="text-sm font-semibold text-gray-900">
                           {order.orderNumber}
                         </p>
+                        {order.transactionId && (
+                          <div className="flex items-center gap-1 mt-1 text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 w-fit">
+                            <CreditCard className="w-3 h-3" />
+                            <span className="font-mono">
+                              {order.transactionId}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">

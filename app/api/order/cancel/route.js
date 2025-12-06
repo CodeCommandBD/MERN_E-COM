@@ -52,6 +52,16 @@ export async function PUT(request) {
       );
     }
 
+    // Prevent cancellation of orders that have already been paid (Stripe/bKash)
+    // Only Cash on Delivery orders with pending payment can be cancelled by users
+    if (order.paymentStatus === "paid") {
+      return res(
+        false,
+        400,
+        "Orders that have been paid cannot be cancelled. Please contact customer support for refund assistance."
+      );
+    }
+
     // Check time window (12 hours)
     const orderDate = new Date(order.createdAt);
     const currentDate = new Date();

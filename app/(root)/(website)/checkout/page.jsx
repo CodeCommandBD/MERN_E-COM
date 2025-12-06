@@ -226,6 +226,15 @@ const Checkout = () => {
         );
 
         if (response.data.success) {
+          // Save guest order to local storage (for both guests and logged-in users to persist on device)
+          const guestOrders = JSON.parse(
+            localStorage.getItem("guest_orders") || "[]"
+          );
+          // Check if orderId exists to avoid duplicates
+          if (!guestOrders.includes(response.data.data.orderId)) {
+            guestOrders.push(response.data.data.orderId);
+            localStorage.setItem("guest_orders", JSON.stringify(guestOrders));
+          }
           // Redirect to Stripe Checkout
           window.location.href = response.data.data.url;
         } else {
@@ -235,9 +244,27 @@ const Checkout = () => {
       } else {
         // For cash and bKash, use regular order creation
         const response = await axios.post("/api/order/create", orderData);
-        console.log(response.data);
-        showToast("success", response.data.message);
-        setPlacingOrder(false);
+        if (response.data.success) {
+          showToast("success", response.data.message);
+
+          // Save guest order to local storage (for both guests and logged-in users to persist on device)
+          const guestOrders = JSON.parse(
+            localStorage.getItem("guest_orders") || "[]"
+          );
+          // Check if orderId exists to avoid duplicates (though new order ID is unique)
+          if (!guestOrders.includes(response.data.data.orderId)) {
+            guestOrders.push(response.data.data.orderId);
+            localStorage.setItem("guest_orders", JSON.stringify(guestOrders));
+          }
+
+          // Clear cart after successful order
+          dispatch(clearCart());
+          // Redirect to order tracking page
+          window.location.href = `/order/${response.data.data.orderId}`;
+        } else {
+          showToast("error", response.data.message);
+          setPlacingOrder(false);
+        }
       }
     } catch (error) {
       console.log(error);

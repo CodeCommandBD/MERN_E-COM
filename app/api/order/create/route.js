@@ -16,6 +16,7 @@ export async function POST(request) {
       orderNote,
       couponCode,
       userId,
+      transactionId,
     } = body;
 
     // Validate required fields
@@ -48,10 +49,11 @@ export async function POST(request) {
       items,
       pricing,
       paymentMethod,
-      paymentStatus: paymentMethod === "cash" ? "pending" : "pending",
-      orderStatus: "confirmed",
+      paymentStatus: "pending",
+      orderStatus: "pending",
       orderNote: orderNote || "",
       couponCode: couponCode || null,
+      transactionId: transactionId || null,
     });
 
     return NextResponse.json(

@@ -9,10 +9,14 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
     const userId = searchParams.get("userId");
+    const orderIds = searchParams.get("orderIds");
 
-    if (!email && !userId) {
+    if (!email && !userId && !orderIds) {
       return NextResponse.json(
-        { success: false, message: "Email or User ID is required" },
+        {
+          success: false,
+          message: "Email, User ID, or Order IDs are required",
+        },
         { status: 400 }
       );
     }
@@ -28,6 +32,17 @@ export async function GET(request) {
       query = { userId: userId };
     } else if (email) {
       query = { "customerInfo.email": email };
+    }
+
+    // Handle multiple order IDs (for guest users)
+    if (orderIds) {
+      const ids = orderIds.split(",").filter((id) => id.trim() !== "");
+      if (ids.length > 0) {
+        // If we have specific IDs, add them to the query
+        // If userId or email was also provided, it acts as an AND condition (security)
+        // If neither was provided (guest), we just query by these IDs
+        query._id = { $in: ids };
+      }
     }
 
     // Count active orders (not delivered or cancelled)
