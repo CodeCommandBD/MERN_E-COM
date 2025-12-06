@@ -95,7 +95,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
   return (
     <div className="lg:px-32 px-4 relative">
       {isProductLoading && (
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 z-50 bg-black/20 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 dark:bg-black/50">
           <Loading></Loading>
         </div>
       )}
