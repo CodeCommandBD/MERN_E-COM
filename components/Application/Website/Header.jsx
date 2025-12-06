@@ -29,7 +29,7 @@ const Header = () => {
   const [orderCount, setOrderCount] = useState(0);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // Fetch active order count
+  // Fetch active order count - deferred to not block initial render
   useEffect(() => {
     const fetchOrderCount = async () => {
       // If user is authenticated
@@ -45,8 +45,9 @@ const Header = () => {
           }
 
           // Fetch order count
-          let params = `userId=${auth._id}`;
-          if (userEmail) params += `&email=${userEmail}`;
+          let params = "";
+          if (auth._id) params += `userId=${auth._id}`;
+          if (userEmail) params += `${params ? "&" : ""}email=${userEmail}`;
 
           const response = await axios.get(`/api/order/count?${params}`);
           if (response.data.success) {
@@ -83,10 +84,14 @@ const Header = () => {
       }
     };
 
-    fetchOrderCount();
+    // Defer API call to after initial render to not block LCP
+    const timeoutId = setTimeout(fetchOrderCount, 100);
     // Refresh count every 30 seconds
     const interval = setInterval(fetchOrderCount, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+    };
   }, [auth]);
 
   const toggleMobileMenu = () => {

@@ -4,10 +4,76 @@ import MainSlider from "@/components/Application/Website/MainSlider";
 import Testimonial from "@/components/Application/Website/Testimonial";
 import { advertisingBanner } from "@/public/image";
 import Image from "next/image";
+import Script from "next/script";
 import { BiSupport } from "react-icons/bi";
 import { FaShippingFast } from "react-icons/fa";
 import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
+
+// SEO Metadata for Home Page
+export const metadata = {
+  title:
+    "E-Store - Premium Fashion & Clothing | Shop T-shirts, Hoodies, Oversized",
+  description:
+    "Welcome to E-Store - Your destination for trendy T-shirts, Hoodies, and Oversized clothing. Free shipping, 7-day returns, 24/7 support. Shop now for exclusive member discounts!",
+  alternates: {
+    canonical: "/",
+  },
+};
+
+// Website JSON-LD Structured Data
+function WebsiteJsonLd() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "E-Store",
+    url: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
+        }/shop?search={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  return (
+    <Script
+      id="website-jsonld"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
+
+// Organization JSON-LD
+function OrganizationJsonLd() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "E-Store",
+    url: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000",
+    logo: `${
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
+    }/logo.png`,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      availableLanguage: ["English", "Bengali"],
+    },
+  };
+
+  return (
+    <Script
+      id="organization-jsonld"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
 
 const page = () => {
   const features = [
@@ -34,79 +100,84 @@ const page = () => {
   ];
 
   return (
-    <div className="bg-white">
-      {/* Hero Slider */}
-      <section>
-        <MainSlider />
-      </section>
+    <>
+      <WebsiteJsonLd />
+      <OrganizationJsonLd />
+      <div className="bg-white">
+        {/* Hero Slider */}
+        <section>
+          <MainSlider />
+        </section>
 
-      {/* Banner Section */}
-      <section>
-        <Banner />
-      </section>
+        {/* Banner Section */}
+        <section>
+          <Banner />
+        </section>
 
-      {/* Featured Products */}
-      <section>
-        <FeaturedProduct />
-      </section>
+        {/* Featured Products */}
+        <section>
+          <FeaturedProduct />
+        </section>
 
-      {/* Advertising Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
-        <div className="border-2 border-primary/20 rounded-lg overflow-hidden">
-          <Image
-            src={advertisingBanner}
-            alt="advertisingBanner"
-            width={advertisingBanner.width}
-            height={advertisingBanner.height}
-            className="w-full h-auto object-cover"
-          />
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
-        <Testimonial />
-      </section>
-
-      {/* Features Section */}
-      <section className="bg-primary/5 py-8 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-8 sm:mb-14">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3">
-              Why Choose Us
-            </h2>
-            <div className="w-20 h-1 bg-primary mx-auto mb-4"></div>
-            <p className="text-foreground/60 text-sm sm:text-base max-w-2xl mx-auto">
-              We're committed to providing you with the best shopping experience
-            </p>
+        {/* Advertising Banner */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
+          <div className="border-2 border-primary/20 rounded-lg overflow-hidden">
+            <Image
+              src={advertisingBanner}
+              alt="advertisingBanner"
+              width={advertisingBanner.width}
+              height={advertisingBanner.height}
+              className="w-full h-auto object-cover"
+            />
           </div>
+        </section>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="bg-white border-2 border-primary/20 rounded-lg p-6 text-center"
-                >
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-                    <Icon className="text-primary" size={32} />
+        {/* Testimonials */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
+          <Testimonial />
+        </section>
+
+        {/* Features Section */}
+        <section className="bg-primary/5 py-8 sm:py-16 lg:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section Header */}
+            <div className="text-center mb-8 sm:mb-14">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3">
+                Why Choose Us
+              </h2>
+              <div className="w-20 h-1 bg-primary mx-auto mb-4"></div>
+              <p className="text-foreground/60 text-sm sm:text-base max-w-2xl mx-auto">
+                We're committed to providing you with the best shopping
+                experience
+              </p>
+            </div>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <div
+                    key={index}
+                    className="bg-white border-2 border-primary/20 rounded-lg p-6 text-center"
+                  >
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                      <Icon className="text-primary" size={32} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-foreground/60 leading-relaxed">
+                      {feature.description}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-foreground/60 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 };
 

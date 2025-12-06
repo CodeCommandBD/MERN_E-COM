@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/dbConnection";
 import OrderModel from "@/Models/Order.model.js";
+import { isAuthenticated } from "@/lib/authentication";
 
 export async function POST(request) {
   try {
@@ -15,7 +16,6 @@ export async function POST(request) {
       paymentMethod,
       orderNote,
       couponCode,
-      userId,
       transactionId,
     } = body;
 
@@ -41,9 +41,21 @@ export async function POST(request) {
       );
     }
 
+    // Authenticate user to determine valid userId
+    // If authenticated, we MUST use the authored ID to prevent spoofing
+    const auth = await isAuthenticated();
+    let validatedUserId = null;
+
+    if (auth.isAuth) {
+      validatedUserId = auth._id;
+    }
+
+    console.log("Order creation - Auth status:", auth.isAuth);
+    console.log("Using userId:", validatedUserId);
+
     // Create order
     const order = await OrderModel.create({
-      userId: userId || null,
+      userId: validatedUserId, // Use the verified ID or null
       customerInfo,
       shippingAddress,
       items,

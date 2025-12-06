@@ -25,10 +25,60 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { logout } from "@/store/reducer/authReducer";
+import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
 
 const AppSidebar = () => {
   const { toggleSidebar, isMobile } = useSidebar();
   const [unreadCount, setUnreadCount] = useState(0);
+  const auth = useSelector((store) => store.authStore.auth);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  // Check if admin user still exists in database
+  useEffect(() => {
+    const performLogout = async () => {
+      try {
+        await axios.post("/api/auth/logout");
+      } catch (err) {
+        console.error("Logout API failed", err);
+      }
+      dispatch(logout());
+      router.push(WEBSITE_LOGIN);
+    };
+
+    const checkAdminExists = async () => {
+      // If no auth ID is found after hydration (handled by PersistGate),
+      // it means the session is invalid or desynchronized (cookie exists but store is empty).
+      // We must redirect to login.
+      if (!auth?._id) {
+        await performLogout();
+        return;
+      }
+
+      try {
+        const response = await axios.get(`/api/user/${auth._id}`);
+        const userData = response.data?.data;
+
+        // Check if user exists and has admin role
+        if (!response.data.success || !userData || userData.role !== "admin") {
+          await performLogout();
+          return;
+        }
+      } catch (error) {
+        // If 404 (Not Found) or 401/403 (Unauthorized), logout immediately
+        // Also handling generic errors if user can't be verified
+        await performLogout();
+      }
+    };
+
+    // Check immediately and then every 30 seconds
+    checkAdminExists();
+    const interval = setInterval(checkAdminExists, 30000);
+    return () => clearInterval(interval);
+  }, [auth?._id, dispatch, router]);
 
   useEffect(() => {
     fetchUnreadCount();
