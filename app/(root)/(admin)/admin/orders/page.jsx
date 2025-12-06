@@ -230,6 +230,9 @@ export default function AdminOrders() {
                   Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Location
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Total
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -247,7 +250,7 @@ export default function AdminOrders() {
               {filteredOrders.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="9"
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     <Package className="w-12 h-12 text-gray-400 mx-auto mb-2" />
@@ -288,11 +291,27 @@ export default function AdminOrders() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4" />
-                        <span>
+                      <div className="text-sm text-gray-900">
+                        <div className="flex items-center gap-1 font-medium">
+                          <Calendar className="w-4 h-4 text-gray-500" />
                           {new Date(order.createdAt).toLocaleDateString()}
-                        </span>
+                        </div>
+                        <p className="text-xs text-gray-500 pl-5">
+                          {new Date(order.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        <p className="font-medium">
+                          {order.shippingAddress?.landmark}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {order.shippingAddress?.city}
+                        </p>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -335,7 +354,7 @@ export default function AdminOrders() {
                     </td>
                     <td className="px-6 py-4">
                       <Button asChild variant="outline" size="sm">
-                        <Link href={`/order/${order._id}`}>
+                        <Link href={`/admin/orders/${order._id}`}>
                           <Eye className="w-4 h-4 mr-1" />
                           View
                         </Link>

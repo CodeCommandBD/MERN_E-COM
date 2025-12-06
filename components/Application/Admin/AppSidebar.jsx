@@ -23,9 +23,30 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const AppSidebar = () => {
   const { toggleSidebar, isMobile } = useSidebar();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    fetchUnreadCount();
+    // Poll for unread messages every 10 seconds
+    const interval = setInterval(fetchUnreadCount, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await axios.get("/api/support/unread-count");
+      if (response.data.success) {
+        setUnreadCount(response.data.count);
+      }
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  };
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -83,10 +104,15 @@ const AppSidebar = () => {
                       <Link
                         href={menu?.url}
                         onClick={handleLinkClick}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 w-full"
                       >
                         <menu.icon></menu.icon>
-                        {menu.title}
+                        <span className="flex-1">{menu.title}</span>
+                        {menu.title === "Support" && unreadCount > 0 && (
+                          <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                            {unreadCount}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   )}
