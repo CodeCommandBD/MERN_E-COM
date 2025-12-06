@@ -122,7 +122,7 @@ const Header = () => {
                 </Link>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href={WEBSITE_HOME} className="py-2 px-3">
+                <Link href="/about" className="py-2 px-3">
                   About
                 </Link>
               </li>
@@ -132,17 +132,26 @@ const Header = () => {
                 </Link>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href={WEBSITE_HOME} className="py-2 px-3">
+                <Link
+                  href={`${WEBSITE_SHOP}?category=t-shirts`}
+                  className="py-2 px-3"
+                >
                   T-shirt
                 </Link>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href={WEBSITE_HOME} className="py-2 px-3">
-                  Hoddies
+                <Link
+                  href={`${WEBSITE_SHOP}?category=hoodies`}
+                  className="py-2 px-3"
+                >
+                  Hoodies
                 </Link>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href={WEBSITE_HOME} className="py-2 px-3">
+                <Link
+                  href={`${WEBSITE_SHOP}?category=oversized`}
+                  className="py-2 px-3"
+                >
                   Oversized
                 </Link>
               </li>
@@ -272,7 +281,7 @@ const Header = () => {
               </li>
               <li className="border-b">
                 <Link
-                  href={WEBSITE_HOME}
+                  href="/about"
                   className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                   onClick={closeMobileMenu}
                 >
@@ -290,7 +299,7 @@ const Header = () => {
               </li>
               <li className="border-b">
                 <Link
-                  href={WEBSITE_HOME}
+                  href={`${WEBSITE_SHOP}?category=t-shirts`}
                   className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                   onClick={closeMobileMenu}
                 >
@@ -299,16 +308,16 @@ const Header = () => {
               </li>
               <li className="border-b">
                 <Link
-                  href={WEBSITE_HOME}
+                  href={`${WEBSITE_SHOP}?category=hoodies`}
                   className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                   onClick={closeMobileMenu}
                 >
-                  Hoddies
+                  Hoodies
                 </Link>
               </li>
               <li className="border-b">
                 <Link
-                  href={WEBSITE_HOME}
+                  href={`${WEBSITE_SHOP}?category=oversized`}
                   className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                   onClick={closeMobileMenu}
                 >

@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
     }
 
     const user = await UserModel.findById(userId).select(
-      "name email avatar role"
+      "name email avatar role phone address isEmailVerified"
     );
 
     if (!user) {
