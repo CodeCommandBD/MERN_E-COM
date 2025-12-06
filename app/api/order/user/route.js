@@ -10,8 +10,6 @@ export async function GET(request) {
     const email = searchParams.get("email");
     const userId = searchParams.get("userId");
 
-    console.log("Fetching orders for:", { email, userId });
-
     if (!email && !userId) {
       return NextResponse.json(
         { success: false, message: "Email or User ID is required" },
@@ -37,9 +35,6 @@ export async function GET(request) {
       .sort({ createdAt: -1 })
       .limit(50);
 
-    console.log("Found orders:", orders.length);
-    console.log("Query used:", JSON.stringify(query));
-
     return NextResponse.json(
       {
         success: true,
@@ -49,7 +44,6 @@ export async function GET(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Get user orders error:", error);
     return NextResponse.json(
       {
         success: false,

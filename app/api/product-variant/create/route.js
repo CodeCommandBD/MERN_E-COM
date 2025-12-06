@@ -27,7 +27,6 @@ export async function POST(request) {
 
     const validate = schema.safeParse(payload);
     if (!validate.success) {
-      console.log("Validation Error:", validate.error);
       return res(false, 400, "Invalid or missing fields.", validate.error);
     }
     const variantData = validate.data;
@@ -58,7 +57,6 @@ export async function POST(request) {
 
     return res(true, 200, "Product variant added successfully.");
   } catch (error) {
-    console.log("Create Variant Error:", error);
     return catchError(error);
   }
 }

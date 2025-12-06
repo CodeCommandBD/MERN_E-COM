@@ -20,13 +20,11 @@ const CountOverView = () => {
     const triggerAutoConfirm = async () => {
       try {
         await fetch("/api/cron/auto-confirm");
-      } catch (err) {
-        console.error("Auto-confirm trigger failed:", err);
-      }
+      } catch (err) {}
     };
     triggerAutoConfirm();
   }, []);
-  console.log(count);
+
   return (
     <div className="grid lg:grid-cols-4 sm:grid-cols-2  sm:gap-10 gap-5">
       <Link href={ADMIN_CATEGORY_SHOW}>

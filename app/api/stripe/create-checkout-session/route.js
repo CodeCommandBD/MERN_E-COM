@@ -11,8 +11,6 @@ export async function POST(request) {
     await connectDB();
 
     const body = await request.json();
-    console.log("=== Stripe Checkout Session Request ===");
-    console.log("Received body:", JSON.stringify(body, null, 2));
 
     const {
       customerInfo,
@@ -106,12 +104,6 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Stripe checkout session error:", error);
-    console.error("Error details:", {
-      message: error.message,
-      stack: error.stack,
-      errors: error.errors,
-    });
     return NextResponse.json(
       {
         success: false,

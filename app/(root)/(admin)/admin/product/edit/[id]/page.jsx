@@ -56,8 +56,6 @@ const EditProduct = ({ params }) => {
     error: getProductError,
   } = useFetch(`/api/product/get/${id}`);
 
-  console.log(getProduct);
-
   // mediamodel state
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);

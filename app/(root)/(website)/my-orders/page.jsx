@@ -38,10 +38,7 @@ export default function MyOrders() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      console.log("Auth state:", auth);
-
       if (!auth?._id && !auth?.email) {
-        console.log("No auth found - user not logged in");
         setError("Please login to view your orders");
         setLoading(false);
         return;
@@ -52,12 +49,10 @@ export default function MyOrders() {
         let userEmail = auth.email;
 
         if (!userEmail && auth._id) {
-          console.log("Fetching user email from profile...");
           try {
             const userResponse = await axios.get(`/api/user/${auth._id}`);
             if (userResponse.data.success) {
               userEmail = userResponse.data.data.email;
-              console.log("Got email from profile:", userEmail);
             }
           } catch (error) {
             console.error("Failed to fetch user email:", error);
@@ -69,9 +64,8 @@ export default function MyOrders() {
         if (userEmail) {
           params += `&email=${userEmail}`;
         }
-        console.log("Fetching orders with params:", params);
+
         const response = await axios.get(`/api/order/user?${params}`);
-        console.log("Orders response:", response.data);
 
         if (response.data.success) {
           setOrders(response.data.data);
@@ -79,7 +73,6 @@ export default function MyOrders() {
           setError(response.data.message);
         }
       } catch (err) {
-        console.error("Fetch orders error:", err);
         setError(err.response?.data?.message || "Failed to fetch orders");
       } finally {
         setLoading(false);
@@ -112,7 +105,6 @@ export default function MyOrders() {
         setIsDialogOpen(false);
       }
     } catch (err) {
-      console.error("Cancel order error:", err);
       alert(err.response?.data?.message || "Failed to cancel order");
       setIsDialogOpen(false);
     }

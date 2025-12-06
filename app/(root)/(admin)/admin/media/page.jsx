@@ -46,7 +46,6 @@ const Media = () => {
     const { data: response } = await axios.get(
       `/api/media?page=${page}&&limit=10&&deleteType=${deleteType}`
     );
-    console.log(response);
 
     return response;
   };

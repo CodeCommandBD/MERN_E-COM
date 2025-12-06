@@ -106,19 +106,12 @@ const Checkout = () => {
         return total + item.quantity * item.sellingPrice;
       }, 0);
 
-      console.log("=== Applying Coupon ===");
-      console.log("Selling Price Total:", sellingPriceTotal);
-
       const payload = {
         ...values,
         miniShoppingAmount: sellingPriceTotal,
       };
 
-      console.log("Payload:", payload);
-
       const { data: response } = await axios.post("/api/coupon/apply", payload);
-
-      console.log("API Response:", response);
 
       if (!response.success) {
         showToast("error", response.message);
@@ -127,18 +120,15 @@ const Checkout = () => {
       }
 
       const discountPercentage = response.data.discountPercent;
-      console.log("Discount Percentage:", discountPercentage);
 
       // Calculate coupon discount on selling price total
       const couponDiscount = (sellingPriceTotal * discountPercentage) / 100;
-      console.log("Calculated Coupon Discount:", couponDiscount);
 
       setCouponDiscountAmount(couponDiscount);
       setIsCouponApplied(true);
 
       showToast("success", response.message);
     } catch (error) {
-      console.error("Coupon Error:", error);
       showToast("error", error.message);
     } finally {
       setCouponLoading(false);
@@ -267,7 +257,6 @@ const Checkout = () => {
         }
       }
     } catch (error) {
-      console.log(error);
       showToast(
         "error",
         error.response?.data?.message || "Failed to place order"
