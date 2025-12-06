@@ -9,7 +9,6 @@ import DeleteAction from "@/components/Application/Admin/DeleteAction";
 import { columnConfig } from "@/lib/helper";
 import DataTableWrapper from "@/components/Application/Admin/DataTableWrapper";
 
-
 const breadcrumbData = [
   {
     href: ADMIN_DASHBOARD,
@@ -58,11 +57,11 @@ const ShowReviews = () => {
         <CardContent className={"py-5 px-2"} suppressHydrationWarning={true}>
           <DataTableWrapper
             queryKey="review-data"
-            fetchUrl="/api/reviews"
+            fetchUrl="/api/review"
             columnsConfig={columns}
             initialPageSize={10}
-            exportEndpoint="/api/reviews/export"
-            deleteEndpoint="/api/reviews/delete"
+            exportEndpoint="/api/review/export"
+            deleteEndpoint="/api/review/delete"
             deleteType="SD"
             trashView={`${ADMIN_TRASH}?trashof=review`}
             createAction={action}

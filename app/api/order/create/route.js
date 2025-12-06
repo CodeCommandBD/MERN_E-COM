@@ -47,11 +47,16 @@ export async function POST(request) {
     let validatedUserId = null;
 
     if (auth.isAuth) {
-      validatedUserId = auth._id;
+      validatedUserId = String(auth._id);
     }
 
     console.log("Order creation - Auth status:", auth.isAuth);
-    console.log("Using userId:", validatedUserId);
+    console.log(
+      "Using validatedUserId:",
+      validatedUserId,
+      "Type:",
+      typeof validatedUserId
+    );
 
     // Create order
     const order = await OrderModel.create({

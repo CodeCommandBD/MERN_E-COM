@@ -9,44 +9,85 @@ import {
 } from "@/components/ui/table";
 import { imagePlaceholder } from "@/public/image";
 import { IoStar } from "react-icons/io5";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ADMIN_REVIEW_SHOW } from "@/Routes/AdminPanelRoute";
 
-const LatestReview = () => {
+const LatestReview = ({ data = [] }) => {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className={"font-semibold"}>Product</TableHead>
-          <TableHead className={"font-semibold"}>Rating</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {Array.from({ length: 10 }).map((_, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Avatar>
-                  <AvatarImage
-                    src={imagePlaceholder.src || imagePlaceholder}
-                    alt="Product"
-                  />
-                  <AvatarFallback>PR</AvatarFallback>
-                </Avatar>
-                <span className="line-clamp-1">Lorem ipsum dolor sit amet.</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <span key={index} className="text-yellow-500">
-                    <IoStar />
-                  </span>
-                ))}
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm h-full overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h3 className="font-semibold text-lg">Latest Review</h3>
+        <Link href={ADMIN_REVIEW_SHOW}>
+          <Button variant="default" size="sm">
+            View All
+          </Button>
+        </Link>
+      </div>
+      <div className="p-0 overflow-auto h-[calc(100%-60px)]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className={"font-semibold"}>Product</TableHead>
+              <TableHead className={"font-semibold"}>Rating</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={2} className="text-center h-24">
+                  No reviews found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((review) => (
+                <TableRow key={review._id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar>
+                        <AvatarImage
+                          src={
+                            review.product?.media?.[0]?.secure_url ||
+                            imagePlaceholder.src ||
+                            imagePlaceholder
+                          }
+                          alt="Product"
+                        />
+                        <AvatarFallback>PR</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="line-clamp-1 font-medium">
+                          {review.product?.name || "Unknown Product"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {review.user?.name || "Unknown User"}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <span
+                          key={index}
+                          className={
+                            index < review.rating
+                              ? "text-yellow-500"
+                              : "text-gray-300"
+                          }
+                        >
+                          <IoStar />
+                        </span>
+                      ))}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 };
 

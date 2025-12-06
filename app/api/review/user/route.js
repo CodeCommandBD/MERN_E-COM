@@ -2,6 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import ReviewModel from "@/Models/Review.model.js";
+import mongoose from "mongoose";
 
 export async function GET(request) {
   try {
@@ -17,7 +18,7 @@ export async function GET(request) {
     const reviews = await ReviewModel.aggregate([
       {
         $match: {
-          user: auth._id,
+          user: new mongoose.Types.ObjectId(auth._id),
           deletedAt: null,
         },
       },
@@ -33,6 +34,14 @@ export async function GET(request) {
         $unwind: { path: "$productData", preserveNullAndEmptyArrays: true },
       },
       {
+        $lookup: {
+          from: "medias",
+          localField: "productData.media",
+          foreignField: "_id",
+          as: "productImages",
+        },
+      },
+      {
         $sort: { createdAt: -1 },
       },
       {
@@ -45,8 +54,8 @@ export async function GET(request) {
           product: {
             _id: "$productData._id",
             name: "$productData.name",
-            image: { $arrayElemAt: ["$productData.images", 0] },
-            url: "$productData.url",
+            image: { $arrayElemAt: ["$productImages.secure_url", 0] },
+            url: "$productData.slug",
           },
         },
       },

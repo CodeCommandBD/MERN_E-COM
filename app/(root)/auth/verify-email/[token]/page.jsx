@@ -8,6 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "@/store/reducer/authReducer";
 
 const EmailVerification = ({ params }) => {
   const { token } = use(params);
@@ -31,13 +33,29 @@ const EmailVerification = ({ params }) => {
   }, [token]);
 
   // Auto redirect to login after successful verification
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (isVerified === true) {
-      const interval = setInterval(() => {
+      const interval = setInterval(async () => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
-            router.push(WEBSITE_LOGIN);
+            // Logout user before redirecting to login page
+            const performLogout = async () => {
+              try {
+                await axios.post("/api/auth/logout");
+                dispatch(logout());
+              } catch (error) {
+                console.error(
+                  "Logout failed during verification redirect",
+                  error
+                );
+              } finally {
+                router.push(WEBSITE_LOGIN);
+              }
+            };
+            performLogout();
             return 0;
           }
           return prev - 1;
@@ -45,7 +63,7 @@ const EmailVerification = ({ params }) => {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isVerified, router]);
+  }, [isVerified, router, dispatch]);
 
   return (
     <Card className={"w-[400px] mx-auto"}>

@@ -5,11 +5,13 @@ import {
   ADMIN_CUSTOMER_SHOW,
   ADMIN_ORDER_SHOW,
   ADMIN_PRODUCT_SHOW,
+  ADMIN_REVIEW_SHOW,
 } from "@/Routes/AdminPanelRoute";
 import Link from "next/link";
 import React from "react";
 import { BiCategory } from "react-icons/bi";
 import { IoShirtOutline } from "react-icons/io5";
+import { IoMdStarOutline } from "react-icons/io";
 import { LuUserRound } from "react-icons/lu";
 import { MdOutlineShoppingCart } from "react-icons/md";
 
@@ -92,6 +94,23 @@ const CountOverView = () => {
           <div>
             <span className="w-12 h-12 border rounded-full flex items-center justify-center bg-cyan-500 text-white">
               <MdOutlineShoppingCart />
+            </span>
+          </div>
+        </div>
+      </Link>
+      <Link href={ADMIN_REVIEW_SHOW}>
+        <div className="flex items-center justify-between p-3 border border-l-4 border-l-purple-400 rounded-lg bg-white dark:bg-card dark:border-gray-800 dark:border-l-purple-400 dark:text-white">
+          <div>
+            <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">
+              Total reviews
+            </h4>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">
+              {count?.data?.review || 0}
+            </p>
+          </div>
+          <div>
+            <span className="w-12 h-12 border rounded-full flex items-center justify-center bg-purple-500 text-white">
+              <IoMdStarOutline />
             </span>
           </div>
         </div>

@@ -33,7 +33,7 @@ export async function middleware(req) {
 
     //  prevent logged in user from accessing auth routes
 
-    if (pathname.startsWith("/auth")) {
+    if (pathname.startsWith("/auth") && !pathname.includes("/verify-email")) {
       return NextResponse.redirect(
         new URL(
           role === "admin" ? ADMIN_DASHBOARD : USER_DASHBOARD,
