@@ -32,28 +32,54 @@ const Header = () => {
   // Fetch active order count
   useEffect(() => {
     const fetchOrderCount = async () => {
-      if (!auth?._id) return;
-
-      try {
-        // Get user email
-        let userEmail = auth.email;
-        if (!userEmail) {
-          const userResponse = await axios.get(`/api/user/${auth._id}`);
-          if (userResponse.data.success) {
-            userEmail = userResponse.data.data.email;
+      // If user is authenticated
+      if (auth?._id) {
+        try {
+          // Get user email
+          let userEmail = auth.email;
+          if (!userEmail) {
+            const userResponse = await axios.get(`/api/user/${auth._id}`);
+            if (userResponse.data.success) {
+              userEmail = userResponse.data.data.email;
+            }
           }
-        }
 
-        // Fetch order count
-        let params = `userId=${auth._id}`;
-        if (userEmail) params += `&email=${userEmail}`;
+          // Fetch order count
+          let params = `userId=${auth._id}`;
+          if (userEmail) params += `&email=${userEmail}`;
 
-        const response = await axios.get(`/api/order/count?${params}`);
-        if (response.data.success) {
-          setOrderCount(response.data.count);
+          const response = await axios.get(`/api/order/count?${params}`);
+          if (response.data.success) {
+            setOrderCount(response.data.count);
+          }
+        } catch (error) {
+          console.error("Failed to fetch order count:", error);
         }
-      } catch (error) {
-        console.error("Failed to fetch order count:", error);
+      } else {
+        // If guest user, check local storage and validate with API
+        try {
+          const guestOrders = JSON.parse(
+            localStorage.getItem("guest_orders") || "[]"
+          );
+
+          // Filter out potential null/undefined/empty strings
+          const validGuestOrders = guestOrders.filter((id) => id);
+
+          if (validGuestOrders.length > 0) {
+            // Validate against DB to ensure orders still exist and aren't cancelled/delivered
+            const response = await axios.get(
+              `/api/order/count?orderIds=${validGuestOrders.join(",")}`
+            );
+            if (response.data.success) {
+              setOrderCount(response.data.count);
+            }
+          } else {
+            setOrderCount(0);
+          }
+        } catch (error) {
+          console.error("Failed to parse guest orders or fetch count:", error);
+          setOrderCount(0);
+        }
       }
     };
 

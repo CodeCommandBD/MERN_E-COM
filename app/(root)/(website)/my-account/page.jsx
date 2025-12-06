@@ -25,6 +25,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { WEBSITE_LOGIN, USER_DASHBOARD } from "@/Routes/WebsiteRoute";
 import { showToast } from "@/lib/showToast";
+import { persistor } from "@/store/store";
 
 export default function MyAccountPage() {
   const auth = useSelector((state) => state.authStore.auth);
@@ -142,12 +143,12 @@ export default function MyAccountPage() {
       await axios.post("/api/auth/logout");
       // Clear Redux state
       dispatch(logout());
+      // Flush redux-persist to ensure state is saved to localStorage
+      await persistor.flush();
       // Show success message
       showToast("success", "Logged out successfully!");
       // Redirect to home page
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
       showToast("error", "Logout failed. Please try again.");

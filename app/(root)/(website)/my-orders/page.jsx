@@ -265,10 +265,20 @@ export default function MyOrders() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-100">
                     <div className="text-sm text-gray-500">
                       {["pending", "confirmed"].includes(order.orderStatus) &&
+                        order.paymentStatus !== "paid" &&
                         (new Date() - new Date(order.createdAt)) /
                           (1000 * 60 * 60) <=
                           12 && (
                           <p>You can cancel this order within 12 hours.</p>
+                        )}
+                      {order.paymentStatus === "paid" &&
+                        ["pending", "confirmed"].includes(
+                          order.orderStatus
+                        ) && (
+                          <p className="text-amber-600">
+                            Paid orders cannot be cancelled online. Contact
+                            support for refunds.
+                          </p>
                         )}
                     </div>
                     <div className="flex gap-3">
@@ -283,8 +293,9 @@ export default function MyOrders() {
                         </Link>
                       </Button>
 
-                      {/* Cancel Button */}
+                      {/* Cancel Button - Only for unpaid orders (COD) */}
                       {["pending", "confirmed"].includes(order.orderStatus) &&
+                        order.paymentStatus !== "paid" &&
                         (new Date() - new Date(order.createdAt)) /
                           (1000 * 60 * 60) <=
                           12 && (

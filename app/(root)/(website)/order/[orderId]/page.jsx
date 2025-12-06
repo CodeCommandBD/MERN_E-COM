@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { ArrowLeft, Package, Mail, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, Package, Mail, Phone, MapPin, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
+import { WEBSITE_LOGIN, WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
 import OrderStatusTracker from "@/components/Order/OrderStatusTracker";
+import { useSelector } from "react-redux";
 
 import {
   Dialog,
@@ -22,10 +23,12 @@ import {
 export default function OrderTracking() {
   const params = useParams();
   const orderId = params?.orderId;
+  const auth = useSelector((state) => state.authStore.auth);
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -130,6 +133,14 @@ export default function OrderTracking() {
               <p className="text-sm text-gray-600">
                 Order #{order.orderNumber}
               </p>
+              {order.transactionId && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Transaction ID:{" "}
+                  <span className="font-medium font-mono text-gray-800">
+                    {order.transactionId}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
@@ -165,19 +176,40 @@ export default function OrderTracking() {
         {/* Action Buttons */}
         <div className="flex justify-between items-center bg-white border border-gray-300 rounded-lg p-6 mb-6">
           <div>
-            {["pending", "confirmed"].includes(order.orderStatus) && (
-              <div className="text-sm text-gray-500">
-                <p>You can cancel this order within 12 hours of placing it.</p>
-              </div>
-            )}
+            {["pending", "confirmed"].includes(order.orderStatus) &&
+              order.paymentStatus !== "paid" &&
+              (new Date() - new Date(order.createdAt)) / (1000 * 60 * 60) <=
+                12 && (
+                <div className="text-sm text-gray-500">
+                  <p>
+                    You can cancel this order within 12 hours of placing it.
+                  </p>
+                </div>
+              )}
+            {order.paymentStatus === "paid" &&
+              ["pending", "confirmed"].includes(order.orderStatus) && (
+                <div className="text-sm text-amber-600">
+                  <p>
+                    This order has been paid and cannot be cancelled online.
+                    Please contact customer support for refund assistance.
+                  </p>
+                </div>
+              )}
           </div>
           <div>
             {["pending", "confirmed"].includes(order.orderStatus) &&
+              order.paymentStatus !== "paid" &&
               (new Date() - new Date(order.createdAt)) / (1000 * 60 * 60) <=
                 12 && (
                 <Button
                   variant="destructive"
-                  onClick={() => setIsDialogOpen(true)}
+                  onClick={() => {
+                    if (!auth) {
+                      setIsLoginDialogOpen(true);
+                    } else {
+                      setIsDialogOpen(true);
+                    }
+                  }}
                   className="bg-red-600 hover:bg-red-700 text-white"
                 >
                   Cancel Order
@@ -205,6 +237,34 @@ export default function OrderTracking() {
                 className="bg-red-600 hover:bg-red-700"
               >
                 Yes, Cancel Order
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <LogIn className="w-5 h-5" />
+                Login Required
+              </DialogTitle>
+              <DialogDescription>
+                You need to be logged in to cancel this order. Please login to
+                verify your identity.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => setIsLoginDialogOpen(false)}
+              >
+                Close
+              </Button>
+              <Button asChild>
+                <Link href={`${WEBSITE_LOGIN}?callback=/order/${order._id}`}>
+                  Login Now
+                </Link>
               </Button>
             </DialogFooter>
           </DialogContent>

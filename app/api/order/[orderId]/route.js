@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
   try {
     await connectDB();
 
-    const { orderId } = params;
+    const { orderId } = await params;
 
     if (!orderId) {
       return NextResponse.json(
@@ -22,6 +22,13 @@ export async function GET(request, { params }) {
         { success: false, message: "Order not found" },
         { status: 404 }
       );
+    }
+
+    // Auto-sync: If payment is paid but order is still pending,
+    // update order status to confirmed (works for both COD and online payments)
+    if (order.paymentStatus === "paid" && order.orderStatus === "pending") {
+      order.orderStatus = "confirmed";
+      await order.save();
     }
 
     return NextResponse.json(
