@@ -214,7 +214,6 @@ orderSchema.index({ orderStatus: 1, createdAt: -1 });
 orderSchema.index({ "customerInfo.email": 1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });
-orderSchema.index({ orderNumber: 1 });
 
 const OrderModel =
   mongoose.models.Order || mongoose.model("Order", orderSchema);
