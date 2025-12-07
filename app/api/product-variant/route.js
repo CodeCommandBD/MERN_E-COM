@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
 import ProductVariantModel from "@/Models/Product.Variant.model";
+import { escapeRegex } from "@/lib/escapeRegex";
 
 export async function GET(request) {
   try {
@@ -34,15 +35,20 @@ export async function GET(request) {
     // Global search
     if (globalFilters) {
       postLookupMatch.$or = [
-        { sku: { $regex: globalFilters, $options: "i" } },
-        { color: { $regex: globalFilters, $options: "i" } },
-        { size: { $regex: globalFilters, $options: "i" } },
-        { "productData.name": { $regex: globalFilters, $options: "i" } },
+        { sku: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { color: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { size: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        {
+          "productData.name": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
         {
           $expr: {
             $regexMatch: {
               input: { $toString: "$mrp" },
-              regex: globalFilters,
+              regex: escapeRegex(globalFilters),
               options: "i",
             },
           },
@@ -51,7 +57,7 @@ export async function GET(request) {
           $expr: {
             $regexMatch: {
               input: { $toString: "$sellingPrice" },
-              regex: globalFilters,
+              regex: escapeRegex(globalFilters),
               options: "i",
             },
           },
@@ -60,7 +66,7 @@ export async function GET(request) {
           $expr: {
             $regexMatch: {
               input: { $toString: "$discountPercentage" },
-              regex: globalFilters,
+              regex: escapeRegex(globalFilters),
               options: "i",
             },
           },
@@ -78,11 +84,14 @@ export async function GET(request) {
         postLookupMatch[element.id] = Number(element.value);
       } else if (element.id === "product") {
         postLookupMatch["productData.name"] = {
-          $regex: element.value,
+          $regex: escapeRegex(element.value),
           $options: "i",
         };
       } else {
-        postLookupMatch[element.id] = { $regex: element.value, $options: "i" };
+        postLookupMatch[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
       }
     });
 

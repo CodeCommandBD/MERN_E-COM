@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import ProductModel from "@/Models/Product.model";
 import { NextResponse } from "next/server";
+import { escapeRegex } from "@/lib/escapeRegex";
 
 export async function GET(request) {
   try {
@@ -25,15 +26,12 @@ export async function GET(request) {
     let baseMatchQuery = {};
 
     if (deleteType === "SD") {
-      baseMatchQuery = { 
-        $or: [
-          { deletedAt: null },
-          { deletedAt: { $exists: false } }
-        ]
+      baseMatchQuery = {
+        $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
       };
     } else if (deleteType === "PD" || deleteType === "TD") {
-      baseMatchQuery = { 
-        deletedAt: { $exists: true, $ne: null } 
+      baseMatchQuery = {
+        deletedAt: { $exists: true, $ne: null },
       };
     }
 
@@ -43,52 +41,70 @@ export async function GET(request) {
     // Column filteration
     const columnFilters = {};
     filters.forEach((element) => {
-        if(element.id === 'mrp' || element.id === 'sellingPrice' || element.id === 'discountPercentage'){
-            columnFilters[element.id] = Number(element.value);
-            baseMatchQuery[element.id] = Number(element.value);
-        } else if (element.id === 'category') {
-            // Category filter needs to use categoryData.name after lookup
-            columnFilters['categoryData.name'] = { $regex: element.value, $options: "i" };
-        } else {
-            columnFilters[element.id] = { $regex: element.value, $options: "i" };
-            baseMatchQuery[element.id] = { $regex: element.value, $options: "i" };
-        }
+      if (
+        element.id === "mrp" ||
+        element.id === "sellingPrice" ||
+        element.id === "discountPercentage"
+      ) {
+        columnFilters[element.id] = Number(element.value);
+        baseMatchQuery[element.id] = Number(element.value);
+      } else if (element.id === "category") {
+        // Category filter needs to use categoryData.name after lookup
+        columnFilters["categoryData.name"] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
+      } else {
+        columnFilters[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
+        baseMatchQuery[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
+      }
     });
 
     // Build global search conditions (for aggregation match after lookups)
     let globalSearchConditions = null;
     if (globalFilters) {
       globalSearchConditions = [
-        { name: { $regex: globalFilters, $options: "i" } },
-        { slug: { $regex: globalFilters, $options: "i" } },
-        { 'categoryData.name': { $regex: globalFilters, $options: "i" } },
+        { name: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { slug: { $regex: escapeRegex(globalFilters), $options: "i" } },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$mrp'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
+          "categoryData.name": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
         },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$sellingPrice'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$mrp" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
         },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$discountPercentage'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
-        }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$sellingPrice" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
+        },
+        {
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$discountPercentage" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
+        },
       ];
     }
 
@@ -96,35 +112,35 @@ export async function GET(request) {
     let baseSearchConditions = null;
     if (globalFilters) {
       baseSearchConditions = [
-        { name: { $regex: globalFilters, $options: "i" } },
-        { slug: { $regex: globalFilters, $options: "i" } },
+        { name: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { slug: { $regex: escapeRegex(globalFilters), $options: "i" } },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$mrp'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$mrp" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
         },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$sellingPrice'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$sellingPrice" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
         },
         {
-            $expr:{
-                $regexMatch: {
-                    input: {$toString: '$discountPercentage'},
-                    regex: globalFilters,
-                    options: "i"
-                }
-            }
-        }
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$discountPercentage" },
+              regex: globalFilters,
+              options: "i",
+            },
+          },
+        },
       ];
     }
 
@@ -139,7 +155,7 @@ export async function GET(request) {
     if (Object.keys(columnFilters).length > 0) {
       aggregationConditions.push(columnFilters);
     }
-    
+
     let finalAggregationMatchQuery = {};
     if (aggregationConditions.length > 1) {
       finalAggregationMatchQuery = { $and: aggregationConditions };
@@ -152,17 +168,11 @@ export async function GET(request) {
       if (Object.keys(baseMatchQuery).length > 0) {
         if (baseMatchQuery.$or) {
           baseMatchQuery = {
-            $and: [
-              baseMatchQuery,
-              { $or: baseSearchConditions }
-            ]
+            $and: [baseMatchQuery, { $or: baseSearchConditions }],
           };
         } else {
           baseMatchQuery = {
-            $and: [
-              baseMatchQuery,
-              { $or: baseSearchConditions }
-            ]
+            $and: [baseMatchQuery, { $or: baseSearchConditions }],
           };
         }
       } else {
@@ -179,16 +189,22 @@ export async function GET(request) {
 
     // Aggregate pipeline - match deletedAt before lookups for better performance
     const aggregatePipeline = [];
-    
+
     // Check if we need to match before lookups (simple conditions only)
-    const needsPreMatch = Object.keys(baseMatchQuery).length > 0 && !globalSearchConditions && Object.keys(columnFilters).length === 0;
-    const needsPostMatch = globalSearchConditions || Object.keys(columnFilters).length > 0 || (Object.keys(baseMatchQuery).length > 0 && !needsPreMatch);
-    
+    const needsPreMatch =
+      Object.keys(baseMatchQuery).length > 0 &&
+      !globalSearchConditions &&
+      Object.keys(columnFilters).length === 0;
+    const needsPostMatch =
+      globalSearchConditions ||
+      Object.keys(columnFilters).length > 0 ||
+      (Object.keys(baseMatchQuery).length > 0 && !needsPreMatch);
+
     // Add initial match for deletedAt if it's a simple condition
     if (needsPreMatch) {
       aggregatePipeline.push({ $match: baseMatchQuery });
     }
-    
+
     // Add lookups
     aggregatePipeline.push(
       {
@@ -206,12 +222,12 @@ export async function GET(request) {
         },
       }
     );
-    
+
     // Add match after lookups (for fields that need lookups or combined conditions)
     if (needsPostMatch && Object.keys(finalAggregationMatchQuery).length > 0) {
       aggregatePipeline.push({ $match: finalAggregationMatchQuery });
     }
-    
+
     // Add sort, skip, limit, and project
     aggregatePipeline.push(
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
@@ -232,22 +248,28 @@ export async function GET(request) {
         },
       }
     );
-    
+
     // Execute query
     const getProducts = await ProductModel.aggregate(aggregatePipeline);
 
     // Get TotalRowCount - use aggregation to match the same logic
     const countPipeline = [];
-    
+
     // Check if we need to match before lookups (simple conditions only)
-    const countNeedsPreMatch = Object.keys(baseMatchQuery).length > 0 && !globalSearchConditions && Object.keys(columnFilters).length === 0;
-    const countNeedsPostMatch = globalSearchConditions || Object.keys(columnFilters).length > 0 || (Object.keys(baseMatchQuery).length > 0 && !countNeedsPreMatch);
-    
+    const countNeedsPreMatch =
+      Object.keys(baseMatchQuery).length > 0 &&
+      !globalSearchConditions &&
+      Object.keys(columnFilters).length === 0;
+    const countNeedsPostMatch =
+      globalSearchConditions ||
+      Object.keys(columnFilters).length > 0 ||
+      (Object.keys(baseMatchQuery).length > 0 && !countNeedsPreMatch);
+
     // Add initial match for deletedAt if it's a simple condition
     if (countNeedsPreMatch) {
       countPipeline.push({ $match: baseMatchQuery });
     }
-    
+
     // Add lookups
     countPipeline.push(
       {
@@ -265,14 +287,17 @@ export async function GET(request) {
         },
       }
     );
-    
+
     // Add match after lookups if needed
-    if (countNeedsPostMatch && Object.keys(finalAggregationMatchQuery).length > 0) {
+    if (
+      countNeedsPostMatch &&
+      Object.keys(finalAggregationMatchQuery).length > 0
+    ) {
       countPipeline.push({ $match: finalAggregationMatchQuery });
     }
-    
+
     countPipeline.push({ $count: "total" });
-    
+
     const countResult = await ProductModel.aggregate(countPipeline);
     const totalRowCount = countResult[0]?.total || 0;
 
