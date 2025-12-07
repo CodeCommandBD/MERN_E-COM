@@ -26,6 +26,7 @@ import Select from "@/components/Application/Select";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import { sizes } from "@/lib/utils";
+import PageLoader from "@/components/Application/Admin/PageLoader";
 
 const breadcrumbData = [
   {
@@ -44,6 +45,7 @@ const breadcrumbData = [
 
 const AddProductVariant = () => {
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [productOption, setProductOption] = useState([]);
   const [editorKey, setEditorKey] = useState(0);
 
@@ -149,6 +151,20 @@ const AddProductVariant = () => {
   const handleRemove = (mediaId) => {
     setSelectedMedia(selectedMedia.filter((media) => media._id !== mediaId));
   };
+
+  useEffect(() => {
+    // Show loader initially and hide it after component mounts
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <PageLoader message="Loading Add Variant..." />;
+  }
+
   return (
     <div>
       <BreadCrumb breadcrumbData={breadcrumbData}></BreadCrumb>

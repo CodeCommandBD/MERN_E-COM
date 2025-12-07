@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
-  MRT_ToggleGlobalFilterButton,
   MRT_ShowHideColumnsButton,
   MRT_ToggleFullScreenButton,
   MRT_ToggleDensePaddingButton,
@@ -34,6 +33,7 @@ const DataTable = ({
   createAction,
   initialGlobalFilter = "",
   initialColumnFilters = [],
+  onDeleteSuccess,
 }) => {
   const [columnFilters, setColumnFilters] = useState(initialColumnFilters);
   const [globalFilter, setGlobalFilter] = useState(initialGlobalFilter);
@@ -67,7 +67,7 @@ const DataTable = ({
     deleteType: "",
   });
 
-  const deleteMutation = useDeleteMutation(queryKey, deleteEndpoint);
+  const deleteMutation = useDeleteMutation(queryKey, deleteEndpoint, onDeleteSuccess);
 
   // Delete method
   const handleDelete = (ids, deleteType) => {
@@ -226,7 +226,6 @@ const DataTable = ({
     getRowId: (originalRow) => originalRow._id,
     renderToolbarInternalActions: ({ table }) => (
       <>
-        <MRT_ToggleGlobalFilterButton table={table} />
         <MRT_ShowHideColumnsButton table={table} />
         <MRT_ToggleFullScreenButton table={table} />
         <MRT_ToggleDensePaddingButton table={table} />

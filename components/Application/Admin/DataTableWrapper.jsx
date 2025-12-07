@@ -17,7 +17,8 @@ const DataTableWrapper = ({
   trashView,
   createAction,
   initialGlobalFilter = "",
-  initialColumnFilters = []
+  initialColumnFilters = [],
+  onDeleteSuccess
 }) => {
   
   const {resolvedTheme} = useTheme()
@@ -42,6 +43,7 @@ const DataTableWrapper = ({
           createAction={createAction}
           initialGlobalFilter={initialGlobalFilter}
           initialColumnFilters={initialColumnFilters}
+          onDeleteSuccess={onDeleteSuccess}
       ></DataTable>
     </ThemeProvider>
   )

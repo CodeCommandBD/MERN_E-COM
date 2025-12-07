@@ -2,7 +2,7 @@ import { showToast } from "@/lib/showToast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
-const useDeleteMutation = (querykey, deleteEndpoint) => {
+const useDeleteMutation = (querykey, deleteEndpoint, onDeleteSuccess) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -20,6 +20,10 @@ const useDeleteMutation = (querykey, deleteEndpoint) => {
     onSuccess: (data) => {
         showToast('success', data.message || 'Operation completed successfully')
         queryClient.invalidateQueries([querykey])
+        // Call the custom onDeleteSuccess callback if provided
+        if (onDeleteSuccess && typeof onDeleteSuccess === 'function') {
+          onDeleteSuccess(data)
+        }
     },
     onError: (error) => {
         showToast('error', error.message)

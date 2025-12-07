@@ -260,6 +260,7 @@ const ShowOrders = () => {
             createAction={action}
             initialGlobalFilter={debouncedSearchTerm}
             initialColumnFilters={columnFilters}
+            onDeleteSuccess={refetchStats}
           />
           </CardContent>
         </Card>

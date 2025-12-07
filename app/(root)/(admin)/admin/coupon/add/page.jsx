@@ -11,13 +11,14 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ADMIN_COUPON_SHOW, ADMIN_DASHBOARD } from "@/Routes/AdminPanelRoute";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { showToast } from "@/lib/showToast";
+import PageLoader from "@/components/Application/Admin/PageLoader";
 
 const breadcrumbData = [
   {
@@ -36,6 +37,16 @@ const breadcrumbData = [
 
 const AddCoupon = () => {
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loader initially and hide it after component mounts
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // TODO:##### Form valid
   // TODO:##### Form valid
@@ -75,6 +86,11 @@ const AddCoupon = () => {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <PageLoader message="Loading Add Coupon..." />;
+  }
+
   return (
     <div>
       <BreadCrumb breadcrumbData={breadcrumbData}></BreadCrumb>
