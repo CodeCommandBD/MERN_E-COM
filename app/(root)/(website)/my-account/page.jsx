@@ -71,6 +71,18 @@ export default function MyAccountPage() {
     address: "",
   });
 
+  const handleLoginRedirect = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      dispatch(logout());
+      await persistor.flush();
+      window.location.href = WEBSITE_LOGIN;
+    } catch (error) {
+      console.error("Logout failed:", error);
+      window.location.href = WEBSITE_LOGIN;
+    }
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (!auth?._id) {
@@ -332,11 +344,12 @@ export default function MyAccountPage() {
           <p className="text-red-500 text-lg mb-6">
             Please login to view your account
           </p>
-          <Link href={WEBSITE_LOGIN}>
-            <Button className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-2 rounded-lg">
-              Login
-            </Button>
-          </Link>
+          <Button
+            onClick={handleLoginRedirect}
+            className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-2 rounded-lg"
+          >
+            Login
+          </Button>
         </div>
       </div>
     );

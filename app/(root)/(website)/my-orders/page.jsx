@@ -1,12 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Package, Eye, Calendar, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
 import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrumb";
+import { logout } from "@/store/reducer/authReducer";
+import { persistor } from "@/store/store";
 
 const breadcrumb = {
   title: "My Orders",
@@ -30,11 +33,25 @@ import {
 
 export default function MyOrders() {
   const auth = useSelector((state) => state.authStore.auth);
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleLoginRedirect = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      dispatch(logout());
+      await persistor.flush();
+      window.location.href = WEBSITE_LOGIN;
+    } catch (error) {
+      console.error("Logout failed:", error);
+      window.location.href = WEBSITE_LOGIN;
+    }
+  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -154,11 +171,12 @@ export default function MyOrders() {
           <p className="text-red-500 text-lg mb-6">
             Please login to view your orders
           </p>
-          <Link href={WEBSITE_LOGIN}>
-            <Button className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-2 rounded-lg">
-              Login
-            </Button>
-          </Link>
+          <Button
+            onClick={handleLoginRedirect}
+            className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-2 rounded-lg"
+          >
+            Login
+          </Button>
         </div>
       </div>
     );
