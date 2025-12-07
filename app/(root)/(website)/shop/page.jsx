@@ -1,6 +1,6 @@
 "use client";
 import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrumb";
 import Filter from "@/components/Application/Website/Filter";
 import Sorting from "@/components/Application/Website/Sorting";
@@ -18,6 +18,7 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
+import Loading from "@/components/Application/Loading";
 
 const breadcrumb = {
   title: "Shop",
@@ -34,7 +35,16 @@ const Shop = () => {
   const [limit, setLimit] = useState(9);
   const [sorting, setSorting] = useState("asc");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const windowSize = useWindowSize();
+
+  useEffect(() => {
+    // Show loader initially, then hide it after a short delay to ensure smooth transition
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const fetchProducts = async (pageParam) => {
     try {
@@ -76,6 +86,14 @@ const Shop = () => {
   // Flatten all pages into a single products array and filter out any undefined/null values
   const allProducts =
     data?.pages?.flatMap((page) => page?.products || []).filter(Boolean) || [];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

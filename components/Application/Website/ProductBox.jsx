@@ -1,8 +1,10 @@
 import { imagePlaceholder } from "@/public/image";
 import Image from "next/image";
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { WEBSITE_PRODUCT_DETAILS } from "@/Routes/WebsiteRoute";
+import Loading from "@/components/Application/Loading";
 
 // Loading skeleton component
 const ImageSkeleton = () => (
@@ -12,6 +14,9 @@ const ImageSkeleton = () => (
 );
 
 const ProductBox = ({ product }) => {
+  const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
+
   // Get first media item from array
   const mediaItem = product?.media?.[0];
   const imageSrc = mediaItem?.secure_url || imagePlaceholder;
@@ -28,16 +33,40 @@ const ProductBox = ({ product }) => {
     });
   };
 
+  // Fallback: Clear loading state after timeout (in case navigation fails or is slow)
+  useEffect(() => {
+    if (isNavigating) {
+      const timeout = setTimeout(() => {
+        setIsNavigating(false);
+      }, 5000); // 5 second timeout as safety net
+      return () => clearTimeout(timeout);
+    }
+  }, [isNavigating]);
+
+  // Handle product click with loading state
+  const handleProductClick = (e) => {
+    e.preventDefault();
+    setIsNavigating(true);
+    router.push(WEBSITE_PRODUCT_DETAILS(product?.slug));
+  };
+
   return (
-    <article
-      className="h-full flex flex-col rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer"
-      itemScope
-      itemType="https://schema.org/Product"
-    >
-      <Link
-        href={WEBSITE_PRODUCT_DETAILS(product?.slug)}
-        aria-label={`View ${product?.name} details`}
+    <>
+      {isNavigating && (
+        <div className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex items-center justify-center">
+          <Loading />
+        </div>
+      )}
+      <article
+        className="h-full flex flex-col rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg hover:border-primary transition-all duration-300 cursor-pointer"
+        itemScope
+        itemType="https://schema.org/Product"
       >
+        <Link
+          href={WEBSITE_PRODUCT_DETAILS(product?.slug)}
+          aria-label={`View ${product?.name} details`}
+          onClick={handleProductClick}
+        >
         <Suspense fallback={<ImageSkeleton />}>
           <Image
             src={imageSrc}
@@ -86,6 +115,7 @@ const ProductBox = ({ product }) => {
         </div>
       </Link>
     </article>
+    </>
   );
 };
 

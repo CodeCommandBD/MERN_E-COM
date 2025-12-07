@@ -10,6 +10,8 @@ import {
   Shield,
   Headphones,
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import Loading from "@/components/Application/Loading";
 
 const breadcrumb = {
   title: "About Us",
@@ -83,6 +85,24 @@ const features = [
 ];
 
 export default function AboutPage() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loader initially, then hide it after a short delay to ensure smooth transition
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <WebsiteBreadCrumb props={breadcrumb} />

@@ -29,6 +29,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import ReviewList from "./ReviewList";
 import { useQueryClient } from "@tanstack/react-query";
 import useFetch from "@/hooks/useFetch";
+import SuggestedProducts from "./SuggestedProducts";
 
 const ProductReview = ({ product }) => {
   const queryClient = useQueryClient();
@@ -113,18 +114,18 @@ const ProductReview = ({ product }) => {
       showToast("success", response.message);
     } catch (error) {
       // Better error handling
-      const errorMessage = 
-        error.response?.data?.message || 
-        error.response?.status === 403 
+      const errorMessage =
+        error.response?.data?.message || error.response?.status === 403
           ? "You must be logged in to submit a review. Please login and try again."
-          : error.message || 
-        "Failed to submit review. Please try again.";
+          : error.message || "Failed to submit review. Please try again.";
       showToast("error", errorMessage);
-      
+
       // If 403, redirect to login
       if (error.response?.status === 403) {
         setTimeout(() => {
-          window.location.href = `${WEBSITE_LOGIN}?callback=${encodeURIComponent(window.location.href)}`;
+          window.location.href = `${WEBSITE_LOGIN}?callback=${encodeURIComponent(
+            window.location.href
+          )}`;
         }, 2000);
       }
     } finally {
@@ -442,6 +443,14 @@ const ProductReview = ({ product }) => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Suggested Products Section */}
+      <div className="mt-8">
+        <SuggestedProducts
+          currentProductId={product._id}
+          categoryId={product.category}
+        />
       </div>
     </div>
   );
