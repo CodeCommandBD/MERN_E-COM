@@ -21,13 +21,21 @@ import Search from "./Search";
 import { Package } from "lucide-react";
 import { useEffect } from "react";
 import axios from "axios";
+import { useRouter, usePathname } from "next/navigation";
+import Loading from "@/components/Application/Loading";
 
 const Header = () => {
   const auth = useSelector((store) => store.authStore.auth);
+  const router = useRouter();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNavigatingToAbout, setIsNavigatingToAbout] = useState(false);
+  const [isNavigatingToShop, setIsNavigatingToShop] = useState(false);
+  const [isNavigatingToHome, setIsNavigatingToHome] = useState(false);
+  const [isNavigatingToCategory, setIsNavigatingToCategory] = useState(false);
 
   // Fetch active order count - deferred to not block initial render
   useEffect(() => {
@@ -102,6 +110,78 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleAboutClick = (e) => {
+    e.preventDefault();
+    setIsNavigatingToAbout(true);
+    closeMobileMenu();
+    router.push("/about");
+  };
+
+  const handleShopClick = (e) => {
+    e.preventDefault();
+    setIsNavigatingToShop(true);
+    closeMobileMenu();
+    router.push(WEBSITE_SHOP);
+  };
+
+  const handleHomeClick = (e) => {
+    e.preventDefault();
+    setIsNavigatingToHome(true);
+    closeMobileMenu();
+    router.push(WEBSITE_HOME);
+  };
+
+  const handleCategoryClick = (e, category) => {
+    e.preventDefault();
+    setIsNavigatingToCategory(true);
+    closeMobileMenu();
+    router.push(`${WEBSITE_SHOP}?category=${category}`);
+  };
+
+  // Hide loader when pathname changes to /about
+  useEffect(() => {
+    if (pathname === "/about" && isNavigatingToAbout) {
+      // Small delay to ensure page is fully loaded
+      const timer = setTimeout(() => {
+        setIsNavigatingToAbout(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, isNavigatingToAbout]);
+
+  // Hide loader when pathname changes to /shop
+  useEffect(() => {
+    if (pathname === WEBSITE_SHOP && isNavigatingToShop) {
+      // Small delay to ensure page is fully loaded
+      const timer = setTimeout(() => {
+        setIsNavigatingToShop(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, isNavigatingToShop]);
+
+  // Hide loader when pathname changes to home
+  useEffect(() => {
+    if (pathname === WEBSITE_HOME && isNavigatingToHome) {
+      // Small delay to ensure page is fully loaded
+      const timer = setTimeout(() => {
+        setIsNavigatingToHome(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, isNavigatingToHome]);
+
+  // Hide loader when pathname changes to shop with category (T-shirt, Hoodies, Oversized)
+  useEffect(() => {
+    if (pathname === WEBSITE_SHOP && isNavigatingToCategory) {
+      // Small delay to ensure page is fully loaded
+      const timer = setTimeout(() => {
+        setIsNavigatingToCategory(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, isNavigatingToCategory]);
+
   return (
     <div className="bg-white border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,43 +202,52 @@ const Header = () => {
           <nav className="hidden lg:flex flex-1 justify-center mx-8">
             <ul className="flex items-center gap-6 xl:gap-10">
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href={WEBSITE_HOME} className="py-2 px-3">
+                <button
+                  onClick={handleHomeClick}
+                  className="py-2 px-3"
+                >
                   Home
-                </Link>
+                </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href="/about" className="py-2 px-3">
+                <button
+                  onClick={handleAboutClick}
+                  className="py-2 px-3"
+                >
                   About
-                </Link>
+                </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link href={WEBSITE_SHOP} className="py-2 px-3">
+                <button
+                  onClick={handleShopClick}
+                  className="py-2 px-3"
+                >
                   Shop
-                </Link>
+                </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link
-                  href={`${WEBSITE_SHOP}?category=t-shirts`}
+                <button
+                  onClick={(e) => handleCategoryClick(e, "t-shirts")}
                   className="py-2 px-3"
                 >
                   T-shirt
-                </Link>
+                </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link
-                  href={`${WEBSITE_SHOP}?category=hoodies`}
+                <button
+                  onClick={(e) => handleCategoryClick(e, "hoodies")}
                   className="py-2 px-3"
                 >
                   Hoodies
-                </Link>
+                </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <Link
-                  href={`${WEBSITE_SHOP}?category=oversized`}
+                <button
+                  onClick={(e) => handleCategoryClick(e, "oversized")}
                   className="py-2 px-3"
                 >
                   Oversized
-                </Link>
+                </button>
               </li>
             </ul>
           </nav>
@@ -276,58 +365,52 @@ const Header = () => {
           <nav className="flex-1 overflow-y-auto">
             <ul className="flex flex-col py-4">
               <li className="border-b">
-                <Link
-                  href={WEBSITE_HOME}
-                  className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={handleHomeClick}
+                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                 >
                   Home
-                </Link>
+                </button>
               </li>
               <li className="border-b">
-                <Link
-                  href="/about"
-                  className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={handleAboutClick}
+                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                 >
                   About
-                </Link>
+                </button>
               </li>
               <li className="border-b">
-                <Link
-                  href={WEBSITE_SHOP}
-                  className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={handleShopClick}
+                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                 >
                   Shop
-                </Link>
+                </button>
               </li>
               <li className="border-b">
-                <Link
-                  href={`${WEBSITE_SHOP}?category=t-shirts`}
-                  className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={(e) => handleCategoryClick(e, "t-shirts")}
+                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                 >
                   T-shirt
-                </Link>
+                </button>
               </li>
               <li className="border-b">
-                <Link
-                  href={`${WEBSITE_SHOP}?category=hoodies`}
-                  className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={(e) => handleCategoryClick(e, "hoodies")}
+                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                 >
                   Hoodies
-                </Link>
+                </button>
               </li>
               <li className="border-b">
-                <Link
-                  href={`${WEBSITE_SHOP}?category=oversized`}
-                  className="block py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                  onClick={closeMobileMenu}
+                <button
+                  onClick={(e) => handleCategoryClick(e, "oversized")}
+                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
                 >
                   Oversized
-                </Link>
+                </button>
               </li>
             </ul>
           </nav>
@@ -344,6 +427,12 @@ const Header = () => {
       )}
       {isSearchOpen && (
         <Search isShow={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
+      )}
+      {/* Loading Overlay for Navigation */}
+      {(isNavigatingToAbout || isNavigatingToShop || isNavigatingToHome || isNavigatingToCategory) && (
+        <div className="fixed inset-0 bg-white bg-opacity-90 z-[9999] flex items-center justify-center">
+          <Loading />
+        </div>
       )}
     </div>
   );

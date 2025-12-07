@@ -1,15 +1,45 @@
+"use client";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosArrowRoundForward } from "react-icons/io";
 import ProductBox from "./ProductBox";
 
-const FeaturedProduct = async () => {
-  const { data: productData } = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/get-featured-product`
-  );
+const FeaturedProduct = () => {
+  const [productData, setProductData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/get-featured-product`
+        );
+        setProductData(data);
+      } catch (error) {
+        console.error("Failed to fetch featured products:", error);
+        setProductData({ success: false });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-16">
+        <div className="flex items-center justify-center py-10">
+          <div className="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
   if (!productData) return null;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-16">
       {/* Section Header */}
