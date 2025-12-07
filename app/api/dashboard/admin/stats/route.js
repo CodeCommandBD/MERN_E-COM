@@ -17,15 +17,22 @@ export async function GET(req) {
     await connectDB();
 
     // 1. Order Overview (Monthly Orders)
-    const monthlyOrders = await OrderModel.aggregate([
-      {
-        $group: {
-          _id: { $month: "$createdAt" },
-          amount: { $sum: 1 }, // Count orders
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
+    // Use a robust JS computation to avoid aggregation failures
+    const activeFilter = { $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] };
+    let monthlyOrdersDocs = [];
+    try {
+      monthlyOrdersDocs = await OrderModel.find(activeFilter, "createdAt").lean();
+    } catch (_) {
+      monthlyOrdersDocs = [];
+    }
+
+    const monthCounts = Array(12).fill(0);
+    for (const doc of monthlyOrdersDocs) {
+      const d = new Date(doc.createdAt);
+      if (!isNaN(d)) {
+        monthCounts[d.getMonth()]++;
+      }
+    }
 
     // Map month numbers to names
     const monthNames = [
@@ -43,24 +50,26 @@ export async function GET(req) {
       "December",
     ];
 
-    // Fill in missing months with 0
-    const fullMonthlyData = monthNames.map((month, index) => {
-      const found = monthlyOrders.find((m) => m._id === index + 1);
-      return {
-        month,
-        amount: found ? found.amount : 0,
-      };
-    });
+    const fullMonthlyData = monthNames.map((month, index) => ({
+      month,
+      amount: monthCounts[index] || 0,
+    }));
 
     // 2. Order Summary (Status Distribution)
-    const statusCounts = await OrderModel.aggregate([
-      {
-        $group: {
-          _id: "$orderStatus",
-          count: { $sum: 1 },
+    let statusCounts = [];
+    try {
+      statusCounts = await OrderModel.aggregate([
+        { $match: activeFilter },
+        {
+          $group: {
+            _id: "$orderStatus",
+            count: { $sum: 1 },
+          },
         },
-      },
-    ]);
+      ]);
+    } catch (_) {
+      statusCounts = [];
+    }
 
     // Define all possible statuses ensuring colors match standard UI
     const allStatuses = [
@@ -82,26 +91,36 @@ export async function GET(req) {
     });
 
     // 3. Latest Orders
-    const latestOrders = await OrderModel.find()
-      .select(
-        "orderNumber transactionId items orderStatus pricing.total createdAt paymentMethod"
-      )
-      .sort({ createdAt: -1 })
-      .limit(10);
+    let latestOrders = [];
+    try {
+      latestOrders = await OrderModel.find(activeFilter)
+        .select(
+          "orderNumber transactionId items orderStatus pricing.total createdAt paymentMethod"
+        )
+        .sort({ createdAt: -1 })
+        .limit(10);
+    } catch (_) {
+      latestOrders = [];
+    }
 
     // 4. Latest Reviews
-    const latestReviews = await ReviewModel.find({ deletedAt: null })
-      .populate({
-        path: "product",
-        select: "name media",
-        populate: {
-          path: "media",
-          select: "secure_url",
-        },
-      })
-      .populate("user", "name avatar")
-      .sort({ createdAt: -1 })
-      .limit(10);
+    let latestReviews = [];
+    try {
+      latestReviews = await ReviewModel.find({ deletedAt: null })
+        .populate({
+          path: "product",
+          select: "name media",
+          populate: {
+            path: "media",
+            select: "secure_url",
+          },
+        })
+        .populate("user", "name avatar")
+        .sort({ createdAt: -1 })
+        .limit(10);
+    } catch (_) {
+      latestReviews = [];
+    }
 
     return res(true, 200, "Dashboard stats fetched successfully", {
       monthlyOrders: fullMonthlyData,

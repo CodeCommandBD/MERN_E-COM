@@ -32,15 +32,31 @@ const DataTable = ({
   deleteEndpoint,
   trashView,
   createAction,
+  initialGlobalFilter = "",
+  initialColumnFilters = [],
 }) => {
-  const [columnFilters, setColumnFilters] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [columnFilters, setColumnFilters] = useState(initialColumnFilters);
+  const [globalFilter, setGlobalFilter] = useState(initialGlobalFilter);
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: initialPageSize,
   });
   const [selectedRows, setSelectedRows] = useState({});
+  const prevColumnFiltersRef = React.useRef(JSON.stringify(initialColumnFilters));
+
+  // Sync external filters with internal state
+  React.useEffect(() => {
+    setGlobalFilter(initialGlobalFilter);
+  }, [initialGlobalFilter]);
+
+  React.useEffect(() => {
+    const currentFiltersStr = JSON.stringify(initialColumnFilters);
+    if (prevColumnFiltersRef.current !== currentFiltersStr) {
+      setColumnFilters(initialColumnFilters);
+      prevColumnFiltersRef.current = currentFiltersStr;
+    }
+  }, [initialColumnFilters]);
 
   const [exportLoading, setExportLoading] = useState(false);
   const [confirmModal, setConfirmModal] = useState({

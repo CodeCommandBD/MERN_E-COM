@@ -15,7 +15,9 @@ const DataTableWrapper = ({
   deleteType,
   deleteEndpoint,
   trashView,
-  createAction
+  createAction,
+  initialGlobalFilter = "",
+  initialColumnFilters = []
 }) => {
   
   const {resolvedTheme} = useTheme()
@@ -38,6 +40,8 @@ const DataTableWrapper = ({
           deleteEndpoint={deleteEndpoint}
           trashView={trashView}
           createAction={createAction}
+          initialGlobalFilter={initialGlobalFilter}
+          initialColumnFilters={initialColumnFilters}
       ></DataTable>
     </ThemeProvider>
   )

@@ -47,7 +47,12 @@ export async function GET(request) {
 
     // Column filteration
     filters.forEach((element) => {
-      matchQuery[element.id] = { $regex: element.value, $options: "i" };
+      // For orderStatus, use exact match for better accuracy
+      if (element.id === "orderStatus") {
+        matchQuery[element.id] = element.value;
+      } else {
+        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+      }
     });
 
     // sorting
