@@ -3,6 +3,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 import { Assistant } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import GlobalProvider from "@/components/Application/GlobalProvider";
 
 const assistant = Assistant({
@@ -129,6 +130,7 @@ export default function RootLayout({ children }) {
             />
             <div suppressHydrationWarning={true}>{children}</div>
           </div>
+          <SpeedInsights />
         </GlobalProvider>
       </body>
     </html>
