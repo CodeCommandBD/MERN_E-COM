@@ -12,7 +12,7 @@ export async function PUT(request) {
     }
 
     const body = await request.json();
-    const { name, phone, dateOfBirth, gender } = body;
+    const { name, phone, dateOfBirth, gender, address } = body;
 
     // Connect to database
     await connectDB();
@@ -29,6 +29,7 @@ export async function PUT(request) {
     if (phone) user.phone = phone;
     if (dateOfBirth) user.dateOfBirth = dateOfBirth;
     if (gender) user.gender = gender;
+    if (address !== undefined) user.address = address;
 
     await user.save();
 
@@ -39,8 +40,10 @@ export async function PUT(request) {
       phone: user.phone,
       dateOfBirth: user.dateOfBirth,
       gender: user.gender,
+      address: user.address,
       avatar: user.avatar,
       role: user.role,
+      isEmailVerified: user.isEmailVerified,
     });
   } catch (error) {
     return catchError(error);
