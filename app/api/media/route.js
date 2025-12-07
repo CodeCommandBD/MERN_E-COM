@@ -15,13 +15,44 @@ export async function GET(request) {
     const page = parseInt(searchParams.get("page"), 10) || 0;
     const limit = parseInt(searchParams.get("limit"), 10) || 10;
     const deleteType = searchParams.get("deleteType"); // 'SD' | 'PD' | undefined
-    // SD = show non-deleted, PD = show trashed
-    let filter = {};
+    const search = searchParams.get("search") || "";
+    
+    // SD = show non-deleted, PD = show trashed, undefined = show all
+    const filterConditions = [];
+    
+    // Add deleteType filter
     if (deleteType === "SD") {
-      filter = { deletedAt: null };
+      // Active: deletedAt is null or doesn't exist
+      filterConditions.push({
+        $or: [
+          { deletedAt: null },
+          { deletedAt: { $exists: false } }
+        ]
+      });
     } else if (deleteType === "PD") {
-      filter = { deletedAt: { $ne: null } };
+      // Trashed: deletedAt exists and is not null
+      filterConditions.push({
+        deletedAt: { $exists: true, $ne: null }
+      });
     }
+    // If deleteType is not provided or empty, show all (no filter)
+
+    // Add search filter
+    if (search && search.trim()) {
+      filterConditions.push({
+        $or: [
+          { title: { $regex: search.trim(), $options: "i" } },
+          { alt: { $regex: search.trim(), $options: "i" } },
+          { public_id: { $regex: search.trim(), $options: "i" } },
+        ],
+      });
+    }
+
+    // Combine all conditions with $and, or use empty object if no conditions
+    const filter = filterConditions.length > 0 
+      ? { $and: filterConditions }
+      : {};
+
     const mediaData = await MediaModel.find(filter)
       .sort({ createdAt: -1, _id: -1 })
       .skip(page * limit)

@@ -45,7 +45,12 @@ export async function GET(request) {
     // Column filteration
 
     filters.forEach((element) => {
+      // Handle boolean fields differently
+      if (element.id === "isEmailVerified") {
+        matchQuery[element.id] = element.value === "true" || element.value === true;
+      } else {
         matchQuery[element.id] = { $regex: element.value, $options: "i" };
+      }
     });
 
     // sorting

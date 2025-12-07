@@ -82,23 +82,51 @@ const ProductReview = ({ product }) => {
   }, [auth]);
 
   const handleReviewSubmit = async (value) => {
-    // TODO: Implement category submission
+    // Check if user is authenticated
+    if (!auth || !auth._id) {
+      showToast("error", "Please login to submit a review");
+      return;
+    }
+
+    // Validate rating
+    if (!value.rating || value.rating === 0) {
+      showToast("error", "Please select a rating");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: response } = await axios.post("/api/review/create", {
         ...value,
+        userId: auth._id, // Ensure userId is set from auth
       });
       if (!response.success) {
         throw new Error(response.message);
       }
       form.reset();
+      form.setValue("rating", 0); // Reset rating
+      setIsReview(false); // Close the form
       queryClient.invalidateQueries({
         queryKey: ["reviews", product._id],
       });
       refetchReviewDetails();
       showToast("success", response.message);
     } catch (error) {
-      showToast("error", error.message);
+      // Better error handling
+      const errorMessage = 
+        error.response?.data?.message || 
+        error.response?.status === 403 
+          ? "You must be logged in to submit a review. Please login and try again."
+          : error.message || 
+        "Failed to submit review. Please try again.";
+      showToast("error", errorMessage);
+      
+      // If 403, redirect to login
+      if (error.response?.status === 403) {
+        setTimeout(() => {
+          window.location.href = `${WEBSITE_LOGIN}?callback=${encodeURIComponent(window.location.href)}`;
+        }, 2000);
+      }
     } finally {
       setLoading(false);
     }

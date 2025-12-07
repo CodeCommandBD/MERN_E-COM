@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import slugify from 'slugify'
 import axios from 'axios'
 import { showToast } from '@/lib/showToast'
+import PageLoader from '@/components/Application/Admin/PageLoader'
 
 const breadcrumbData = [
   {
@@ -31,6 +32,16 @@ const breadcrumbData = [
 
 const AddCategory = () => {
   const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Show loader initially and hide it after component mounts
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
 
    // TODO:##### Form valid
   // TODO:##### Form valid
@@ -70,6 +81,11 @@ const AddCategory = () => {
       setLoading(false)
     }
   }
+
+  if (isLoading) {
+    return <PageLoader message="Loading Add Category..." />;
+  }
+
   return (
     <div>
       <BreadCrumb breadcrumbData={breadcrumbData}></BreadCrumb>

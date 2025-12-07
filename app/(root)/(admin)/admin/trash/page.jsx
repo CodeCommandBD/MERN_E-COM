@@ -67,9 +67,9 @@ const TRASH_CONFIG = {
   review: {
     title: "Review Trash",
     columns: DT_REVIEW_COLUMN,
-    fetchUrl: "/api/reviews",
-    exportUrl: "/api/reviews/export",
-    deleteUrl: "/api/reviews/delete",
+    fetchUrl: "/api/review",
+    exportUrl: "/api/review/export",
+    deleteUrl: "/api/review/delete",
   },
   order: {
     title: "Order Trash",
