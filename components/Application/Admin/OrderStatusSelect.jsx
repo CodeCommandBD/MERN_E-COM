@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Select, MenuItem, FormControl } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
+import { useStatsUpdate } from "@/app/(root)/(admin)/admin/orders/page";
 
 const ORDER_STATUSES = [
   { value: "pending", label: "PENDING", color: "#f59e0b" },
@@ -19,9 +21,17 @@ export default function OrderStatusSelect({
 }) {
   const [status, setStatus] = useState(currentStatus);
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const updateStatsLive = useStatsUpdate();
+
+  // Sync status when currentStatus prop changes
+  useEffect(() => {
+    setStatus(currentStatus);
+  }, [currentStatus]);
 
   const handleChange = async (e) => {
     const newStatus = e.target.value;
+    const oldStatus = status;
     setLoading(true);
     try {
       const response = await axios.put("/api/dashboard/admin/order/status", {
@@ -30,6 +40,15 @@ export default function OrderStatusSelect({
       });
       if (response.data.success) {
         setStatus(newStatus);
+        
+        // Invalidate order-data query to refresh the table
+        await queryClient.invalidateQueries({ queryKey: ["order-data"] });
+        
+        // Update stats live if context is available
+        if (updateStatsLive) {
+          updateStatsLive(oldStatus, newStatus);
+        }
+        
         if (onUpdate) onUpdate(newStatus);
       } else {
         alert(response.data.message || "Failed to update status");
