@@ -29,6 +29,53 @@ const ChatWidget = () => {
   });
   const messagesEndRef = useRef(null);
 
+  const handleEndChat = React.useCallback(() => {
+    localStorage.removeItem("supportTicketId");
+    localStorage.removeItem("supportTicketNumber");
+    setTicketId(null);
+    setTicketNumber(null);
+    setMessages([]);
+    setUnreadCount(0);
+    setFormData({ name: "", phone: "", message: "" });
+  }, []);
+
+  const fetchMessages = React.useCallback(
+    async (id) => {
+      try {
+        const response = await axios.get(`/api/support/message?ticketId=${id}`);
+        if (response.data.success) {
+          const fetchedMessages = response.data.data.messages || [];
+          setMessages(fetchedMessages);
+
+          // Calculate unread messages from admin
+          const unread = fetchedMessages.filter(
+            (m) => m.sender === "admin" && !m.isRead
+          ).length;
+          setUnreadCount(unread);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+        // If ticket not found (404), clear local storage to reset state
+        if (error.response && error.response.status === 404) {
+          handleEndChat();
+        }
+      }
+    },
+    [handleEndChat]
+  );
+
+  const markMessagesAsRead = React.useCallback(async (id) => {
+    try {
+      await axios.put("/api/support/message", {
+        ticketId: id,
+        role: "customer",
+      });
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+    }
+  }, []);
+
   // Load ticket from localStorage on mount
   useEffect(() => {
     const savedTicketId = localStorage.getItem("supportTicketId");
@@ -38,7 +85,7 @@ const ChatWidget = () => {
       setTicketNumber(savedTicketNumber);
       fetchMessages(savedTicketId);
     }
-  }, []);
+  }, [fetchMessages]);
 
   // Poll for new messages every 5 seconds
   useEffect(() => {
@@ -49,14 +96,14 @@ const ChatWidget = () => {
       }, 5000);
     }
     return () => clearInterval(interval);
-  }, [ticketId, isOpen]);
+  }, [ticketId, fetchMessages]);
 
   // Mark messages as read when chat is opened
   useEffect(() => {
     if (isOpen && unreadCount > 0 && ticketId) {
       markMessagesAsRead(ticketId);
     }
-  }, [isOpen, unreadCount, ticketId]);
+  }, [isOpen, unreadCount, ticketId, markMessagesAsRead]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -64,40 +111,6 @@ const ChatWidget = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen]);
-
-  const fetchMessages = async (id) => {
-    try {
-      const response = await axios.get(`/api/support/message?ticketId=${id}`);
-      if (response.data.success) {
-        const fetchedMessages = response.data.data.messages || [];
-        setMessages(fetchedMessages);
-
-        // Calculate unread messages from admin
-        const unread = fetchedMessages.filter(
-          (m) => m.sender === "admin" && !m.isRead
-        ).length;
-        setUnreadCount(unread);
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-      // If ticket not found (404), clear local storage to reset state
-      if (error.response && error.response.status === 404) {
-        handleEndChat();
-      }
-    }
-  };
-
-  const markMessagesAsRead = async (id) => {
-    try {
-      await axios.put("/api/support/message", {
-        ticketId: id,
-        role: "customer",
-      });
-      setUnreadCount(0);
-    } catch (error) {
-      console.error("Error marking messages as read:", error);
-    }
-  };
 
   const handleStartChat = async (e) => {
     e.preventDefault();
@@ -151,16 +164,6 @@ const ChatWidget = () => {
     } catch (error) {
       console.error("Error sending message:", error);
     }
-  };
-
-  const handleEndChat = () => {
-    localStorage.removeItem("supportTicketId");
-    localStorage.removeItem("supportTicketNumber");
-    setTicketId(null);
-    setTicketNumber(null);
-    setMessages([]);
-    setUnreadCount(0);
-    setFormData({ name: "", phone: "", message: "" });
   };
 
   return (

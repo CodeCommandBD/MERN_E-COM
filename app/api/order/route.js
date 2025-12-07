@@ -24,15 +24,11 @@ export async function GET(request) {
     // build match query
     let matchQuery = {};
 
-    console.log("Order Fetch API - deleteType:", deleteType);
-
     if (deleteType === "SD") {
       matchQuery = { deletedAt: null };
     } else if (deleteType === "PD" || deleteType === "TD") {
       matchQuery = { deletedAt: { $ne: null } };
     }
-
-    console.log("Order Fetch API - matchQuery:", JSON.stringify(matchQuery));
 
     // Global search
     if (globalFilters) {
@@ -88,14 +84,6 @@ export async function GET(request) {
 
     // Execute query
     const getOrders = await OrderModel.aggregate(aggregatePipeline);
-
-    console.log("Order Fetch API - Found orders:", getOrders.length);
-    if (getOrders.length > 0) {
-      console.log(
-        "Order Fetch API - First order deletedAt:",
-        getOrders[0].deletedAt
-      );
-    }
 
     // Get TotalRowCount
     const totalRowCount = await OrderModel.countDocuments(matchQuery);

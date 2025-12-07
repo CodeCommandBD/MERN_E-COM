@@ -37,13 +37,11 @@ export async function PUT(request) {
         { _id: { $in: ids } },
         { $set: { deletedAt: new Date() } }
       );
-      console.log("Soft delete result:", result);
     } else {
       const result = await SupportChatModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: null } }
       );
-      console.log("Restore result:", result);
     }
 
     return res(

@@ -26,8 +26,6 @@ export async function GET(request) {
       query = { deletedAt: { $ne: null, $exists: true } };
     }
 
-    console.log("Fetching orders with query:", JSON.stringify(query));
-
     // get filtered orders sorted by newest first
     const orders = await OrderModel.find(query)
       .sort({ createdAt: -1 })

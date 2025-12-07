@@ -33,19 +33,15 @@ export async function PUT(request) {
     }
 
     if (deleteType === "SD") {
-      console.log("Order Delete API - Soft deleting orders:", ids);
       const result = await OrderModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: new Date() } }
       );
-      console.log("Order Delete API - Update result:", result);
     } else {
-      console.log("Order Delete API - Restoring orders:", ids);
       const result = await OrderModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: null } }
       );
-      console.log("Order Delete API - Update result:", result);
     }
 
     return res(
