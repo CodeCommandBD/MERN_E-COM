@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
-import Cart from "./Cart";
+import CartSidebar from "./CartSidebar";
 import { VscAccount } from "react-icons/vsc";
 import { useSelector } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -349,21 +349,6 @@ const Header = () => {
             <IoClose size={28} />
           </button>
         </div>
-
-        {/* Mobile Menu Content */}
-        <div className="flex flex-col h-full">
-          {/* Navigation Links */}
-          <nav className="flex-1 overflow-y-auto">
-            <ul className="flex flex-col py-4">
-              <li className="border-b">
-                <button
-                  onClick={handleHomeClick}
-                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                >
-                  Home
-                </button>
-              </li>
-              <li className="border-b">
                 <button
                   onClick={handleAboutClick}
                   className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"

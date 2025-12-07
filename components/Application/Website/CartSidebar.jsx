@@ -20,7 +20,7 @@ import { WEBSITE_CART, WEBSITE_CHECKOUT } from "@/Routes/WebsiteRoute";
 import { useState, useEffect } from "react";
 import { showToast } from "@/lib/showToast";
 
-const Cart = () => {
+const CartSidebar = () => {
   const [open, setOpen] = useState(false);
   const cart = useSelector((state) => state.cartStore);
   const dispatch = useDispatch();
@@ -204,4 +204,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default CartSidebar;
