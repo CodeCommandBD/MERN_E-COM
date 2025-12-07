@@ -21,6 +21,7 @@ import {
   MapPin,
   CheckCircle,
   XCircle,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -48,6 +49,7 @@ export default function MyAccountPage() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
   const [gravatarUrl, setGravatarUrl] = useState("");
   const [activeSection, setActiveSection] = useState("account");
   const [orders, setOrders] = useState([]);
@@ -206,6 +208,34 @@ export default function MyAccountPage() {
     } catch (error) {
       console.error("Logout failed:", error);
       showToast("error", "Logout failed. Please try again.");
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!user?.email) return;
+
+    setResendingVerification(true);
+    try {
+      const response = await axios.post("/api/auth/resend-verification", {
+        email: user.email,
+      });
+      if (response.data.success) {
+        showToast(
+          "success",
+          "Verification email sent! Please check your inbox."
+        );
+      } else {
+        showToast(
+          "error",
+          response.data.message || "Failed to send verification email"
+        );
+      }
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to send verification email";
+      showToast("error", message);
+    } finally {
+      setResendingVerification(false);
     }
   };
 
@@ -569,18 +599,29 @@ export default function MyAccountPage() {
                       {/* Verification Help Message */}
                       {!user.isEmailVerified && (
                         <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                          <p className="text-sm text-amber-800">
+                          <p className="text-sm text-amber-800 mb-3">
                             <strong>How to verify your email:</strong> Please
                             check your inbox for a verification email sent when
-                            you registered. If you didn't receive it, contact
-                            our support team at{" "}
-                            <a
-                              href="mailto:support@example.com"
-                              className="text-amber-600 underline hover:text-amber-700"
-                            >
-                              support@example.com
-                            </a>
+                            you registered.
                           </p>
+                          <Button
+                            onClick={handleResendVerification}
+                            disabled={resendingVerification}
+                            size="sm"
+                            className="bg-amber-600 hover:bg-amber-700 text-white"
+                          >
+                            {resendingVerification ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                Sending...
+                              </>
+                            ) : (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-2" />
+                                Resend Verification Email
+                              </>
+                            )}
+                          </Button>
                         </div>
                       )}
                     </div>
