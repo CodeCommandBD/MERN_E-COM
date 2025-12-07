@@ -255,7 +255,7 @@ const Header = () => {
             </button>
 
             {/* Cart - Always visible */}
-            <Cart />
+            <CartSidebar />
 
             {/* My Orders - Always visible */}
             <Link
