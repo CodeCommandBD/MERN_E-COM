@@ -33,6 +33,11 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Performance indexes for common queries
+reviewSchema.index({ product: 1, deletedAt: 1, createdAt: -1 });
+reviewSchema.index({ user: 1, product: 1 });
+reviewSchema.index({ rating: 1 });
+
 const ReviewModel =
   mongoose.models["Review"] ||
   mongoose.model("Review", reviewSchema, "reviews");

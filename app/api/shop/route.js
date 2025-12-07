@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
+import { escapeRegex } from "@/lib/escapeRegex";
 import CategoryModel from "@/Models/category.model";
 import ProductModel from "@/Models/Product.model";
 
@@ -55,7 +56,8 @@ export async function GET(request) {
       matchStage.category = { $in: categoryId };
     }
     if (search) {
-      matchStage.name = { $regex: search, $options: "i" };
+      // Escape special regex chars to prevent ReDoS attacks
+      matchStage.name = { $regex: escapeRegex(search), $options: "i" };
     }
 
     // Add price filter to matchStage for better performance
@@ -216,10 +218,22 @@ export async function GET(request) {
       nextpage = page + 1;
       products.pop();
     }
-    return res(true, 200, "Products fetched successfully", {
-      products,
-      nextpage,
-    });
+
+    // Return response with cache headers for better performance
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "Products fetched successfully",
+        data: { products, nextpage },
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     return catchError(error);
   }

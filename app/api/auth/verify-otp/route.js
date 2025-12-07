@@ -1,5 +1,10 @@
 import { connectDB } from "@/lib/dbConnection";
 import { res } from "@/lib/helper";
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+} from "@/lib/rateLimit";
 import OTPModel from "@/Models/Otp.model";
 import UserModel from "@/Models/user.models";
 import { SignJWT } from "jose";
@@ -7,6 +12,13 @@ import { cookies } from "next/headers";
 
 export async function POST(req) {
   try {
+    // Rate limiting: 5 OTP attempts per minute per IP
+    const clientIP = getClientIP(req);
+    const rateCheck = checkRateLimit(`otp:${clientIP}`, 5, 60000);
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetIn);
+    }
+
     await connectDB();
 
     const { email, otp } = await req.json();
@@ -53,7 +65,7 @@ export async function POST(req) {
     cookieStore.set({
       name: "access_token",
       value: token,
-      httpOnly: process.env.NODE_ENV === "production",
+      httpOnly: true, // Always true to prevent XSS token theft
       path: "/",
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

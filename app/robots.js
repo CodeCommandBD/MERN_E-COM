@@ -12,6 +12,8 @@ export default function robots() {
           "/api/",
           "/auth/",
           "/checkout",
+          "/cart",
+          "/order/",
           "/payment-success",
           "/payment-cancel",
           "/my-account",

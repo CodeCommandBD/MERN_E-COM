@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import UserModel from "@/Models/user.models";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 export async function PUT(request) {
   try {

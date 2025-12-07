@@ -4,14 +4,25 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, generateOTP, res } from "@/lib/helper";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+} from "@/lib/rateLimit";
 import OTPModel from "@/Models/Otp.model";
 import UserModel from "@/Models/user.models";
 import { z } from "zod";
 import { SignJWT } from "jose";
 
-
 export async function POST(req) {
   try {
+    // Rate limiting: 5 login attempts per minute per IP
+    const clientIP = getClientIP(req);
+    const rateCheck = checkRateLimit(`login:${clientIP}`, 5, 60000);
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetIn);
+    }
+
     await connectDB();
 
     // TODO:######### validation form Data For backend
@@ -37,7 +48,9 @@ export async function POST(req) {
     }
     const { email, password } = validatedData.data;
 
-    const getUser = await UserModel.findOne({deletedAt: null, email }).select('+password');
+    const getUser = await UserModel.findOne({ deletedAt: null, email }).select(
+      "+password"
+    );
     if (!getUser) {
       return res(false, 400, "Invalid login credentials.");
     }
@@ -69,29 +82,33 @@ export async function POST(req) {
     }
 
     //TODO: ########## Password verification
-   
+
     const isPasswordVerified = await getUser.comparePassword(password);
     if (!isPasswordVerified) {
       return res(false, 400, "Invalid login password.");
     }
     //TODO: ###########  OTP Generate
-    await OTPModel.deleteMany({email}) //TODO ############ deleting old otp
+    await OTPModel.deleteMany({ email }); //TODO ############ deleting old otp
 
-    const otp = generateOTP()
+    const otp = generateOTP();
     // TODO ########## Storing otp into database
     const newOtpData = new OTPModel({
-        email, 
-        otp: otp.toString() // Ensure it's stored as string
-    })
-    await newOtpData.save()
+      email,
+      otp: otp.toString(), // Ensure it's stored as string
+    });
+    await newOtpData.save();
 
-    const otpEmailStatus = await sendMail('Your login verification code', email, otpEmail(otp))
+    const otpEmailStatus = await sendMail(
+      "Your login verification code",
+      email,
+      otpEmail(otp)
+    );
 
-    if(!otpEmailStatus.success){
-      return res(false, 400, 'Failed to send OTP')
+    if (!otpEmailStatus.success) {
+      return res(false, 400, "Failed to send OTP");
     }
-    return res(true, 200, 'Please verify your device')
+    return res(true, 200, "Please verify your device");
   } catch (error) {
-    return catchError(error)
+    return catchError(error);
   }
 }

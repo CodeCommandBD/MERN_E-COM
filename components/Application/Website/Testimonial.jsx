@@ -1,6 +1,7 @@
 "use client";
+import { memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
+import { Pagination, Autoplay, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { FaStar } from "react-icons/fa";
@@ -47,19 +48,35 @@ const testimonial = [
 
 const Testimonial = () => {
   return (
-    <div className="py-8 md:py-12 px-4 md:px-6 lg:px-16 bg-white">
+    <div
+      className="py-8 md:py-12 px-4 md:px-6 lg:px-16 bg-white"
+      role="region"
+      aria-label="Customer testimonials"
+    >
       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-900">
         Customer Review
       </h2>
-      <div className="testimonial-slider max-w-6xl mx-auto pb-12">
+      <div
+        className="testimonial-slider max-w-6xl mx-auto pb-12"
+        aria-roledescription="carousel"
+        aria-label="Customer reviews carousel"
+      >
         <Swiper
-          modules={[Pagination, Autoplay]}
+          modules={[Pagination, Autoplay, A11y]}
           spaceBetween={20}
           slidesPerView={1}
           pagination={{ clickable: true }}
           autoplay={{ delay: 4000, disableOnInteraction: false }}
           loop={true}
           speed={500}
+          a11y={{
+            enabled: true,
+            prevSlideMessage: "Previous testimonial",
+            nextSlideMessage: "Next testimonial",
+            firstSlideMessage: "This is the first testimonial",
+            lastSlideMessage: "This is the last testimonial",
+            paginationBulletMessage: "Go to testimonial {{index}}",
+          }}
           breakpoints={{
             768: { slidesPerView: 1, spaceBetween: 20 },
             1024: { slidesPerView: 2, spaceBetween: 24 },
@@ -71,7 +88,11 @@ const Testimonial = () => {
               <div className="pb-2">
                 <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-7 mx-auto max-w-lg h-full">
                   <div className="mb-5">
-                    <BsChatQuote size={32} className="text-gray-800" />
+                    <BsChatQuote
+                      size={32}
+                      className="text-gray-800"
+                      aria-hidden="true"
+                    />
                   </div>
                   <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-6 min-h-[100px]">
                     {item.review}
@@ -121,4 +142,4 @@ const Testimonial = () => {
   );
 };
 
-export default Testimonial;
+export default memo(Testimonial);

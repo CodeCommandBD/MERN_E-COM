@@ -1,13 +1,13 @@
-import dbConnection from "@/lib/dbConnection";
-import Product from "@/Models/Product";
-import Category from "@/Models/Category";
+import { connectDB } from "@/lib/dbConnection";
+import Product from "@/Models/Product.model";
+import Category from "@/Models/category.model";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
 export default async function sitemap() {
   // Connect to database
-  await dbConnection();
+  await connectDB();
 
   // Static pages
   const staticPages = [
@@ -34,6 +34,25 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.5,
+    },
+    // Policy pages
+    {
+      url: `${BASE_URL}/privacy-policy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/terms-conditions`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/return-policy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
   ];
 

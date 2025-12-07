@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -20,7 +20,7 @@ const MainSlider = () => {
   return (
     <div className="main-slider relative">
       <Swiper
-        modules={[Navigation, Pagination, Autoplay]}
+        modules={[Navigation, Pagination, Autoplay, A11y]}
         spaceBetween={0}
         slidesPerView={1}
         navigation={{
@@ -48,6 +48,7 @@ const MainSlider = () => {
               width={slide.src.width}
               height={slide.src.height}
               priority={index === 0}
+              fetchPriority={index === 0 ? "high" : "auto"}
               sizes="100vw"
               quality={80}
               className="w-full h-auto"
@@ -97,4 +98,4 @@ const MainSlider = () => {
   );
 };
 
-export default MainSlider;
+export default memo(MainSlider);

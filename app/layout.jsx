@@ -86,7 +86,11 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         {/* Preconnect to Cloudinary for faster image loading */}
-        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link
+          rel="preconnect"
+          href="https://res.cloudinary.com"
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         {/* Preconnect to Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -94,6 +98,14 @@ export default function RootLayout({ children }) {
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
+        />
+        {/* Preload LCP hero slider image */}
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/images/slider-1.webp"
+          type="image/webp"
+          fetchPriority="high"
         />
       </head>
       <body

@@ -3,6 +3,9 @@ import ProductDetails from "./ProductDetails";
 import axios from "axios";
 import Script from "next/script";
 
+// ISR: Revalidate product pages every 60 seconds
+export const revalidate = 60;
+
 // Dynamic metadata generation for SEO
 export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;

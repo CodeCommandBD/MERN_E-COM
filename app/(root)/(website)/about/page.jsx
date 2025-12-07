@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Application/Loading";
+import { FAQJsonLd, LocalBusinessJsonLd } from "@/components/SEO/JsonLd";
 
 const breadcrumb = {
   title: "About Us",
@@ -105,6 +106,10 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* JSON-LD Structured Data for SEO */}
+      <FAQJsonLd />
+      <LocalBusinessJsonLd />
+
       <WebsiteBreadCrumb props={breadcrumb} />
 
       {/* Hero Section */}
