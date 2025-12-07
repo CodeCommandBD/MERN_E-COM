@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { ThemeProvider } from "@mui/material"
-import DataTable from "./DataTable"
-import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
-import { darkTheme, lightTheme } from "@/lib/materialTheme"
+import { ThemeProvider } from "@mui/material";
+import DataTable from "./DataTable";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { darkTheme, lightTheme } from "@/lib/materialTheme";
 
 const DataTableWrapper = ({
   queryKey,
@@ -18,35 +18,36 @@ const DataTableWrapper = ({
   createAction,
   initialGlobalFilter = "",
   initialColumnFilters = [],
-  onDeleteSuccess
+  onDeleteSuccess,
+  onStatusUpdate,
 }) => {
-  
-  const {resolvedTheme} = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  useEffect(()=>{
-    setMounted(true)
-  },[])
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if(!mounted) return null
+  if (!mounted) return null;
   return (
-    <ThemeProvider theme={resolvedTheme === 'dark' ? darkTheme:lightTheme}>
-      <DataTable 
-          queryKey={queryKey}
-          fetchUrl={fetchUrl}
-          columnsConfig={columnsConfig}
-          initialPageSize = {initialPageSize}
-          exportEndpoint={exportEndpoint}
-          deleteType={deleteType}
-          deleteEndpoint={deleteEndpoint}
-          trashView={trashView}
-          createAction={createAction}
-          initialGlobalFilter={initialGlobalFilter}
-          initialColumnFilters={initialColumnFilters}
-          onDeleteSuccess={onDeleteSuccess}
+    <ThemeProvider theme={resolvedTheme === "dark" ? darkTheme : lightTheme}>
+      <DataTable
+        queryKey={queryKey}
+        fetchUrl={fetchUrl}
+        columnsConfig={columnsConfig}
+        initialPageSize={initialPageSize}
+        exportEndpoint={exportEndpoint}
+        deleteType={deleteType}
+        deleteEndpoint={deleteEndpoint}
+        trashView={trashView}
+        createAction={createAction}
+        initialGlobalFilter={initialGlobalFilter}
+        initialColumnFilters={initialColumnFilters}
+        onDeleteSuccess={onDeleteSuccess}
+        onStatusUpdate={onStatusUpdate}
       ></DataTable>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default DataTableWrapper
+export default DataTableWrapper;

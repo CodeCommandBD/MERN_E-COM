@@ -2,6 +2,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoChatbubbleEllipses, IoClose, IoSend } from "react-icons/io5";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +20,8 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -91,6 +102,18 @@ const ChatWidget = () => {
   const handleStartChat = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.message) return;
+
+    // Validate Phone Number
+    if (formData.phone) {
+      const phoneRegex = /^01[3-9]\d{8}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        setErrorModalMessage(
+          "Please enter a valid 11-digit Bangladeshi phone number (e.g., 01712345678)"
+        );
+        setErrorModalOpen(true);
+        return;
+      }
+    }
 
     setIsLoading(true);
     try {
@@ -325,6 +348,18 @@ const ChatWidget = () => {
           )}
         </div>
       )}
+      {/* Error Modal */}
+      <Dialog open={errorModalOpen} onOpenChange={setErrorModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Invalid Input</DialogTitle>
+            <DialogDescription>{errorModalMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setErrorModalOpen(false)}>Okay</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

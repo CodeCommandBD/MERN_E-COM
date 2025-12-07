@@ -11,6 +11,7 @@ import {
   DT_CUSTOMER_COLUMN,
   DT_REVIEW_COLUMN,
   DT_ORDER_COLUMN,
+  DT_SUPPORT_COLUMN,
 } from "@/lib/column";
 import DeleteAction from "@/components/Application/Admin/DeleteAction";
 import RestoreAction from "@/components/Application/Admin/RestoreAction";
@@ -78,6 +79,13 @@ const TRASH_CONFIG = {
     exportUrl: null,
     deleteUrl: "/api/order/delete",
   },
+  support: {
+    title: "Support Trash",
+    columns: DT_SUPPORT_COLUMN,
+    fetchUrl: "/api/support/list",
+    exportUrl: null,
+    deleteUrl: "/api/support/delete",
+  },
 };
 
 const Trash = () => {
@@ -86,9 +94,41 @@ const Trash = () => {
 
   const config = TRASH_CONFIG[trashOf];
 
+  // Handle invalid or missing trashOf parameter
+  if (!config) {
+    return (
+      <div>
+        <BreadCrumb breadcrumbData={breadcrumbData}></BreadCrumb>
+        <Card
+          className="py-0 rounded shadow-sm border"
+          suppressHydrationWarning={true}
+        >
+          <CardHeader
+            className="pt-3 px-3 pb-1"
+            style={{ borderBottom: "1px solid #e5e7eb" }}
+            suppressHydrationWarning={true}
+          >
+            <div className="flex items-center justify-between">
+              <h4 className="text-xl font-semibold">Trash</h4>
+            </div>
+          </CardHeader>
+          <CardContent className={"py-5 px-2"} suppressHydrationWarning={true}>
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">
+                {trashOf
+                  ? `Invalid trash type: "${trashOf}"`
+                  : "Please specify a trash type in the URL (e.g., ?trashof=support)"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const columns = useMemo(() => {
     return columnConfig(config.columns, false, false, true);
-  }, []);
+  }, [config.columns]);
 
   const action = useCallback((row, deleteType, handleDelete) => {
     let actionMenu = [];
