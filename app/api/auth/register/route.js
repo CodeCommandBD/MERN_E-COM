@@ -6,8 +6,21 @@ import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/Models/user.models";
 import { SignJWT } from "jose";
 
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+} from "@/lib/rateLimit";
+
 export async function POST(req) {
   try {
+    // Rate limiting: 3 registrations per hour per IP
+    const clientIP = getClientIP(req);
+    const rateCheck = checkRateLimit(`register:${clientIP}`, 3, 3600000);
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetIn);
+    }
+
     // TODO: ####### Connected DATABASE
     await connectDB();
 
@@ -62,10 +75,16 @@ export async function POST(req) {
     await sendMail(
       "Email Verification request from Developer Shanto",
       email,
-      emailVerificationLink(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`)
+      emailVerificationLink(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`
+      )
     );
-    return res(true, 200, "Registration success, Please verify your email address");
+    return res(
+      true,
+      200,
+      "Registration success, Please verify your email address"
+    );
   } catch (error) {
-    return res(false, 500, 'Internal server error')
+    return res(false, 500, "Internal server error");
   }
 }

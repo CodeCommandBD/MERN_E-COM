@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
 import SupportChatModel from "@/Models/SupportChat.model";
+import { escapeRegex } from "@/lib/escapeRegex";
 
 // Get all support tickets (for admin) - Updated to support DataTableWrapper
 export async function GET(request) {
@@ -34,10 +35,25 @@ export async function GET(request) {
     // Global search
     if (globalFilters) {
       matchQuery.$or = [
-        { ticketNumber: { $regex: globalFilters, $options: "i" } },
-        { "customerInfo.name": { $regex: globalFilters, $options: "i" } },
-        { "customerInfo.email": { $regex: globalFilters, $options: "i" } },
-        { "customerInfo.phone": { $regex: globalFilters, $options: "i" } },
+        { ticketNumber: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        {
+          "customerInfo.name": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        {
+          "customerInfo.email": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        {
+          "customerInfo.phone": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
       ];
     }
 
@@ -47,7 +63,10 @@ export async function GET(request) {
       if (element.id === "status") {
         matchQuery[element.id] = element.value;
       } else {
-        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+        matchQuery[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
       }
     });
 

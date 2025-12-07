@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import MediaModel from "@/Models/Media.model";
 import { NextResponse } from "next/server";
+import { escapeRegex } from "@/lib/escapeRegex";
 
 export async function GET(request) {
   try {
@@ -16,23 +17,20 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get("limit"), 10) || 10;
     const deleteType = searchParams.get("deleteType"); // 'SD' | 'PD' | undefined
     const search = searchParams.get("search") || "";
-    
+
     // SD = show non-deleted, PD = show trashed, undefined = show all
     const filterConditions = [];
-    
+
     // Add deleteType filter
     if (deleteType === "SD") {
       // Active: deletedAt is null or doesn't exist
       filterConditions.push({
-        $or: [
-          { deletedAt: null },
-          { deletedAt: { $exists: false } }
-        ]
+        $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
       });
     } else if (deleteType === "PD") {
       // Trashed: deletedAt exists and is not null
       filterConditions.push({
-        deletedAt: { $exists: true, $ne: null }
+        deletedAt: { $exists: true, $ne: null },
       });
     }
     // If deleteType is not provided or empty, show all (no filter)
@@ -41,17 +39,16 @@ export async function GET(request) {
     if (search && search.trim()) {
       filterConditions.push({
         $or: [
-          { title: { $regex: search.trim(), $options: "i" } },
-          { alt: { $regex: search.trim(), $options: "i" } },
-          { public_id: { $regex: search.trim(), $options: "i" } },
+          { title: { $regex: escapeRegex(search.trim()), $options: "i" } },
+          { alt: { $regex: escapeRegex(search.trim()), $options: "i" } },
+          { public_id: { $regex: escapeRegex(search.trim()), $options: "i" } },
         ],
       });
     }
 
     // Combine all conditions with $and, or use empty object if no conditions
-    const filter = filterConditions.length > 0 
-      ? { $and: filterConditions }
-      : {};
+    const filter =
+      filterConditions.length > 0 ? { $and: filterConditions } : {};
 
     const mediaData = await MediaModel.find(filter)
       .sort({ createdAt: -1, _id: -1 })

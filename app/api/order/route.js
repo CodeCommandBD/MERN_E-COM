@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
 import OrderModel from "@/Models/Order.model";
+import { escapeRegex } from "@/lib/escapeRegex";
 
 export async function GET(request) {
   try {
@@ -33,11 +34,28 @@ export async function GET(request) {
     // Global search
     if (globalFilters) {
       matchQuery.$or = [
-        { orderNumber: { $regex: globalFilters, $options: "i" } },
-        { "customerInfo.name": { $regex: globalFilters, $options: "i" } },
-        { "customerInfo.email": { $regex: globalFilters, $options: "i" } },
-        { "customerInfo.phone": { $regex: globalFilters, $options: "i" } },
-        { transactionId: { $regex: globalFilters, $options: "i" } },
+        { orderNumber: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        {
+          "customerInfo.name": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        {
+          "customerInfo.email": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        {
+          "customerInfo.phone": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        {
+          transactionId: { $regex: escapeRegex(globalFilters), $options: "i" },
+        },
       ];
     }
 
@@ -47,7 +65,10 @@ export async function GET(request) {
       if (element.id === "orderStatus") {
         matchQuery[element.id] = element.value;
       } else {
-        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+        matchQuery[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
       }
     });
 

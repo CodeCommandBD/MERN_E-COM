@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
 import ReviewModel from "@/Models/Review.model";
+import { escapeRegex } from "@/lib/escapeRegex";
 
 export async function GET(request) {
   try {
@@ -25,15 +26,12 @@ export async function GET(request) {
     let baseMatchQuery = {};
 
     if (deleteType === "SD") {
-      baseMatchQuery = { 
-        $or: [
-          { deletedAt: null },
-          { deletedAt: { $exists: false } }
-        ]
+      baseMatchQuery = {
+        $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
       };
     } else if (deleteType === "PD" || deleteType === "TD") {
-      baseMatchQuery = { 
-        deletedAt: { $exists: true, $ne: null } 
+      baseMatchQuery = {
+        deletedAt: { $exists: true, $ne: null },
       };
     }
 
@@ -42,18 +40,24 @@ export async function GET(request) {
     filters.forEach((element) => {
       if (element.id === "productData") {
         columnFilters["productData.name"] = {
-          $regex: element.value,
+          $regex: escapeRegex(element.value),
           $options: "i",
         };
       } else if (element.id === "user") {
-        columnFilters["userData.name"] = { $regex: element.value, $options: "i" };
+        columnFilters["userData.name"] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
       } else if (element.id === "rating") {
         const ratingValue = parseInt(element.value, 10);
         if (!isNaN(ratingValue)) {
           columnFilters[element.id] = ratingValue;
         }
       } else {
-        columnFilters[element.id] = { $regex: element.value, $options: "i" };
+        columnFilters[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
       }
     });
 
@@ -61,12 +65,22 @@ export async function GET(request) {
     let globalSearchConditions = null;
     if (globalFilters) {
       globalSearchConditions = [
-        { "productData.name": { $regex: globalFilters, $options: "i" } },
-        { "userData.name": { $regex: globalFilters, $options: "i" } },
-        { title: { $regex: globalFilters, $options: "i" } },
-        { review: { $regex: globalFilters, $options: "i" } },
+        {
+          "productData.name": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        {
+          "userData.name": {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
+        { title: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { review: { $regex: escapeRegex(globalFilters), $options: "i" } },
       ];
-      
+
       const ratingValue = parseInt(globalFilters, 10);
       if (!isNaN(ratingValue) && ratingValue >= 1 && ratingValue <= 5) {
         globalSearchConditions.push({ rating: ratingValue });
@@ -77,10 +91,10 @@ export async function GET(request) {
     let baseSearchConditions = null;
     if (globalFilters) {
       baseSearchConditions = [
-        { title: { $regex: globalFilters, $options: "i" } },
-        { review: { $regex: globalFilters, $options: "i" } },
+        { title: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { review: { $regex: escapeRegex(globalFilters), $options: "i" } },
       ];
-      
+
       const ratingValue = parseInt(globalFilters, 10);
       if (!isNaN(ratingValue) && ratingValue >= 1 && ratingValue <= 5) {
         baseSearchConditions.push({ rating: ratingValue });
@@ -98,7 +112,7 @@ export async function GET(request) {
     if (Object.keys(columnFilters).length > 0) {
       aggregationConditions.push(columnFilters);
     }
-    
+
     let aggregationMatchQuery = {};
     if (aggregationConditions.length > 1) {
       aggregationMatchQuery = { $and: aggregationConditions };
@@ -112,17 +126,11 @@ export async function GET(request) {
         if (baseMatchQuery.$or) {
           // If baseMatchQuery already has $or, combine with $and
           baseMatchQuery = {
-            $and: [
-              baseMatchQuery,
-              { $or: baseSearchConditions }
-            ]
+            $and: [baseMatchQuery, { $or: baseSearchConditions }],
           };
         } else {
           baseMatchQuery = {
-            $and: [
-              baseMatchQuery,
-              { $or: baseSearchConditions }
-            ]
+            $and: [baseMatchQuery, { $or: baseSearchConditions }],
           };
         }
       } else {
@@ -139,16 +147,22 @@ export async function GET(request) {
 
     // Aggregate pipeline - match deletedAt before lookups for better performance
     const aggregatePipeline = [];
-    
+
     // Check if we need to match before lookups (simple conditions only)
-    const needsPreMatch = Object.keys(baseMatchQuery).length > 0 && !globalSearchConditions && Object.keys(columnFilters).length === 0;
-    const needsPostMatch = globalSearchConditions || Object.keys(columnFilters).length > 0 || (Object.keys(baseMatchQuery).length > 0 && !needsPreMatch);
-    
+    const needsPreMatch =
+      Object.keys(baseMatchQuery).length > 0 &&
+      !globalSearchConditions &&
+      Object.keys(columnFilters).length === 0;
+    const needsPostMatch =
+      globalSearchConditions ||
+      Object.keys(columnFilters).length > 0 ||
+      (Object.keys(baseMatchQuery).length > 0 && !needsPreMatch);
+
     // Add initial match for deletedAt if it's a simple condition (not using lookup fields)
     if (needsPreMatch) {
       aggregatePipeline.push({ $match: baseMatchQuery });
     }
-    
+
     // Add lookups
     aggregatePipeline.push(
       {
@@ -174,12 +188,12 @@ export async function GET(request) {
         $unwind: { path: "$userData", preserveNullAndEmptyArrays: true },
       }
     );
-    
+
     // Add match after lookups (for fields that need lookups or combined conditions)
     if (needsPostMatch && Object.keys(aggregationMatchQuery).length > 0) {
       aggregatePipeline.push({ $match: aggregationMatchQuery });
     }
-    
+
     // Add sort, skip, limit, and project
     aggregatePipeline.push(
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
@@ -204,16 +218,22 @@ export async function GET(request) {
 
     // Get TotalRowCount - use aggregation to match the same logic
     const countPipeline = [];
-    
+
     // Check if we need to match before lookups (simple conditions only)
-    const countNeedsPreMatch = Object.keys(baseMatchQuery).length > 0 && !globalSearchConditions && Object.keys(columnFilters).length === 0;
-    const countNeedsPostMatch = globalSearchConditions || Object.keys(columnFilters).length > 0 || (Object.keys(baseMatchQuery).length > 0 && !countNeedsPreMatch);
-    
+    const countNeedsPreMatch =
+      Object.keys(baseMatchQuery).length > 0 &&
+      !globalSearchConditions &&
+      Object.keys(columnFilters).length === 0;
+    const countNeedsPostMatch =
+      globalSearchConditions ||
+      Object.keys(columnFilters).length > 0 ||
+      (Object.keys(baseMatchQuery).length > 0 && !countNeedsPreMatch);
+
     // Add initial match for deletedAt if it's a simple condition
     if (countNeedsPreMatch) {
       countPipeline.push({ $match: baseMatchQuery });
     }
-    
+
     // Add lookups
     countPipeline.push(
       {
@@ -239,14 +259,14 @@ export async function GET(request) {
         $unwind: { path: "$userData", preserveNullAndEmptyArrays: true },
       }
     );
-    
+
     // Add match after lookups if needed
     if (countNeedsPostMatch && Object.keys(aggregationMatchQuery).length > 0) {
       countPipeline.push({ $match: aggregationMatchQuery });
     }
-    
+
     countPipeline.push({ $count: "total" });
-    
+
     const countResult = await ReviewModel.aggregate(countPipeline);
     const totalRowCount = countResult[0]?.total || 0;
 

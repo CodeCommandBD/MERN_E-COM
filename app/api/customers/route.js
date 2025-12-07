@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
 import UserModel from "@/Models/user.models";
-
+import { escapeRegex } from "@/lib/escapeRegex";
 
 export async function GET(request) {
   try {
@@ -34,11 +34,16 @@ export async function GET(request) {
     // Global search
     if (globalFilters) {
       matchQuery.$or = [
-        { name: { $regex: globalFilters, $options: "i" } },
-        { email: { $regex: globalFilters, $options: "i" } },
-        { phone: { $regex: globalFilters, $options: "i" } },
-        { address: { $regex: globalFilters, $options: "i" } },
-        { isEmailVerified: { $regex: globalFilters, $options: "i" } },
+        { name: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { email: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { phone: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        { address: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        {
+          isEmailVerified: {
+            $regex: escapeRegex(globalFilters),
+            $options: "i",
+          },
+        },
       ];
     }
 
@@ -47,9 +52,13 @@ export async function GET(request) {
     filters.forEach((element) => {
       // Handle boolean fields differently
       if (element.id === "isEmailVerified") {
-        matchQuery[element.id] = element.value === "true" || element.value === true;
+        matchQuery[element.id] =
+          element.value === "true" || element.value === true;
       } else {
-        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+        matchQuery[element.id] = {
+          $regex: escapeRegex(element.value),
+          $options: "i",
+        };
       }
     });
 
@@ -62,7 +71,6 @@ export async function GET(request) {
 
     // Aggregate pipeline
     const aggregatePipeline = [
-     
       { $match: matchQuery },
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
       { $skip: start },
