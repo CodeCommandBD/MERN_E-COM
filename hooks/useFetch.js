@@ -19,6 +19,7 @@ const useFetch = (url, method = "GET", options = {}) => {
       opts.params = { ...opts.params, _t: new Date().getTime() };
     }
     return opts;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method, optionsString, refreshIndex]);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const useFetch = (url, method = "GET", options = {}) => {
       }
     };
     apiCall();
-  }, [url, refreshIndex, requestOptions]);
+  }, [url, refreshIndex, requestOptions, method]);
 
   const refetch = React.useCallback(() => {
     setRefreshIndex((prev) => prev + 1);
