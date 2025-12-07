@@ -45,7 +45,7 @@ export async function POST(req) {
     const secret = new TextEncoder().encode(process.env.SECRET_KEY);
     const token = await new SignJWT(loggedInUserData)
       .setIssuedAt()
-      .setExpirationTime("24h")
+      .setExpirationTime("7d")
       .setProtectedHeader({ alg: "HS256" })
       .sign(secret);
 
@@ -57,6 +57,7 @@ export async function POST(req) {
       path: "/",
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
     // Delete the used OTP

@@ -17,9 +17,19 @@ const useDeleteMutation = (querykey, deleteEndpoint, onDeleteSuccess) => {
         }
         return response
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+        console.log('Delete mutation success:', data);
+        console.log('Query key to invalidate:', querykey);
         showToast('success', data.message || 'Operation completed successfully')
-        queryClient.invalidateQueries([querykey])
+        
+        // Invalidate all queries that start with the querykey
+        // This will match queries like ["support-data", {...}] 
+        await queryClient.invalidateQueries({ 
+          queryKey: [querykey],
+          exact: false, // Match all queries that start with this key
+          refetchType: 'active'
+        })
+        
         // Call the custom onDeleteSuccess callback if provided
         if (onDeleteSuccess && typeof onDeleteSuccess === 'function') {
           onDeleteSuccess(data)

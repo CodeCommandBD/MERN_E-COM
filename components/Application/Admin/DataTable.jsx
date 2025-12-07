@@ -34,6 +34,7 @@ const DataTable = ({
   initialGlobalFilter = "",
   initialColumnFilters = [],
   onDeleteSuccess,
+  onStatusUpdate,
 }) => {
   const [columnFilters, setColumnFilters] = useState(initialColumnFilters);
   const [globalFilter, setGlobalFilter] = useState(initialGlobalFilter);
@@ -43,7 +44,9 @@ const DataTable = ({
     pageSize: initialPageSize,
   });
   const [selectedRows, setSelectedRows] = useState({});
-  const prevColumnFiltersRef = React.useRef(JSON.stringify(initialColumnFilters));
+  const prevColumnFiltersRef = React.useRef(
+    JSON.stringify(initialColumnFilters)
+  );
 
   // Sync external filters with internal state
   React.useEffect(() => {
@@ -67,7 +70,11 @@ const DataTable = ({
     deleteType: "",
   });
 
-  const deleteMutation = useDeleteMutation(queryKey, deleteEndpoint, onDeleteSuccess);
+  const deleteMutation = useDeleteMutation(
+    queryKey,
+    deleteEndpoint,
+    onDeleteSuccess
+  );
 
   // Delete method
   const handleDelete = (ids, deleteType) => {
@@ -222,6 +229,9 @@ const DataTable = ({
       showProgressBars: isRefetching,
       sorting,
       rowSelection: selectedRows,
+    },
+    meta: {
+      onStatusUpdate,
     },
     getRowId: (originalRow) => originalRow._id,
     renderToolbarInternalActions: ({ table }) => (
