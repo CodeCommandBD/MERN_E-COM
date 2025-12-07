@@ -4,6 +4,7 @@ import axios from "axios";
 import Link from "next/link";
 import { MessageCircle, Search, User, Phone, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PageLoader from "@/components/Application/Admin/PageLoader";
 
 export default function AdminSupport() {
   const [tickets, setTickets] = useState([]);
@@ -84,14 +85,7 @@ export default function AdminSupport() {
   });
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading support tickets...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader message="Loading support tickets..." />;
   }
 
   if (error) {
