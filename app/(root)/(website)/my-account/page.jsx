@@ -23,6 +23,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { WEBSITE_LOGIN, USER_DASHBOARD } from "@/Routes/WebsiteRoute";
 import { showToast } from "@/lib/showToast";
@@ -366,6 +367,8 @@ export default function MyAccountPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Hidden H1 for accessibility/SEO */}
+      <h1 className="sr-only">My Account - Manage Your Profile</h1>
       <WebsiteBreadCrumb props={breadcrumb} />
       <div className="bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-7xl">
@@ -395,13 +398,17 @@ export default function MyAccountPage() {
                     <button
                       key={index}
                       onClick={() => handleMenuClick(item.section)}
+                      aria-label={`Navigate to ${item.label}`}
+                      aria-current={
+                        activeSection === item.section ? "page" : undefined
+                      }
                       className={`w-full flex items-center gap-3 px-6 py-3 transition-colors ${
                         activeSection === item.section
                           ? "bg-primary text-white"
                           : "text-gray-700 hover:bg-gray-50"
                       }`}
                     >
-                      <item.icon className="w-5 h-5" />
+                      <item.icon className="w-5 h-5" aria-hidden="true" />
                       <span className="text-sm font-medium">{item.label}</span>
                     </button>
                   ))}
@@ -409,9 +416,10 @@ export default function MyAccountPage() {
                   {/* Logout Button */}
                   <button
                     onClick={handleLogout}
+                    aria-label="Logout from your account"
                     className="w-full flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-5 h-5" aria-hidden="true" />
                     <span className="text-sm font-medium">Logout</span>
                   </button>
                 </nav>
@@ -450,8 +458,11 @@ export default function MyAccountPage() {
                         </AvatarFallback>
                       </Avatar>
                       {isEditing && (
-                        <button className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors">
-                          <Edit2 className="w-4 h-4" />
+                        <button
+                          aria-label="Change profile picture"
+                          className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                       )}
                     </div>
@@ -693,11 +704,13 @@ export default function MyAccountPage() {
                           <div className="flex gap-4">
                             {/* Product Image */}
                             <div className="flex-shrink-0">
-                              <img
+                              <Image
                                 src={
                                   review.product?.image || "/placeholder.png"
                                 }
-                                alt={review.product?.name}
+                                alt={review.product?.name || "Product"}
+                                width={80}
+                                height={80}
                                 className="w-20 h-20 object-cover rounded-lg bg-gray-100"
                               />
                             </div>
@@ -777,12 +790,17 @@ export default function MyAccountPage() {
                           onClick={() =>
                             setShowCurrentPassword(!showCurrentPassword)
                           }
+                          aria-label={
+                            showCurrentPassword
+                              ? "Hide current password"
+                              : "Show current password"
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                           {showCurrentPassword ? (
-                            <EyeOff className="w-5 h-5" />
+                            <EyeOff className="w-5 h-5" aria-hidden="true" />
                           ) : (
-                            <Eye className="w-5 h-5" />
+                            <Eye className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                       </div>
@@ -815,12 +833,17 @@ export default function MyAccountPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
+                          aria-label={
+                            showNewPassword
+                              ? "Hide new password"
+                              : "Show new password"
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                           {showNewPassword ? (
-                            <EyeOff className="w-5 h-5" />
+                            <EyeOff className="w-5 h-5" aria-hidden="true" />
                           ) : (
-                            <Eye className="w-5 h-5" />
+                            <Eye className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                       </div>
@@ -857,12 +880,17 @@ export default function MyAccountPage() {
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide confirm password"
+                              : "Show confirm password"
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                           {showConfirmPassword ? (
-                            <EyeOff className="w-5 h-5" />
+                            <EyeOff className="w-5 h-5" aria-hidden="true" />
                           ) : (
-                            <Eye className="w-5 h-5" />
+                            <Eye className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                       </div>

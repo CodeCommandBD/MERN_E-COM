@@ -1,7 +1,13 @@
 import { connectDB } from "@/lib/dbConnection";
-import { catchError, res } from "@/lib/helper";
+import { catchError } from "@/lib/helper";
 import ProductModel from "@/Models/Product.model";
 import MediaModel from "@/Models/Media.model"; // Required for populate
+
+// Cache headers for featured products (medium cache, used on homepage)
+const CACHE_HEADERS = {
+  "Content-Type": "application/json",
+  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+};
 
 export async function GET() {
   try {
@@ -13,12 +19,21 @@ export async function GET() {
       .lean();
 
     if (!getProduct) {
-      return res(false, 404, "Product not found.");
+      return new Response(
+        JSON.stringify({ success: false, message: "Product not found." }),
+        { status: 404, headers: CACHE_HEADERS }
+      );
     }
 
-    return res(true, 200, "Product found.", getProduct);
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "Product found.",
+        data: getProduct,
+      }),
+      { status: 200, headers: CACHE_HEADERS }
+    );
   } catch (error) {
-    console.error("Error in get-featured-product:", error);
     return catchError(error);
   }
 }

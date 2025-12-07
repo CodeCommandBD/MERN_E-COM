@@ -99,6 +99,11 @@ const Shop = () => {
     <div className="min-h-screen bg-white">
       <WebsiteBreadCrumb props={breadcrumb} />
 
+      {/* SEO H1 - visually hidden but accessible to screen readers and search engines */}
+      <h1 className="sr-only">
+        Shop All Products - E-Store Fashion Collection
+      </h1>
+
       {/* Main Shop Container */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="lg:flex lg:gap-8">

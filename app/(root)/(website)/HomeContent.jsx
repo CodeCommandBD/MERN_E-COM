@@ -1,28 +1,72 @@
 "use client";
-import Banner from "@/components/Application/Website/Banner";
-import FeaturedProduct from "@/components/Application/Website/FeaturedProduct";
-import MainSlider from "@/components/Application/Website/MainSlider";
-import Testimonial from "@/components/Application/Website/Testimonial";
+import dynamic from "next/dynamic";
 import { advertisingBanner } from "@/public/image";
 import Image from "next/image";
 import { BiSupport } from "react-icons/bi";
 import { FaShippingFast } from "react-icons/fa";
 import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
-import { useState, useEffect } from "react";
-import Loading from "@/components/Application/Loading";
+
+// Dynamic imports for heavy components with loading skeletons
+// MainSlider must render on server for LCP optimization
+const MainSlider = dynamic(
+  () => import("@/components/Application/Website/MainSlider"),
+  {
+    loading: () => (
+      <div
+        className="w-full aspect-[16/5] bg-gray-100 animate-pulse"
+        aria-label="Loading slider"
+      />
+    ),
+  }
+);
+
+const Banner = dynamic(
+  () => import("@/components/Application/Website/Banner"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="h-40 bg-gray-100 animate-pulse rounded-lg" />
+          <div className="h-40 bg-gray-100 animate-pulse rounded-lg" />
+        </div>
+      </div>
+    ),
+  }
+);
+
+const FeaturedProduct = dynamic(
+  () => import("@/components/Application/Website/FeaturedProduct"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="h-8 w-48 bg-gray-100 animate-pulse rounded mb-6" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-64 bg-gray-100 animate-pulse rounded-lg"
+            />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const Testimonial = dynamic(
+  () => import("@/components/Application/Website/Testimonial"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-48 bg-gray-100 animate-pulse rounded-lg" />
+    ),
+  }
+);
 
 const HomeContent = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Show loader initially, then hide it after a short delay to ensure smooth transition
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
-
   const features = [
     {
       icon: GiReturnArrow,
@@ -46,16 +90,13 @@ const HomeContent = () => {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loading />
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white">
+      {/* Hidden H1 for accessibility/SEO */}
+      <h1 className="sr-only">
+        E-Store - Premium Fashion & Clothing | Shop T-shirts, Hoodies, Oversized
+      </h1>
+
       {/* Hero Slider */}
       <section>
         <MainSlider />
@@ -99,8 +140,7 @@ const HomeContent = () => {
             </h2>
             <div className="w-20 h-1 bg-primary mx-auto mb-4"></div>
             <p className="text-foreground/60 text-sm sm:text-base max-w-2xl mx-auto">
-              We're committed to providing you with the best shopping
-              experience
+              We're committed to providing you with the best shopping experience
             </p>
           </div>
 

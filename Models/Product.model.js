@@ -66,7 +66,12 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-productSchema.index({ category: 1 });
+// Performance indexes for common queries
+productSchema.index({ slug: 1 }, { unique: true }); // Fast slug lookups
+productSchema.index({ category: 1, sellingPrice: 1 }); // Category + price sorting
+productSchema.index({ category: 1, createdAt: -1 }); // Category + newest first
+productSchema.index({ deletedAt: 1, category: 1 }); // Filter deleted + category
+productSchema.index({ name: "text", description: "text" }); // Text search
 
 const ProductModel =
   mongoose.models.Product ||

@@ -208,6 +208,14 @@ orderSchema.pre("save", async function (next) {
   next();
 });
 
+// Performance indexes for common queries
+orderSchema.index({ userId: 1, orderStatus: 1 });
+orderSchema.index({ orderStatus: 1, createdAt: -1 });
+orderSchema.index({ "customerInfo.email": 1 });
+orderSchema.index({ paymentStatus: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ orderNumber: 1 });
+
 const OrderModel =
   mongoose.models.Order || mongoose.model("Order", orderSchema);
 

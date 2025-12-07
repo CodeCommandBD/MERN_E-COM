@@ -16,27 +16,27 @@ import { TiSocialFacebook } from "react-icons/ti";
 
 const Footer = () => {
   const categories = [
-    { name: "T-shirt", href: "/" },
-    { name: "Hoodies", href: "/" },
-    { name: "Oversized", href: "/" },
-    { name: "Full Sleeve", href: "/" },
-    { name: "Polo", href: "/" },
+    { name: "T-shirt", href: "/shop?category=t-shirts" },
+    { name: "Hoodies", href: "/shop?category=hoodies" },
+    { name: "Oversized", href: "/shop?category=oversized" },
+    { name: "Full Sleeve", href: "/shop?category=full-sleeve" },
+    { name: "Polo", href: "/shop?category=polo" },
   ];
 
   const usefulLinks = [
     { name: "Home", href: WEBSITE_HOME },
-    { name: "Shop", href: "" },
-    { name: "About", href: "" },
+    { name: "Shop", href: "/shop" },
+    { name: "About", href: "/about" },
     { name: "Register", href: WEBSITE_REGISTER },
     { name: "Login", href: WEBSITE_LOGIN },
   ];
 
   const helpLinks = [
-    { name: "Register", href: "" },
-    { name: "Login", href: "" },
-    { name: "My Account", href: "" },
-    { name: "Privacy Policy", href: "" },
-    { name: "Terms & Conditions", href: "" },
+    { name: "My Account", href: "/my-account" },
+    { name: "My Orders", href: "/my-orders" },
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms & Conditions", href: "/terms-conditions" },
+    { name: "Return Policy", href: "/return-policy" },
   ];
 
   const socialLinks = [

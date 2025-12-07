@@ -202,26 +202,17 @@ const Header = () => {
           <nav className="hidden lg:flex flex-1 justify-center mx-8">
             <ul className="flex items-center gap-6 xl:gap-10">
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <button
-                  onClick={handleHomeClick}
-                  className="py-2 px-3"
-                >
+                <button onClick={handleHomeClick} className="py-2 px-3">
                   Home
                 </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <button
-                  onClick={handleAboutClick}
-                  className="py-2 px-3"
-                >
+                <button onClick={handleAboutClick} className="py-2 px-3">
                   About
                 </button>
               </li>
               <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <button
-                  onClick={handleShopClick}
-                  className="py-2 px-3"
-                >
+                <button onClick={handleShopClick} className="py-2 px-3">
                   Shop
                 </button>
               </li>
@@ -255,7 +246,7 @@ const Header = () => {
           {/* Right Side Icons */}
           <div className="flex items-center gap-3 lg:gap-6 flex-shrink-0">
             {/* Search Icon - Always visible */}
-            <button type="button">
+            <button type="button" aria-label="Open search">
               <IoIosSearch
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 size={24}
@@ -429,7 +420,10 @@ const Header = () => {
         <Search isShow={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
       )}
       {/* Loading Overlay for Navigation */}
-      {(isNavigatingToAbout || isNavigatingToShop || isNavigatingToHome || isNavigatingToCategory) && (
+      {(isNavigatingToAbout ||
+        isNavigatingToShop ||
+        isNavigatingToHome ||
+        isNavigatingToCategory) && (
         <div className="fixed inset-0 bg-white bg-opacity-90 z-[9999] flex items-center justify-center">
           <Loading />
         </div>
