@@ -90,10 +90,10 @@ const Search = ({ isShow, setIsSearchOpen }) => {
   return (
     <div
       ref={searchRef}
-      className={`fixed md:absolute border-t transition-all duration-300 left-0 top-0 md:top-auto py-4 md:py-8 px-4 md:px-32 z-50 bg-white/98 backdrop-blur-md w-full shadow-2xl ${
+      className={`fixed md:absolute border-t transition-[transform,opacity,visibility] duration-300 ease-in-out left-0 top-0 w-full z-50 bg-white/98 backdrop-blur-md shadow-2xl ${
         isShow
-          ? "translate-y-[72px] md:translate-y-0 md:top-18 opacity-100"
-          : "-translate-y-full md:-top-full opacity-0"
+          ? "translate-y-[72px] md:translate-y-[70px] opacity-100 visible"
+          : "-translate-y-full opacity-0 invisible"
       }`}
     >
       <div className="max-w-4xl mx-auto relative">
