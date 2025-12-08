@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Image from "next/image";
 import { sliderFour, sliderOne, sliderThree, sliderTwo } from "@/public/image";
-import { LuChevronRight, LuChevronLeft } from "react-icons/lu";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 const MainSlider = () => {
   const slides = [
@@ -67,14 +67,14 @@ const MainSlider = () => {
         aria-label="Previous slide"
         className="swiper-button-prev-custom w-12 h-12 hidden sm:flex items-center justify-center absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-primary/30 rounded-lg cursor-pointer"
       >
-        <LuChevronLeft size={20} className="text-primary" />
+        <ChevronLeft size={20} className="text-primary" />
       </button>
       <button
         type="button"
         aria-label="Next slide"
         className="swiper-button-next-custom w-12 h-12 hidden sm:flex items-center justify-center absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-primary/30 rounded-lg cursor-pointer"
       >
-        <LuChevronRight size={20} className="text-primary" />
+        <ChevronRight size={20} className="text-primary" />
       </button>
 
       <style jsx global>{`
