@@ -3,7 +3,7 @@ import { Assistant } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import GlobalProvider from "@/components/Application/GlobalProvider";
-import Toaster from "@/components/Application/Toaster";
+import ToasterWrapper from "@/components/Application/ToasterWrapper";
 
 const assistant = Assistant({
   weight: ["400", "600", "700"],
@@ -92,7 +92,7 @@ export default function RootLayout({ children }) {
       >
         <GlobalProvider>
           <div suppressHydrationWarning={true}>
-            <Toaster />
+            <ToasterWrapper />
             <div suppressHydrationWarning={true}>{children}</div>
           </div>
           <SpeedInsights />
