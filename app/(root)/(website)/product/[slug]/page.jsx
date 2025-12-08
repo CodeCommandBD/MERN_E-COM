@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import { preload } from "react-dom";
 
 import Script from "next/script";
 import xss from "xss";
@@ -39,9 +40,18 @@ export async function generateMetadata({ params, searchParams }) {
     const variant = data.variant;
 
     const title = product.name;
-    const description = product.description
-      ? product.description.replace(/<[^>]*>/g, "").slice(0, 160) + "..."
-      : `Shop ${product.name} at E-Store. Premium quality fashion with free shipping.`;
+    const stripHtml = (html) => {
+      if (!html) return "";
+      return html.replace(/<[^>]*>/g, "");
+    };
+
+    let description = stripHtml(product.description).slice(0, 160);
+
+    if (description.length < 10) {
+      description = `Shop ${product.name} at E-Store. Premium quality fashion with free shipping.`;
+    } else {
+      description += "...";
+    }
     const imageUrl =
       variant?.media?.[0]?.secure_url || product?.media?.[0]?.secure_url;
 
@@ -163,6 +173,13 @@ const ProductPage = async ({ params, searchParams }) => {
 
     const { products: product, variant, getColor, getSize, reviewCount } = data;
     const sanitizedDescription = xss(product.description || "");
+
+    const imageUrl =
+      variant?.media?.[0]?.secure_url || product?.media?.[0]?.secure_url;
+
+    if (imageUrl) {
+      preload(imageUrl, { as: "image", fetchPriority: "high" });
+    }
 
     return (
       <>
