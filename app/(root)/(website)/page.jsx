@@ -66,12 +66,18 @@ function OrganizationJsonLd() {
   );
 }
 
-const page = () => {
+import { getTestimonials } from "@/lib/actions/testimonial.action";
+
+export const dynamic = "force-dynamic";
+
+const page = async () => {
+  const testimonials = await getTestimonials();
+
   return (
     <>
       <WebsiteJsonLd />
       <OrganizationJsonLd />
-      <HomeContent />
+      <HomeContent testimonials={testimonials} />
     </>
   );
 };

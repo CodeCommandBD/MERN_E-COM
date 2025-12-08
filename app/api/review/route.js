@@ -145,25 +145,15 @@ export async function GET(request) {
       sortQuery[element.id] = element.desc ? -1 : 1;
     });
 
-    // Aggregate pipeline - match deletedAt before lookups for better performance
+    // Aggregate pipeline
     const aggregatePipeline = [];
 
-    // Check if we need to match before lookups (simple conditions only)
-    const needsPreMatch =
-      Object.keys(baseMatchQuery).length > 0 &&
-      !globalSearchConditions &&
-      Object.keys(columnFilters).length === 0;
-    const needsPostMatch =
-      globalSearchConditions ||
-      Object.keys(columnFilters).length > 0 ||
-      (Object.keys(baseMatchQuery).length > 0 && !needsPreMatch);
-
-    // Add initial match for deletedAt if it's a simple condition (not using lookup fields)
-    if (needsPreMatch) {
+    // 1. Pre-lookup Match
+    if (Object.keys(baseMatchQuery).length > 0) {
       aggregatePipeline.push({ $match: baseMatchQuery });
     }
 
-    // Add lookups
+    // 2. Lookups
     aggregatePipeline.push(
       {
         $lookup: {
@@ -189,12 +179,26 @@ export async function GET(request) {
       }
     );
 
-    // Add match after lookups (for fields that need lookups or combined conditions)
-    if (needsPostMatch && Object.keys(aggregationMatchQuery).length > 0) {
-      aggregatePipeline.push({ $match: aggregationMatchQuery });
+    // 3. Post-lookup Match
+    const postLookupConditions = [];
+
+    if (globalSearchConditions) {
+      postLookupConditions.push({ $or: globalSearchConditions });
+    }
+    if (Object.keys(columnFilters).length > 0) {
+      postLookupConditions.push(columnFilters);
     }
 
-    // Add sort, skip, limit, and project
+    if (postLookupConditions.length > 0) {
+      aggregatePipeline.push({
+        $match:
+          postLookupConditions.length > 1
+            ? { $and: postLookupConditions }
+            : postLookupConditions[0],
+      });
+    }
+
+    // 4. Sort, Skip, Limit, Project
     aggregatePipeline.push(
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
       { $skip: start },
@@ -213,56 +217,57 @@ export async function GET(request) {
         },
       }
     );
+
     // Execute query
     const getReviews = await ReviewModel.aggregate(aggregatePipeline);
 
-    // Get TotalRowCount - use aggregation to match the same logic
+    // Get TotalRowCount
     const countPipeline = [];
 
-    // Check if we need to match before lookups (simple conditions only)
-    const countNeedsPreMatch =
-      Object.keys(baseMatchQuery).length > 0 &&
-      !globalSearchConditions &&
-      Object.keys(columnFilters).length === 0;
-    const countNeedsPostMatch =
-      globalSearchConditions ||
-      Object.keys(columnFilters).length > 0 ||
-      (Object.keys(baseMatchQuery).length > 0 && !countNeedsPreMatch);
-
-    // Add initial match for deletedAt if it's a simple condition
-    if (countNeedsPreMatch) {
+    // 1. Pre-lookup Match
+    if (Object.keys(baseMatchQuery).length > 0) {
       countPipeline.push({ $match: baseMatchQuery });
     }
 
-    // Add lookups
-    countPipeline.push(
-      {
-        $lookup: {
-          from: "products",
-          localField: "product",
-          foreignField: "_id",
-          as: "productData",
-        },
-      },
-      {
-        $unwind: { path: "$productData", preserveNullAndEmptyArrays: true },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "userData",
-        },
-      },
-      {
-        $unwind: { path: "$userData", preserveNullAndEmptyArrays: true },
-      }
-    );
+    // 2. Lookups (Needed if filters rely on them)
+    const needsLookupsForCount =
+      globalSearchConditions || Object.keys(columnFilters).length > 0;
 
-    // Add match after lookups if needed
-    if (countNeedsPostMatch && Object.keys(aggregationMatchQuery).length > 0) {
-      countPipeline.push({ $match: aggregationMatchQuery });
+    if (needsLookupsForCount) {
+      countPipeline.push(
+        {
+          $lookup: {
+            from: "products",
+            localField: "product",
+            foreignField: "_id",
+            as: "productData",
+          },
+        },
+        {
+          $unwind: { path: "$productData", preserveNullAndEmptyArrays: true },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "userData",
+          },
+        },
+        {
+          $unwind: { path: "$userData", preserveNullAndEmptyArrays: true },
+        }
+      );
+    }
+
+    // 3. Post-lookup Match
+    if (needsLookupsForCount && postLookupConditions.length > 0) {
+      countPipeline.push({
+        $match:
+          postLookupConditions.length > 1
+            ? { $and: postLookupConditions }
+            : postLookupConditions[0],
+      });
     }
 
     countPipeline.push({ $count: "total" });
