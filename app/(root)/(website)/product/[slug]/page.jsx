@@ -163,7 +163,16 @@ const ProductPage = async ({ params, searchParams }) => {
 
     return (
       <>
-        <ProductJsonLd product={data.products} variant={data.variant} />
+        {lcpImage ? (
+          <Head>
+            <link
+              rel="preload"
+              as="image"
+              href={lcpImage}
+              fetchpriority="high"
+            />
+          </Head>
+        ) : null}
         <ProductDetails
           product={data.products}
           variant={data.variant}

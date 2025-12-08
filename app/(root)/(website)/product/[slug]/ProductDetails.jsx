@@ -174,7 +174,8 @@ const ProductDetails = ({
                   width={100}
                   height={100}
                   className="md:max-w-full max-w-16 object-cover aspect-square"
-                  sizes="(max-width: 768px) 25vw, 100px"
+                  sizes="100px"
+                  loading="lazy"
                 />
               </div>
             ))}
@@ -189,11 +190,13 @@ const ProductDetails = ({
               <Image
                 src={activeThumb || imagePlaceholder.src}
                 alt={product.name}
-                fill
-                className="object-contain relative z-10 transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                width={600}
+                height={600}
+                className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 1024px) 80vw, 50vw"
                 priority
-                quality={85}
+                fetchPriority="high"
+                loading="eager"
                 placeholder="blur"
                 blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
               />
