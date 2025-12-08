@@ -36,12 +36,7 @@ const TestimonialSkeleton = () => (
   <div className="h-48 bg-gray-100 animate-pulse rounded-lg" />
 );
 
-const MainSlider = dynamic(
-  () => import("@/components/Application/Website/MainSlider"),
-  {
-    loading: MainSliderSkeleton,
-  }
-);
+import MainSlider from "@/components/Application/Website/MainSlider";
 
 const Banner = dynamic(
   () => import("@/components/Application/Website/Banner"),
