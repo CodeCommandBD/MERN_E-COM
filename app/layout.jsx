@@ -4,6 +4,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import GlobalProvider from "@/components/Application/GlobalProvider";
 import ToasterWrapper from "@/components/Application/ToasterWrapper";
+import criticalCss from "@/lib/critical-css";
+import StylePreloadClient from "@/components/Application/StylePreloadClient";
 
 const assistant = Assistant({
   weight: ["400", "600", "700"],
@@ -88,6 +90,11 @@ export default function RootLayout({ children }) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <style
+          data-critical="above-the-fold"
+          // Inline only the minimal atoms needed for first paint.
+          dangerouslySetInnerHTML={{ __html: criticalCss }}
+        />
       </head>
       <body
         className={`${assistant.className} antialiased`}
@@ -95,6 +102,7 @@ export default function RootLayout({ children }) {
       >
         <GlobalProvider>
           <div suppressHydrationWarning={true}>
+            <StylePreloadClient />
             <ToasterWrapper />
             <div suppressHydrationWarning={true}>{children}</div>
           </div>
