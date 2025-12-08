@@ -139,7 +139,7 @@ const ProductPage = async ({ params, searchParams }) => {
         </div>
       );
     }
-    return <div>Something went wrong</div>;
+    return <div>Something went wrong: {error.message}</div>;
   }
 };
 
