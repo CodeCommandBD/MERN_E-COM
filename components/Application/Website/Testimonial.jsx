@@ -129,8 +129,9 @@ const Testimonial = () => {
           bottom: 0;
         }
         .testimonial-slider .swiper-pagination-bullet {
-          width: 10px;
-          height: 10px;
+          width: 14px;
+          height: 14px;
+          margin: 0 8px !important;
           background: #d1d5db;
           opacity: 1;
         }
