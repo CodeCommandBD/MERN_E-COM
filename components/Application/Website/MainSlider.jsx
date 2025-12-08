@@ -17,10 +17,12 @@ const MainSlider = () => {
     { src: sliderFour, alt: "Oversized T-shirts" },
   ];
 
+  const aspectRatio = slides[0].src.width / slides[0].src.height;
+
   return (
     <div
-      className="main-slider relative aspect-[16/7]"
-      style={{ contain: "content" }}
+      className="main-slider relative"
+      style={{ aspectRatio: aspectRatio, contain: "content" }}
     >
       <Swiper
         modules={[Navigation, Pagination, Autoplay, A11y]}
