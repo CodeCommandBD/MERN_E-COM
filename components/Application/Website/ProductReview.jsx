@@ -19,8 +19,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import axios from "axios";
 import { showToast } from "@/lib/showToast";
-import { useState } from "react";
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
 import Link from "next/link";
