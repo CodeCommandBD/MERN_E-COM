@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import axios from "axios";
+
 import Script from "next/script";
 import xss from "xss";
 import { getProductDetails } from "@/lib/actions/product.action";
@@ -28,15 +28,15 @@ export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;
   const { color, size } = await searchParams;
 
-  let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/details/${slug}`;
-  if (color && size) {
-    url += `?color=${color}&size=${size}`;
-  }
-
   try {
-    const { data: getProduct } = await axios.get(url);
-    const product = getProduct.data.products;
-    const variant = getProduct.data.variant;
+    const data = await getProductDetails({ slug, color, size });
+
+    if (!data || !data.products) {
+      throw new Error("Product not found");
+    }
+
+    const product = data.products;
+    const variant = data.variant;
 
     const title = product.name;
     const description = product.description

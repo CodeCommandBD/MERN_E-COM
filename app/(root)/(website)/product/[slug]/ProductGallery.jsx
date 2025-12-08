@@ -57,6 +57,7 @@ const ProductGallery = ({ media = [], productName, activeColor }) => {
             className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
             priority={true}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+            fetchPriority="high"
           />
         </div>
       </div>
