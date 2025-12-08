@@ -60,6 +60,7 @@ const Footer = () => {
               width={120}
               height={60}
               className="mb-4"
+              style={{ height: "auto" }}
             />
             <p className="text-foreground/70 text-sm leading-relaxed mb-6">
               E-store is your trusted destination for quality and convenience.
