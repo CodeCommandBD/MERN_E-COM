@@ -54,8 +54,8 @@ const CartSidebar = () => {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger>
           <div className="cursor-pointer hover:text-primary transition-colors relative">
-            <BsCart2 size={24} className=" " />
-            <span className="text-[10px] absolute -top-1 -right-1 bg-primary text-white w-4 h-4 flex items-center justify-center rounded-full font-bold">
+            <BsCart2 size={24} className="" />
+            <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               {cart.count}
             </span>
           </div>

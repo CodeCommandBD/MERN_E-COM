@@ -45,7 +45,11 @@ const testimonial = [
   },
 ];
 
-const Testimonial = () => {
+const Testimonial = ({ testimonials }) => {
+  // Use passed testimonials if available and not empty, otherwise default to hardcoded ones
+  const data =
+    testimonials && testimonials.length > 0 ? testimonials : testimonial;
+
   return (
     <div
       className="py-8 md:py-12 px-4 md:px-6 lg:px-16 bg-white"
@@ -83,7 +87,7 @@ const Testimonial = () => {
             1280: { slidesPerView: 3, spaceBetween: 30 },
           }}
         >
-          {testimonial.map((item, index) => (
+          {data.map((item, index) => (
             <SwiperSlide key={index}>
               <div className="pb-2">
                 <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-7 mx-auto max-w-lg h-full">

@@ -10,20 +10,32 @@ import { sliderFour, sliderOne, sliderThree, sliderTwo } from "@/public/image";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 const MainSlider = () => {
+  // TODO: Replace 'mobile' images with your dedicated vertical images (e.g., 800x1200px)
   const slides = [
-    { src: sliderOne, alt: "New Arrivals at E-Store" },
-    { src: sliderTwo, alt: "Premium Fashion Collection" },
-    { src: sliderThree, alt: "Trending Hoodies" },
-    { src: sliderFour, alt: "Oversized T-shirts" },
+    {
+      desktop: sliderOne,
+      mobile: sliderOne,
+      alt: "New Arrivals at E-Store",
+    },
+    {
+      desktop: sliderTwo,
+      mobile: sliderTwo,
+      alt: "Premium Fashion Collection",
+    },
+    {
+      desktop: sliderThree,
+      mobile: sliderThree,
+      alt: "Trending Hoodies",
+    },
+    {
+      desktop: sliderFour,
+      mobile: sliderFour,
+      alt: "Oversized T-shirts",
+    },
   ];
 
-  const aspectRatio = slides[0].src.width / slides[0].src.height;
-
   return (
-    <div
-      className="main-slider relative"
-      style={{ aspectRatio: aspectRatio, contain: "content" }}
-    >
+    <div className="main-slider relative w-full group">
       <Swiper
         modules={[Navigation, Pagination, Autoplay, A11y]}
         spaceBetween={0}
@@ -34,69 +46,95 @@ const MainSlider = () => {
         }}
         pagination={{ clickable: true, dynamicBullets: false }}
         autoplay={{
-          delay: 3000,
+          delay: 4000,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
         loop={true}
-        speed={600}
+        speed={800}
         breakpoints={{
-          0: { pagination: { enabled: false } },
-          600: { pagination: { enabled: true } },
+          0: { pagination: { enabled: true } },
+          768: { pagination: { enabled: true } },
         }}
+        className="h-auto w-full"
       >
         {slides.map((slide, index) => (
-          <SwiperSlide key={index}>
-            <Image
-              src={slide.src}
-              alt={slide.alt}
-              width={slide.src.width}
-              height={slide.src.height}
-              priority={index === 0}
-              fetchPriority={index === 0 ? "high" : "auto"}
-              sizes="100vw"
-              quality={80}
-              className="w-full h-auto"
-            />
+          <SwiperSlide key={index} className="relative w-full h-auto">
+            {/* Desktop Image */}
+            <div className="hidden md:block w-full h-auto relative">
+              <Image
+                src={slide.desktop}
+                alt={slide.alt}
+                width={1920}
+                height={800}
+                priority={index === 0}
+                placeholder="blur"
+                sizes="100vw"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+
+            {/* Mobile Image */}
+            <div className="block md:hidden w-full h-auto relative">
+              <Image
+                src={slide.mobile}
+                alt={slide.alt}
+                width={800}
+                height={1000}
+                priority={index === 0}
+                placeholder="blur"
+                sizes="100vw"
+                className="w-full h-auto object-cover"
+              />
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>
 
+      {/* Custom Navigation Buttons */}
       <button
         type="button"
         aria-label="Previous slide"
-        className="swiper-button-prev-custom w-12 h-12 hidden sm:flex items-center justify-center absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-primary/30 rounded-lg cursor-pointer"
+        className="swiper-button-prev-custom w-10 h-10 md:w-12 md:h-12 flex items-center justify-center absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white border border-gray-200 rounded-full shadow-lg cursor-pointer transition-all opacity-0 group-hover:opacity-100"
       >
-        <ChevronLeft size={20} className="text-primary" />
+        <ChevronLeft size={24} className="text-gray-800" />
       </button>
       <button
         type="button"
         aria-label="Next slide"
-        className="swiper-button-next-custom w-12 h-12 hidden sm:flex items-center justify-center absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white border-2 border-primary/30 rounded-lg cursor-pointer"
+        className="swiper-button-next-custom w-10 h-10 md:w-12 md:h-12 flex items-center justify-center absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white border border-gray-200 rounded-full shadow-lg cursor-pointer transition-all opacity-0 group-hover:opacity-100"
       >
-        <ChevronRight size={20} className="text-primary" />
+        <ChevronRight size={24} className="text-gray-800" />
       </button>
 
       <style jsx global>{`
         .main-slider .swiper-pagination {
-          bottom: 20px;
+          bottom: 12px;
         }
         .main-slider .swiper-pagination-bullet {
-          width: 14px;
-          height: 14px;
-          margin: 0 8px !important;
-          background: #fff;
-          opacity: 0.6;
-          border: 2px solid rgba(255, 255, 255, 0.8);
+          width: 8px;
+          height: 8px;
+          margin: 0 4px !important;
+          background: rgba(255, 255, 255, 0.5);
+          opacity: 1;
+          transition: all 0.3s ease;
         }
         .main-slider .swiper-pagination-bullet-active {
-          background: hsl(var(--primary));
-          opacity: 1;
-          border-color: hsl(var(--primary));
+          background: #fff;
+          width: 24px;
+          border-radius: 4px;
         }
-        @media (max-width: 600px) {
+        @media (min-width: 768px) {
           .main-slider .swiper-pagination {
-            display: none;
+            bottom: 24px;
+          }
+          .main-slider .swiper-pagination-bullet {
+            width: 10px;
+            height: 10px;
+            margin: 0 6px !important;
+          }
+          .main-slider .swiper-pagination-bullet-active {
+            width: 30px;
           }
         }
       `}</style>
