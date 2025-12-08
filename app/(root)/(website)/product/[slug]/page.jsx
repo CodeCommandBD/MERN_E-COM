@@ -207,6 +207,7 @@ const ProductPage = async ({ params, searchParams }) => {
             {/* Visuals (Client Component) */}
             <div className="w-full">
               <ProductGallery
+                key={variant?._id || product._id}
                 media={variant.media || product.media}
                 productName={product.name}
                 activeColor={variant.color}

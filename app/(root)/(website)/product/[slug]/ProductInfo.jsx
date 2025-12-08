@@ -45,7 +45,7 @@ const ProductInfo = ({
                 currencyDisplay: "narrowSymbol",
               })}
             </span>
-            <span className="text-lg text-gray-400 line-through">
+            <span className="text-lg text-gray-500 line-through">
               {product.mrp.toLocaleString("BD", {
                 currency: "BDT",
                 style: "currency",
@@ -53,7 +53,7 @@ const ProductInfo = ({
               })}
             </span>
             <div>
-              <div className="bg-green-500 text-white px-4 py-1 rounded-xl font-bold text-sm">
+              <div className="bg-green-600 text-white px-4 py-1 rounded-xl font-bold text-sm">
                 Save{" "}
                 {(product.mrp - product.sellingPrice).toLocaleString("BD", {
                   currency: "BDT",
@@ -83,10 +83,10 @@ const ProductInfo = ({
 
         {/* Color Selection */}
         <div className="p-4 lg:p-6">
-          <h3 className="text-base font-bold mb-3">
+          <p className="text-base font-bold mb-3">
             <span className="text-gray-900">Color: </span>
             <span className="text-gray-600">{variant?.color}</span>
-          </h3>
+          </p>
           <div className="flex items-center gap-2 flex-wrap">
             {Color.map((item, index) => (
               <Link
@@ -111,10 +111,10 @@ const ProductInfo = ({
 
         {/* Size Selection */}
         <div className="p-4 lg:p-6">
-          <h3 className="text-base font-bold mb-3">
+          <p className="text-base font-bold mb-3">
             <span className="text-gray-900">Size: </span>
             <span className="text-gray-600">{variant?.size}</span>
-          </h3>
+          </p>
           <div className="flex items-center gap-2 flex-wrap">
             {Size.map((item, index) => (
               <Link

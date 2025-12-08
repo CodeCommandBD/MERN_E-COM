@@ -209,6 +209,7 @@ const ProductReview = ({ product }) => {
                       <Progress
                         value={reviewsCount?.percentage?.[rating] || 0}
                         className="h-2.5"
+                        aria-label={`${rating} star ratings`}
                       />
                     </div>
                     <span className="text-sm font-medium text-gray-600 min-w-[45px] text-right">

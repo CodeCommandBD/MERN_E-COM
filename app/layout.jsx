@@ -91,8 +91,7 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         {/* Resource hints to pull key assets sooner */}
-        <link rel="preconnect" href="https://res.cloudinary.com" />
-        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
         {/* Preload critical CSS chunks observed in production Lighthouse */}
         {/* Preload critical CSS chunks observed in production Lighthouse - REMOVED dynamic chunks to avoid 404s/unused warnings */}
         <style
