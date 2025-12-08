@@ -306,9 +306,12 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <Link href={USER_DASHBOARD}>
+              <Link href={USER_DASHBOARD} aria-label="My Account">
                 <Avatar className="cursor-pointer w-8 h-8">
-                  <AvatarImage src={auth?.avatar?.url || userIcon.src} />
+                  <AvatarImage
+                    src={auth?.avatar?.url || userIcon.src}
+                    alt={auth?.name || "User Profile"}
+                  />
                 </Avatar>
               </Link>
             )}

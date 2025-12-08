@@ -101,14 +101,6 @@ export default function RootLayout({ children }) {
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Preload LCP hero slider image */}
-        <link
-          rel="preload"
-          as="image"
-          href="/assets/images/slider-1.webp"
-          type="image/webp"
-          fetchPriority="high"
-        />
       </head>
       <body
         className={`${assistant.className} antialiased`}
