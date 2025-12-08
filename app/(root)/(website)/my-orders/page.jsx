@@ -306,7 +306,7 @@ export default function MyOrders() {
                             </p>
                           )}
                       </div>
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <Button
                           asChild
                           variant="outline"
@@ -327,7 +327,7 @@ export default function MyOrders() {
                             <Button
                               variant="destructive"
                               onClick={() => openCancelDialog(order)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
+                              className="bg-red-600 hover:bg-red-700 text-white w-full md:w-auto"
                             >
                               Cancel Order
                             </Button>
