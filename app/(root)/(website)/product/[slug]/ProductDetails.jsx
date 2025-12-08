@@ -172,6 +172,8 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
                   width={100}
                   height={100}
                   className="md:max-w-full max-w-16 object-cover aspect-square"
+                  sizes="100px"
+                  loading="lazy"
                 />
               </div>
             ))}
@@ -179,14 +181,22 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
 
           {/* Main Image */}
           <div className="xl:flex-1 relative group">
-            <div className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 border border-gray-200">
+            <div
+              className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 border border-gray-200"
+              style={{ aspectRatio: "1 / 1" }}
+            >
               <Image
                 src={activeThumb || imagePlaceholder.src}
                 alt={product.name}
                 width={600}
                 height={600}
                 className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 1024px) 80vw, 50vw"
                 priority
+                fetchPriority="high"
+                loading="eager"
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
               />
               {/* Discount Badge */}
               {product.discountPercentage > 0 && (

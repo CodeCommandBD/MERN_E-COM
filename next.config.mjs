@@ -43,9 +43,9 @@ const nextConfig = {
   poweredByHeader: false,
   headers: async () => {
     return [
-      // Force Cache-Control for bfcache support
+      // Main HTML documents (bfcache friendly)
       {
-        source: "/(.*)",
+        source: "/product/:slug",
         headers: [
           {
             key: "Cache-Control",
@@ -53,30 +53,28 @@ const nextConfig = {
           },
         ],
       },
+      // Apply same doc policy to all other pages as a safe default
+      {
+        source: "/((?!_next/static).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, must-revalidate",
+          },
+        ],
+      },
+      // Security + DNS prefetch
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
+          { key: "X-DNS-Prefetch-Control", value: "on" },
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
           },
-          {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "origin-when-cross-origin",
-          },
-          // Content Security Policy - Enhanced for Stripe + Cloudinary
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "origin-when-cross-origin" },
           {
             key: "Content-Security-Policy",
             value: [
@@ -92,16 +90,13 @@ const nextConfig = {
               "form-action 'self'",
             ].join("; "),
           },
-          // Preconnect to Cloudinary for faster image loading - Removed to fix unused warning
         ],
       },
+      // Hint Cloudinary at the HTTP layer too
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Link",
-            value: "<https://res.cloudinary.com>; rel=preconnect",
-          },
+          { key: "Link", value: "<https://res.cloudinary.com>; rel=preconnect" },
         ],
       },
       // Cache control for static assets (1 year, immutable)
@@ -121,6 +116,16 @@ const nextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // API responses: private short cache with SWR
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, max-age=300, stale-while-revalidate=600",
           },
         ],
       },

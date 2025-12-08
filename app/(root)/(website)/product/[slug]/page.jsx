@@ -2,6 +2,7 @@ import React from "react";
 import ProductDetails from "./ProductDetails";
 import axios from "axios";
 import Script from "next/script";
+import Head from "next/head";
 
 // ISR: Revalidate product pages every 60 seconds
 export const revalidate = 60;
@@ -28,22 +29,36 @@ export async function generateMetadata({ params, searchParams }) {
     const imageUrl =
       variant?.media?.[0]?.secure_url || product?.media?.[0]?.secure_url;
 
+    const absoluteImage = imageUrl
+      ? imageUrl.startsWith("http")
+        ? imageUrl
+        : `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""}${imageUrl}`
+      : undefined;
+
+    const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""}/product/${product.slug}`;
+
     return {
       title,
       description,
+      alternates: {
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title: `${product.name} | E-Store`,
         description,
-        images: imageUrl
-          ? [{ url: imageUrl, width: 800, height: 800, alt: product.name }]
+        url: canonicalUrl,
+        images: absoluteImage
+          ? [{ url: absoluteImage, width: 800, height: 800, alt: product.name }]
           : [],
+        // Next.js metadata only allows built-in Open Graph types.
+        // Use "website" to avoid runtime errors while still carrying product data.
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
         title: `${product.name} | E-Store`,
         description,
-        images: imageUrl ? [imageUrl] : [],
+        images: absoluteImage ? [absoluteImage] : [],
       },
     };
   } catch (error) {
@@ -114,6 +129,9 @@ const ProductPage = async ({ params, searchParams }) => {
 
   try {
     const data = await getProductDetails({ slug, color, size });
+    const lcpImage =
+      data?.variant?.media?.[0]?.secure_url ||
+      data?.products?.media?.[0]?.secure_url;
 
     // Handle 404s appropriately
     if (!data || !data.products) {
@@ -138,6 +156,16 @@ const ProductPage = async ({ params, searchParams }) => {
 
     return (
       <>
+        {lcpImage ? (
+          <Head>
+            <link
+              rel="preload"
+              as="image"
+              href={lcpImage}
+              fetchpriority="high"
+            />
+          </Head>
+        ) : null}
         <ProductJsonLd product={data.products} variant={data.variant} />
         <ProductDetails
           product={data.products}

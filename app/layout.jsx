@@ -90,6 +90,12 @@ export default function RootLayout({ children }) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        {/* Resource hints to pull key assets sooner */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        {/* Preload critical CSS chunks observed in production Lighthouse */}
+        <link rel="preload" href="/chunks/1a08af5b241d62e0.css" as="style" />
+        <link rel="preload" href="/chunks/8bee4e60cdd3d416.css" as="style" />
         <style
           data-critical="above-the-fold"
           // Inline only the minimal atoms needed for first paint.
