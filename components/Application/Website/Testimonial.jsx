@@ -4,8 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import { FaStar } from "react-icons/fa";
-import { BsChatQuote } from "react-icons/bs";
+import { Quote, Star } from "lucide-react";
 
 const testimonial = [
   {
@@ -89,7 +88,7 @@ const Testimonial = () => {
               <div className="pb-2">
                 <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-7 mx-auto max-w-lg h-full">
                   <div className="mb-5">
-                    <BsChatQuote
+                    <Quote
                       size={32}
                       className="text-gray-800"
                       aria-hidden="true"
@@ -107,13 +106,17 @@ const Testimonial = () => {
                         { length: Math.floor(item.rating) },
                         (_, i) => (
                           <span key={i} className="text-yellow-400">
-                            <FaStar size={16} />
+                            <Star size={16} fill="currentColor" />
                           </span>
                         )
                       )}
                       {item.rating % 1 !== 0 && (
                         <span className="text-yellow-400">
-                          <FaStar size={16} className="opacity-50" />
+                          <Star
+                            size={16}
+                            fill="currentColor"
+                            className="opacity-50"
+                          />
                         </span>
                       )}
                     </div>
