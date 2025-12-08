@@ -12,6 +12,7 @@ const nextConfig = {
 
   // Optimize package imports for tree-shaking
   experimental: {
+    optimizeCss: true,
     optimizePackageImports: [
       "lucide-react",
       "react-icons",
@@ -92,6 +93,15 @@ const nextConfig = {
             ].join("; "),
           },
           // Preconnect to Cloudinary for faster image loading - Removed to fix unused warning
+        ],
+      },
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Link",
+            value: "<https://res.cloudinary.com>; rel=preconnect",
+          },
         ],
       },
       // Cache control for static assets (1 year, immutable)

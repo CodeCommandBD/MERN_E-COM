@@ -73,6 +73,7 @@
     "@eslint/eslintrc": "^3",
     "@faker-js/faker": "^10.1.0",
     "@tailwindcss/postcss": "^4",
+    "critters": "^0.0.25",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4"
