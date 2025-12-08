@@ -11,18 +11,25 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
-import CartSidebar from "./CartSidebar";
+import { IoIosSearch } from "react-icons/io";
 import { VscAccount } from "react-icons/vsc";
 import { useSelector } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
-import Search from "./Search";
 import { Package } from "lucide-react";
 import { useEffect } from "react";
 import axios from "axios";
 import { useRouter, usePathname } from "next/navigation";
 import Loading from "@/components/Application/Loading";
+import dynamic from "next/dynamic";
+
+const CartSidebar = dynamic(() => import("./CartSidebar"), {
+  loading: () => (
+    <div className="w-6 h-6 bg-gray-100 rounded-full animate-pulse" />
+  ),
+});
+const Search = dynamic(() => import("./Search"), { ssr: false });
 
 const Header = () => {
   const auth = useSelector((store) => store.authStore.auth);
