@@ -201,7 +201,6 @@ const Header = () => {
               alt="logo"
               width={300}
               height={150}
-              style={{ height: "auto" }}
               priority
             />
           </Link>

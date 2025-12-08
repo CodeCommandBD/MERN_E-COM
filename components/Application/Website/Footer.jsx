@@ -59,7 +59,7 @@ const Footer = () => {
               alt="E-Store Logo"
               width={120}
               height={60}
-              className="mb-4 w-auto h-auto"
+              className="mb-4 w-32 h-auto"
               priority
             />
             <p className="text-foreground/70 text-sm leading-relaxed mb-6">
