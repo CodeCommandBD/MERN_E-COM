@@ -1,14 +1,29 @@
-import React from "react";
-import ProductDetails from "./ProductDetails";
+import React, { Suspense } from "react";
 import axios from "axios";
 import Script from "next/script";
-import Head from "next/head";
 import xss from "xss";
+import { getProductDetails } from "@/lib/actions/product.action";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
+import ProductGallery from "./ProductGallery";
+import ProductInfo from "./ProductInfo";
+import ProductActions from "./ProductActions";
+import Loading from "@/components/Application/Loading";
 
-// ISR: Revalidate product pages every 60 seconds
+// Lazy load Reviews to reduce initial bundle
+const ProductReview = React.lazy(() =>
+  import("@/components/Application/Website/ProductReview")
+);
+
 export const revalidate = 60;
 
-// Dynamic metadata generation for SEO
 export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;
   const { color, size } = await searchParams;
@@ -57,8 +72,6 @@ export async function generateMetadata({ params, searchParams }) {
         images: absoluteImage
           ? [{ url: absoluteImage, width: 800, height: 800, alt: product.name }]
           : [],
-        // Next.js metadata only allows built-in Open Graph types.
-        // Use "website" to avoid runtime errors while still carrying product data.
         type: "website",
       },
       twitter: {
@@ -76,7 +89,6 @@ export async function generateMetadata({ params, searchParams }) {
   }
 }
 
-// JSON-LD Structured Data Component
 function ProductJsonLd({ product, variant }) {
   const structuredData = {
     "@context": "https://schema.org",
@@ -108,7 +120,6 @@ function ProductJsonLd({ product, variant }) {
     },
   };
 
-  // Add aggregate rating if reviews exist
   if (product.averageRating && product.reviewCount) {
     structuredData.aggregateRating = {
       "@type": "AggregateRating",
@@ -126,23 +137,15 @@ function ProductJsonLd({ product, variant }) {
   );
 }
 
-// Direct data fetching from DB (Server Action pattern)
-import { getProductDetails } from "@/lib/actions/product.action";
-import { notFound } from "next/navigation";
-
 const ProductPage = async ({ params, searchParams }) => {
   const { slug } = await params;
   const { color, size } = await searchParams;
 
   try {
     const data = await getProductDetails({ slug, color, size });
-    const lcpImage =
-      data?.variant?.media?.[0]?.secure_url ||
-      data?.products?.media?.[0]?.secure_url;
 
-    // Handle 404s appropriately
+    // Handle 404s
     if (!data || !data.products) {
-      // You can use Next.js notFound() or manual UI
       return (
         <div className="flex items-center justify-center h-screen text-4xl font-bold text-red-500">
           Product not found
@@ -150,9 +153,6 @@ const ProductPage = async ({ params, searchParams }) => {
       );
     }
 
-    // Original logic seemed to treat missing variant as a critical error (404),
-    // but maybe we should just show the product?
-    // STRICT MODE COMPLIANCE: If original API returned 404 for missing variant, we do too.
     if (!data.variant) {
       return (
         <div className="flex items-center justify-center h-screen text-4xl font-bold text-red-500">
@@ -161,26 +161,105 @@ const ProductPage = async ({ params, searchParams }) => {
       );
     }
 
+    const { products: product, variant, getColor, getSize, reviewCount } = data;
+    const sanitizedDescription = xss(product.description || "");
+
     return (
       <>
-        {lcpImage ? (
-          <Head>
-            <link
-              rel="preload"
-              as="image"
-              href={lcpImage}
-              fetchpriority="high"
-            />
-          </Head>
-        ) : null}
-        <ProductDetails
-          product={data.products}
-          variant={data.variant}
-          Color={data.getColor}
-          Size={data.getSize}
-          reviewCount={data.reviewCount}
-          sanitizedDescription={xss(data.products.description)}
-        />
+        <ProductJsonLd product={product} variant={variant} />
+
+        <div className="container mx-auto px-4 lg:px-8 max-w-[1440px]">
+          {/* Breadcrumb */}
+          <div className="my-6 lg:my-10">
+            <div className="bg-white/80 backdrop-blur-md rounded-xl px-4 py-2 border border-gray-200 inline-block">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink
+                      href="/"
+                      className="hover:text-gray-700 transition-colors text-sm lg:text-base"
+                    >
+                      Home
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink
+                      href={WEBSITE_SHOP}
+                      className="hover:text-gray-700 transition-colors text-sm lg:text-base"
+                    >
+                      Shop
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="font-semibold text-gray-900 text-sm lg:text-base line-clamp-1 max-w-[150px] lg:max-w-none">
+                      {product.name}
+                    </BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+          </div>
+
+          {/* Main Product Section - Responsive Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-16 mb-20 items-start">
+            {/* Visuals (Client Component) */}
+            <div className="w-full">
+              <ProductGallery
+                media={variant.media || product.media}
+                productName={product.name}
+                activeColor={variant.color}
+              />
+            </div>
+
+            {/* Info (Server Component + Client Actions) */}
+            <div className="w-full flex flex-col gap-6">
+              <ProductInfo
+                product={product}
+                variant={variant}
+                Color={getColor}
+                Size={getSize}
+                reviewCount={reviewCount}
+                sanitizedDescription={sanitizedDescription}
+              />
+              {/* Client Actions: Quantity, Add to Cart */}
+              <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden w-full">
+                <ProductActions product={product} variant={variant} />
+              </div>
+            </div>
+          </div>
+
+          {/* Product Description Section */}
+          <div className="mb-20">
+            <div className="rounded-3xl bg-white border border-gray-200">
+              <div className="p-6 bg-gray-50 border-b border-gray-200">
+                <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                  Product Description
+                </h2>
+              </div>
+              <div className="p-6 lg:p-8">
+                <div
+                  className="prose prose-lg max-w-none text-gray-700 leading-relaxed overflow-hidden"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizedDescription,
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Review Section */}
+          <Suspense
+            fallback={
+              <div className="flex justify-center py-20">
+                <Loading />
+              </div>
+            }
+          >
+            <ProductReview product={product} />
+          </Suspense>
+        </div>
       </>
     );
   } catch (error) {
