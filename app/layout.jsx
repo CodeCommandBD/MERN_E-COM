@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Assistant } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import GlobalProvider from "@/components/Application/GlobalProvider";
 
 const assistant = Assistant({
@@ -131,6 +132,7 @@ export default function RootLayout({ children }) {
             <div suppressHydrationWarning={true}>{children}</div>
           </div>
           <SpeedInsights />
+          <Analytics />
         </GlobalProvider>
       </body>
     </html>
