@@ -29,7 +29,7 @@ export async function generateMetadata({ params, searchParams }) {
   const { color, size } = await searchParams;
 
   try {
-    const data = await getProductDetails({ slug, color, size });
+    const data = await getProductDetails(slug, color, size);
 
     if (!data || !data.products) {
       throw new Error("Product not found");
@@ -142,7 +142,7 @@ const ProductPage = async ({ params, searchParams }) => {
   const { color, size } = await searchParams;
 
   try {
-    const data = await getProductDetails({ slug, color, size });
+    const data = await getProductDetails(slug, color, size);
 
     // Handle 404s
     if (!data || !data.products) {

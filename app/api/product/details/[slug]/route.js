@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
     const color = searchParams.get("color");
     const size = searchParams.get("size");
 
-    const data = await getProductDetails({ slug, color, size });
+    const data = await getProductDetails(slug, color, size);
 
     if (!data) {
       return new Response(
