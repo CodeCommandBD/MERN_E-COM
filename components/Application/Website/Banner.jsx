@@ -18,6 +18,7 @@ const Banner = () => {
             height={bannerOne.height}
             sizes="(max-width: 768px) 50vw, 45vw"
             className="w-full h-auto"
+            style={{ width: "100%", height: "auto" }}
             priority
           />
         </Link>
@@ -32,6 +33,7 @@ const Banner = () => {
             height={bannerTwo.height}
             sizes="(max-width: 768px) 50vw, 45vw"
             className="w-full h-auto"
+            style={{ width: "100%", height: "auto" }}
             priority
           />
         </Link>
