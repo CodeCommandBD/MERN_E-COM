@@ -18,7 +18,10 @@ const MainSlider = () => {
   ];
 
   return (
-    <div className="main-slider relative" style={{ contain: "content" }}>
+    <div
+      className="main-slider relative aspect-[16/7]"
+      style={{ contain: "content" }}
+    >
       <Swiper
         modules={[Navigation, Pagination, Autoplay, A11y]}
         spaceBetween={0}
