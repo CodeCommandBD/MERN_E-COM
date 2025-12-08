@@ -87,7 +87,13 @@ export default function RootLayout({ children }) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        {/* Preload LCP Hero Image */}
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/images/slider-1.webp"
+          type="image/webp"
+        />
       </head>
       <body
         className={`${assistant.className} antialiased`}

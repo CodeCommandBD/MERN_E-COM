@@ -78,5 +78,10 @@
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.8"
   },
-  "packageManager": "pnpm@10.24.0"
+  "packageManager": "pnpm@10.24.0",
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not android 4.4"
+  ]
 }
