@@ -67,54 +67,54 @@ const ProductBox = ({ product }) => {
           aria-label={`View ${product?.name} details`}
           onClick={handleProductClick}
         >
-        <Suspense fallback={<ImageSkeleton />}>
-          <Image
-            src={imageSrc}
-            alt={altText}
-            title={mediaItem?.title || product?.name}
-            width={400}
-            height={400}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="w-full lg:h-[350px] md:h-[250px] h-[200px] object-cover"
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
-            itemProp="image"
-          />
-        </Suspense>
-        <div className="p-3">
-          <h2 className="text-lg font-semibold" itemProp="name">
-            {product?.name}
-          </h2>
-          <p
-            className="flex items-center gap-2"
-            itemProp="offers"
-            itemScope
-            itemType="https://schema.org/Offer"
-          >
-            <span
-              className="line-through text-gray-400"
-              aria-label="Original price"
-            >
-              {formatPrice(product?.mrp)}
-            </span>
-            <span
-              className="text-primary font-semibold"
-              itemProp="price"
-              content={product?.sellingPrice}
-              aria-label="Sale price"
-            >
-              {formatPrice(product?.sellingPrice)}
-            </span>
-            <meta itemProp="priceCurrency" content="BDT" />
-            <meta
-              itemProp="availability"
-              content="https://schema.org/InStock"
+          <Suspense fallback={<ImageSkeleton />}>
+            <Image
+              src={imageSrc}
+              alt={altText}
+              title={mediaItem?.title || product?.name}
+              width={400}
+              height={400}
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="w-full lg:h-[350px] md:h-[250px] h-[200px] object-cover"
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
+              itemProp="image"
             />
-          </p>
-        </div>
-      </Link>
-    </article>
+          </Suspense>
+          <div className="p-3">
+            <h2 className="text-lg font-semibold" itemProp="name">
+              {product?.name}
+            </h2>
+            <p
+              className="flex items-center gap-2"
+              itemProp="offers"
+              itemScope
+              itemType="https://schema.org/Offer"
+            >
+              <span
+                className="line-through text-gray-500"
+                aria-label="Original price"
+              >
+                {formatPrice(product?.mrp)}
+              </span>
+              <span
+                className="text-purple-700 font-semibold"
+                itemProp="price"
+                content={product?.sellingPrice}
+                aria-label="Sale price"
+              >
+                {formatPrice(product?.sellingPrice)}
+              </span>
+              <meta itemProp="priceCurrency" content="BDT" />
+              <meta
+                itemProp="availability"
+                content="https://schema.org/InStock"
+              />
+            </p>
+          </div>
+        </Link>
+      </article>
     </>
   );
 };

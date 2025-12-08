@@ -100,7 +100,7 @@ const CartSidebar = () => {
                       </div>
 
                       <div className="flex items-center justify-between mt-2">
-                        <div className="font-semibold text-primary">
+                        <div className="font-semibold text-purple-700">
                           {item?.sellingPrice.toLocaleString("BD", {
                             currency: "BDT",
                             style: "currency",
@@ -156,7 +156,7 @@ const CartSidebar = () => {
                     })}
                   </span>
                 </div>
-                <div className="flex justify-between text-base font-bold text-primary pt-2 border-t border-border/50">
+                <div className="flex justify-between text-base font-bold text-purple-700 pt-2 border-t border-border/50">
                   <span>Total Amount</span>
                   <span>
                     {total.toLocaleString("BD", {

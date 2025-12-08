@@ -77,8 +77,9 @@ const MainSlider = () => {
           bottom: 20px;
         }
         .main-slider .swiper-pagination-bullet {
-          width: 12px;
-          height: 12px;
+          width: 14px;
+          height: 14px;
+          margin: 0 8px !important;
           background: #fff;
           opacity: 0.6;
           border: 2px solid rgba(255, 255, 255, 0.8);

@@ -179,8 +179,9 @@ const Footer = () => {
       <div className="border-t-2 border-primary/20 bg-primary/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-center text-sm text-foreground/70">
-            © 2025 <span className="font-semibold text-primary">E-Store</span>.
-            All rights reserved.
+            © 2025{" "}
+            <span className="font-semibold text-purple-700">E-Store</span>. All
+            rights reserved.
           </p>
         </div>
       </div>
