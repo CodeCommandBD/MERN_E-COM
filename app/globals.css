@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,14 +118,17 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Suppress browser extension interference */
   [bis_skin_checked] {
     /* Ignore browser extension attributes */
   }
-  
+
   /* Ensure form elements are not affected by browser extensions */
-  input, textarea, select, button {
+  input,
+  textarea,
+  select,
+  button {
     /* Reset any browser extension modifications */
     appearance: none;
     -webkit-appearance: none;
@@ -149,7 +151,7 @@
   }
 } */
 
-.slick-dots{
+.slick-dots {
   bottom: 15px !important;
 }
 /* Shimmer animation for image loading */

@@ -9,7 +9,7 @@ import {
 } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 
 import { VscAccount } from "react-icons/vsc";

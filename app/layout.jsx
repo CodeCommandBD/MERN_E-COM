@@ -1,11 +1,9 @@
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
-
 import { Assistant } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import GlobalProvider from "@/components/Application/GlobalProvider";
+import Toaster from "@/components/Application/Toaster";
 
 const assistant = Assistant({
   weight: ["400", "600", "700"],
@@ -101,19 +99,7 @@ export default function RootLayout({ children }) {
       >
         <GlobalProvider>
           <div suppressHydrationWarning={true}>
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick={false}
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-              suppressHydrationWarning={true}
-            />
+            <Toaster />
             <div suppressHydrationWarning={true}>{children}</div>
           </div>
           <SpeedInsights />

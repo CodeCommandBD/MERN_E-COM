@@ -5,55 +5,62 @@ import { BiSupport } from "react-icons/bi";
 import { FaShippingFast } from "react-icons/fa";
 import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
+import LazyLoad from "@/components/Common/LazyLoad";
+
+// Loading Skeletons
+const MainSliderSkeleton = () => (
+  <div className="h-[200px] md:h-[400px] w-full bg-gray-100 animate-pulse" />
+);
+
+const BannerSkeleton = () => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="grid grid-cols-2 gap-4">
+      <div className="h-40 bg-gray-100 animate-pulse rounded-lg" />
+      <div className="h-40 bg-gray-100 animate-pulse rounded-lg" />
+    </div>
+  </div>
+);
+
+const FeaturedProductSkeleton = () => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="h-8 w-48 bg-gray-100 animate-pulse rounded mb-6" />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-64 bg-gray-100 animate-pulse rounded-lg" />
+      ))}
+    </div>
+  </div>
+);
+
+const TestimonialSkeleton = () => (
+  <div className="h-48 bg-gray-100 animate-pulse rounded-lg" />
+);
 
 const MainSlider = dynamic(
   () => import("@/components/Application/Website/MainSlider"),
   {
-    loading: () => (
-      <div className="h-[200px] md:h-[400px] w-full bg-gray-100 animate-pulse" />
-    ),
+    loading: MainSliderSkeleton,
   }
 );
 
 const Banner = dynamic(
   () => import("@/components/Application/Website/Banner"),
   {
-    loading: () => (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="h-40 bg-gray-100 animate-pulse rounded-lg" />
-          <div className="h-40 bg-gray-100 animate-pulse rounded-lg" />
-        </div>
-      </div>
-    ),
+    loading: BannerSkeleton,
   }
 );
 
 const FeaturedProduct = dynamic(
   () => import("@/components/Application/Website/FeaturedProduct"),
   {
-    loading: () => (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="h-8 w-48 bg-gray-100 animate-pulse rounded mb-6" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="h-64 bg-gray-100 animate-pulse rounded-lg"
-            />
-          ))}
-        </div>
-      </div>
-    ),
+    loading: FeaturedProductSkeleton,
   }
 );
 
 const Testimonial = dynamic(
   () => import("@/components/Application/Website/Testimonial"),
   {
-    loading: () => (
-      <div className="h-48 bg-gray-100 animate-pulse rounded-lg" />
-    ),
+    loading: TestimonialSkeleton,
   }
 );
 
@@ -100,7 +107,9 @@ const HomeContent = () => {
 
       {/* Featured Products */}
       <section>
-        <FeaturedProduct />
+        <LazyLoad placeholder={<FeaturedProductSkeleton />}>
+          <FeaturedProduct />
+        </LazyLoad>
       </section>
 
       {/* Advertising Banner */}
@@ -118,7 +127,9 @@ const HomeContent = () => {
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
-        <Testimonial />
+        <LazyLoad placeholder={<TestimonialSkeleton />}>
+          <Testimonial />
+        </LazyLoad>
       </section>
 
       {/* Features Section */}
