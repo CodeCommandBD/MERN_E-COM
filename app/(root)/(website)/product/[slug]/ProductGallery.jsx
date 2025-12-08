@@ -25,10 +25,9 @@ const ProductGallery = ({ media = [], productName, activeColor }) => {
   if (!displayMedia) return null;
 
   return (
-    <div className="flex flex-col-reverse lg:flex-row gap-4 lg:gap-6 lg:sticky lg:top-24 w-full">
+    <div className="flex flex-col gap-4 w-full">
       {/* Thumbnail Images */}
-      {/* Mobile: Horizontal Scroll bottom, Desktop: Vertical Scroll left */}
-      <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto w-full lg:w-24 shrink-0 pb-2 lg:pb-0 scrollbar-hide max-h-[500px]">
+      <div className="flex gap-3 p-2 overflow-x-auto w-full shrink-0 pb-2 scrollbar-hide">
         {displayMedia.map((item, index) => (
           <div
             key={index}

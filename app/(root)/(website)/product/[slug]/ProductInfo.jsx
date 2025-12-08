@@ -96,7 +96,7 @@ const ProductInfo = ({
                 key={index}
                 className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
                   item === variant?.color
-                    ? "bg-primary text-white border-primary"
+                    ? "bg-primary !text-white border-primary"
                     : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                 }`}
               >
@@ -124,7 +124,7 @@ const ProductInfo = ({
                 key={index}
                 className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
                   item === variant?.size
-                    ? "bg-primary text-white border-primary"
+                    ? "bg-primary !text-white border-primary"
                     : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                 }`}
               >
