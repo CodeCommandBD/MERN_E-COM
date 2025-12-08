@@ -22,7 +22,6 @@ import { showToast } from "@/lib/showToast";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Rating } from "@mui/material";
 import { WEBSITE_LOGIN } from "@/Routes/WebsiteRoute";
 import Link from "next/link";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -288,14 +287,23 @@ const ProductReview = ({ product }) => {
                               Your Rating
                             </FormLabel>
                             <FormControl>
-                              <div className="py-2">
-                                <Rating
-                                  value={field.value}
-                                  size="large"
-                                  onChange={(e) =>
-                                    field.onChange(e.target.value)
-                                  }
-                                />
+                              <div className="py-2 flex gap-1">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => field.onChange(star)}
+                                    className="focus:outline-none transition-colors"
+                                  >
+                                    <IoStar
+                                      className={`text-3xl ${
+                                        star <= field.value
+                                          ? "text-yellow-400"
+                                          : "text-gray-300"
+                                      }`}
+                                    />
+                                  </button>
+                                ))}
                               </div>
                             </FormControl>
                             <FormMessage />
