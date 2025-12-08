@@ -3,6 +3,7 @@ import ProductDetails from "./ProductDetails";
 import axios from "axios";
 import Script from "next/script";
 import Head from "next/head";
+import xss from "xss";
 
 // ISR: Revalidate product pages every 60 seconds
 export const revalidate = 60;
@@ -32,10 +33,16 @@ export async function generateMetadata({ params, searchParams }) {
     const absoluteImage = imageUrl
       ? imageUrl.startsWith("http")
         ? imageUrl
-        : `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""}${imageUrl}`
+        : `${
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            process.env.NEXT_PUBLIC_APP_URL ||
+            ""
+          }${imageUrl}`
       : undefined;
 
-    const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""}/product/${product.slug}`;
+    const canonicalUrl = `${
+      process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""
+    }/product/${product.slug}`;
 
     return {
       title,
@@ -173,6 +180,7 @@ const ProductPage = async ({ params, searchParams }) => {
           Color={data.getColor}
           Size={data.getSize}
           reviewCount={data.reviewCount}
+          sanitizedDescription={xss(data.products.description)}
         />
       </>
     );
