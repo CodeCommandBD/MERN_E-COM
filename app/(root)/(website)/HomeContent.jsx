@@ -7,19 +7,7 @@ import { FaShippingFast } from "react-icons/fa";
 import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
 
-// Dynamic imports for heavy components with loading skeletons
-// MainSlider must render on server for LCP optimization
-const MainSlider = dynamic(
-  () => import("@/components/Application/Website/MainSlider"),
-  {
-    loading: () => (
-      <div
-        className="w-full aspect-[16/5] bg-gray-100 animate-pulse"
-        aria-label="Loading slider"
-      />
-    ),
-  }
-);
+import MainSlider from "@/components/Application/Website/MainSlider";
 
 const Banner = dynamic(
   () => import("@/components/Application/Website/Banner"),
