@@ -3,7 +3,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { IoIosArrowRoundForward } from "react-icons/io";
+import { ArrowRight } from "lucide-react";
 import ProductBox from "./ProductBox";
 
 const FeaturedProduct = () => {
@@ -66,7 +66,7 @@ const FeaturedProduct = () => {
             className='flex items-center gap-2 transition-all duration-300 hover:text-primary relative after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-current after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100'
           >
             View All
-            <IoIosArrowRoundForward size={24} />
+            <ArrowRight size={24} />
           </Link>
         </div>
         <p className="text-foreground/60 text-sm sm:text-base mt-2">

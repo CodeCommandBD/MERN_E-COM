@@ -16,7 +16,7 @@ import {
 } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
 import { imagePlaceholder } from "@/public/image";
-import { IoStar } from "react-icons/io5";
+import { Star } from "lucide-react";
 import Link from "next/link";
 import { HiPlus, HiMinus } from "react-icons/hi";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
@@ -193,10 +193,10 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
           <div className="flex items-center gap-2 mb-6 bg-yellow-50 px-4 py-2 rounded-xl border border-yellow-200 w-fit">
             <div className="flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, index) => (
-                <IoStar
+                <Star
                   key={index}
-                  className="text-yellow-500 text-lg"
-                ></IoStar>
+                  className="text-yellow-500 w-5 h-5 fill-yellow-500"
+                />
               ))}
             </div>
             <span className="text-sm font-medium text-gray-700">
