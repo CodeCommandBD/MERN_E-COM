@@ -1,5 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  Suspense,
+} from "react";
 import DOMPurify from "isomorphic-dompurify";
 import {
   Breadcrumb,
@@ -26,13 +32,17 @@ import { showToast } from "@/lib/showToast";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import Loading from "@/components/Application/Loading";
-import ProductReview from "@/components/Application/Website/ProductReview";
+const ProductReview = React.lazy(() =>
+  import("@/components/Application/Website/ProductReview")
+);
 
 const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
   const dispatch = useDispatch();
   const cartStore = useSelector((state) => state.cartStore);
   const [quantity, setQuantity] = useState(1);
-  const [activeThumb, setActiveThumb] = useState();
+  const [activeThumb, setActiveThumb] = useState(
+    variant?.media?.[0]?.secure_url
+  );
   const [isAddedIntocart, setIsAddedIntocart] = useState(false);
   const [isProductLoading, setIsProductLoading] = useState(false);
   useEffect(() => {
@@ -58,19 +68,26 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
     setIsProductLoading(false);
   }, [variant]);
 
-  const handleThumbClick = (thumb) => {
+  const handleThumbClick = useCallback((thumb) => {
     setActiveThumb(thumb);
-  };
+  }, []);
 
-  const handleQuantityChange = (actionType) => {
-    if (actionType === "inc") {
-      setQuantity((prev) => prev + 1);
-    } else {
-      if (quantity !== 1) {
-        setQuantity((prev) => prev - 1);
+  const handleQuantityChange = useCallback(
+    (actionType) => {
+      if (actionType === "inc") {
+        setQuantity((prev) => prev + 1);
+      } else {
+        if (quantity !== 1) {
+          setQuantity((prev) => prev - 1);
+        }
       }
-    }
-  };
+    },
+    [quantity]
+  );
+
+  const sanitizedDescription = useMemo(() => {
+    return DOMPurify.sanitize(product.description);
+  }, [product.description]);
 
   const handleAddToCart = () => {
     const cartProduct = {
@@ -169,6 +186,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
                 width={600}
                 height={600}
                 className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-105"
+                priority
               />
               {/* Discount Badge */}
               {product.discountPercentage > 0 && (
@@ -244,7 +262,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
               <div
                 className="text-gray-700 leading-relaxed text-sm line-clamp-2"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(product.description),
+                  __html: sanitizedDescription,
                 }}
               ></div>
             </div>
@@ -378,7 +396,7 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
             <div
               className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(product.description),
+                __html: sanitizedDescription,
               }}
             ></div>
           </div>
@@ -386,7 +404,15 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
       </div>
 
       {/* Product Review Section */}
-      <ProductReview product={product} />
+      <Suspense
+        fallback={
+          <div className="flex justify-center py-20">
+            <Loading />
+          </div>
+        }
+      >
+        <ProductReview product={product} />
+      </Suspense>
     </div>
   );
 };
