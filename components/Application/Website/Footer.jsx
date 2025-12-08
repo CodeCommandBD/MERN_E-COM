@@ -59,8 +59,8 @@ const Footer = () => {
               alt="E-Store Logo"
               width={120}
               height={60}
-              className="mb-4"
-              style={{ height: "auto" }}
+              className="mb-4 w-auto h-auto"
+              priority
             />
             <p className="text-foreground/70 text-sm leading-relaxed mb-6">
               E-store is your trusted destination for quality and convenience.

@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { IoStar } from "react-icons/io5";
+import React, { useState, useEffect } from "react";
+import { Star } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
@@ -180,12 +180,12 @@ const ProductReview = ({ product }) => {
                 </div>
                 <div className="flex justify-center gap-1 mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <IoStar
+                    <Star
                       key={star}
-                      className={`text-2xl ${
+                      className={`h-6 w-6 ${
                         star <= Math.round(reviewsCount?.averageRating || 0)
-                          ? "text-yellow-400"
-                          : "text-gray-300"
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300 fill-gray-300"
                       }`}
                     />
                   ))}
@@ -205,7 +205,7 @@ const ProductReview = ({ product }) => {
                       <span className="text-sm font-medium text-gray-700 w-3">
                         {rating}
                       </span>
-                      <IoStar className="text-yellow-400 text-base" />
+                      <Star className="text-yellow-400 w-4 h-4 fill-yellow-400" />
                     </div>
                     <div className="flex-1">
                       <Progress
@@ -295,11 +295,11 @@ const ProductReview = ({ product }) => {
                                     onClick={() => field.onChange(star)}
                                     className="focus:outline-none transition-colors"
                                   >
-                                    <IoStar
-                                      className={`text-3xl ${
+                                    <Star
+                                      className={`h-8 w-8 ${
                                         star <= field.value
-                                          ? "text-yellow-400"
-                                          : "text-gray-300"
+                                          ? "text-yellow-400 fill-yellow-400"
+                                          : "text-gray-300 fill-gray-300"
                                       }`}
                                     />
                                   </button>

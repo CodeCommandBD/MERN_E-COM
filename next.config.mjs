@@ -42,6 +42,16 @@ const nextConfig = {
   poweredByHeader: false,
   headers: async () => {
     return [
+      // Force Cache-Control for bfcache support
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, must-revalidate",
+          },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [
