@@ -52,6 +52,7 @@ const Testimonial = () => {
       className="py-8 md:py-12 px-4 md:px-6 lg:px-16 bg-white"
       role="region"
       aria-label="Customer testimonials"
+      style={{ contain: "content" }}
     >
       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-900">
         Customer Review

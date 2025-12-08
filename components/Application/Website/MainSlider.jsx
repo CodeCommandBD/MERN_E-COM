@@ -18,7 +18,7 @@ const MainSlider = () => {
   ];
 
   return (
-    <div className="main-slider relative">
+    <div className="main-slider relative" style={{ contain: "content" }}>
       <Swiper
         modules={[Navigation, Pagination, Autoplay, A11y]}
         spaceBetween={0}

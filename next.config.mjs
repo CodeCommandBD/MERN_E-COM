@@ -81,11 +81,7 @@ const nextConfig = {
               "form-action 'self'",
             ].join("; "),
           },
-          // Preconnect to Cloudinary for faster image loading
-          {
-            key: "Link",
-            value: "<https://res.cloudinary.com>; rel=preconnect",
-          },
+          // Preconnect to Cloudinary for faster image loading - Removed to fix unused warning
         ],
       },
       // Cache control for static assets (1 year, immutable)

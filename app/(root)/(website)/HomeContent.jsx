@@ -1,4 +1,3 @@
-"use client";
 import dynamic from "next/dynamic";
 import { advertisingBanner } from "@/public/image";
 import Image from "next/image";
@@ -7,12 +6,18 @@ import { FaShippingFast } from "react-icons/fa";
 import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
 
-import MainSlider from "@/components/Application/Website/MainSlider";
+const MainSlider = dynamic(
+  () => import("@/components/Application/Website/MainSlider"),
+  {
+    loading: () => (
+      <div className="h-[200px] md:h-[400px] w-full bg-gray-100 animate-pulse" />
+    ),
+  }
+);
 
 const Banner = dynamic(
   () => import("@/components/Application/Website/Banner"),
   {
-    ssr: false,
     loading: () => (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-2 gap-4">
@@ -27,7 +32,6 @@ const Banner = dynamic(
 const FeaturedProduct = dynamic(
   () => import("@/components/Application/Website/FeaturedProduct"),
   {
-    ssr: false,
     loading: () => (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="h-8 w-48 bg-gray-100 animate-pulse rounded mb-6" />
@@ -47,7 +51,6 @@ const FeaturedProduct = dynamic(
 const Testimonial = dynamic(
   () => import("@/components/Application/Website/Testimonial"),
   {
-    ssr: false,
     loading: () => (
       <div className="h-48 bg-gray-100 animate-pulse rounded-lg" />
     ),
