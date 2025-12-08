@@ -6,7 +6,6 @@ import React, {
   useCallback,
   Suspense,
 } from "react";
-import DOMPurify from "isomorphic-dompurify";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -36,7 +35,14 @@ const ProductReview = React.lazy(() =>
   import("@/components/Application/Website/ProductReview")
 );
 
-const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
+const ProductDetails = ({
+  product,
+  variant,
+  Color,
+  Size,
+  reviewCount,
+  sanitizedDescription,
+}) => {
   const dispatch = useDispatch();
   const cartStore = useSelector((state) => state.cartStore);
   const [quantity, setQuantity] = useState(1);
@@ -84,10 +90,6 @@ const ProductDetails = ({ product, variant, Color, Size, reviewCount }) => {
     },
     [quantity]
   );
-
-  const sanitizedDescription = useMemo(() => {
-    return DOMPurify.sanitize(product.description);
-  }, [product.description]);
 
   const handleAddToCart = () => {
     const cartProduct = {
