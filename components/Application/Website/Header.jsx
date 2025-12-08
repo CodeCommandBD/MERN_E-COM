@@ -199,8 +199,7 @@ const Header = () => {
               className="w-24 sm:w-28 lg:w-32 h-auto"
               src={logo_black}
               alt="logo"
-              width={300}
-              height={150}
+              sizes="(max-width: 640px) 96px, (max-width: 1024px) 112px, 128px"
               priority
             />
           </Link>
@@ -347,8 +346,7 @@ const Header = () => {
             className="lg:w-32 w-24"
             src={logo_black}
             alt="logo"
-            width={300}
-            height={150}
+            sizes="(max-width: 640px) 96px, 128px"
             priority
           />
           <button
