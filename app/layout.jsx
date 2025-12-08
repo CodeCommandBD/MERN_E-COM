@@ -13,7 +13,10 @@ const assistant = Assistant({
 
 export const metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      "http://localhost:3000"
   ),
   title: {
     default:
