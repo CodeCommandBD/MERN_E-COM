@@ -1,5 +1,4 @@
 "use client";
-import useFetch from "@/hooks/useFetch";
 import React, { useEffect, useState } from "react";
 import {
   Accordion,
@@ -15,15 +14,12 @@ import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-const Filter = () => {
+const Filter = ({ categories, colors, sizes }) => {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
-  const { data: categoryData } = useFetch("/api/category/get-category");
-  const { data: colorsData } = useFetch("/api/product-variant/colors");
-  const { data: sizesData } = useFetch("/api/product-variant/sizes");
 
   const handlePriceRange = (value) => {
     setPriceRange({ min: value[0], max: value[1] });
@@ -190,9 +186,8 @@ const Filter = () => {
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <div className="max-h-48 overflow-auto space-y-2">
-              {categoryData &&
-                categoryData.success &&
-                categoryData.data?.map((category) => (
+              {categories &&
+                categories.map((category) => (
                   <label
                     key={category._id}
                     htmlFor={category._id}
@@ -245,9 +240,8 @@ const Filter = () => {
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <div className="max-h-48 overflow-auto space-y-2">
-              {colorsData &&
-                colorsData.success &&
-                colorsData.data?.map((color) => (
+              {colors &&
+                colors.map((color) => (
                   <label
                     key={color}
                     htmlFor={color}
@@ -298,9 +292,8 @@ const Filter = () => {
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <div className="max-h-48 overflow-auto space-y-2">
-              {sizesData &&
-                sizesData.success &&
-                sizesData.data?.map((size) => (
+              {sizes &&
+                sizes.map((size) => (
                   <label
                     key={size}
                     htmlFor={size}
