@@ -24,13 +24,10 @@ const ProductBox = ({ product }) => {
   // Generate descriptive alt text for SEO
   const altText = mediaItem?.alt || `${product?.name} - Shop at E-Store`;
 
-  // Format price for display
+  // Format price for display without decimal places
   const formatPrice = (price) => {
-    return price?.toLocaleString("BD", {
-      currency: "BDT",
-      style: "currency",
-      currencyDisplay: "narrowSymbol",
-    });
+    if (!price) return "৳0";
+    return `৳${Number(price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
   };
 
   // Fallback: Clear loading state after timeout (in case navigation fails or is slow)
@@ -83,23 +80,23 @@ const ProductBox = ({ product }) => {
             />
           </Suspense>
           <div className="p-3">
-            <h2 className="text-lg font-semibold" itemProp="name">
+            <h2 className="text-sm md:text-lg font-semibold line-clamp-2" itemProp="name">
               {product?.name}
             </h2>
             <p
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-wrap mt-2"
               itemProp="offers"
               itemScope
               itemType="https://schema.org/Offer"
             >
               <span
-                className="line-through text-gray-500"
+                className="line-through text-gray-500 text-xs md:text-sm"
                 aria-label="Original price"
               >
                 {formatPrice(product?.mrp)}
               </span>
               <span
-                className="text-purple-700 font-semibold"
+                className="text-purple-700 font-semibold text-base md:text-lg"
                 itemProp="price"
                 content={product?.sellingPrice}
                 aria-label="Sale price"
