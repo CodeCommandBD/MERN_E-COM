@@ -186,7 +186,8 @@ const ProductPage = async ({ params, searchParams }) => {
       <>
         <ProductJsonLd product={product} variant={variant} />
 
-        <div className="container mx-auto px-4 lg:px-8 max-w-[1440px]">
+        <main id="main-content" className="w-full">
+          <div className="container mx-auto px-4 lg:px-8 max-w-[1440px]">
           {/* Breadcrumb */}
           <div className="my-6 lg:my-10">
             <div className="bg-white/80 backdrop-blur-md rounded-xl px-4 py-2 border border-gray-200 inline-block">
@@ -250,8 +251,8 @@ const ProductPage = async ({ params, searchParams }) => {
           </div>
 
           {/* Product Description Section */}
-          <div className="mb-20">
-            <div className="rounded-3xl bg-white border border-gray-200">
+          <div className="mb-20 w-full">
+            <div className="rounded-3xl bg-white border border-gray-200 overflow-hidden w-full">
               <div className="p-6 bg-gray-50 border-b border-gray-200">
                 <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
                   Product Description
@@ -259,7 +260,7 @@ const ProductPage = async ({ params, searchParams }) => {
               </div>
               <div className="p-6 lg:p-8">
                 <div
-                  className="prose prose-lg max-w-none text-gray-700 leading-relaxed overflow-hidden"
+                  className="text-gray-700 leading-relaxed overflow-hidden space-y-3 w-full"
                   dangerouslySetInnerHTML={{
                     __html: sanitizedDescription,
                   }}
@@ -278,7 +279,8 @@ const ProductPage = async ({ params, searchParams }) => {
           >
             <ProductReview product={product} />
           </Suspense>
-        </div>
+          </div>
+        </main>
       </>
     );
   } catch (error) {

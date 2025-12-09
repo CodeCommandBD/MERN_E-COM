@@ -156,24 +156,25 @@ const ProductDetails = ({
       <div className="md:flex justify-between items-start lg:gap-10 gap-5 mb-20">
         {/* Image Gallery Section */}
         <div className="md:w-1/2 xl:flex xl:justify-center xl:gap-5 md:sticky md:top-20">
-          {/* Thumbnail Images */}
-          <div className="flex xl:flex-col items-center xl:gap-4 gap-3 xl:w-28 overflow-auto xl:pb-0 p-3 max-h-[600px] xl:order-first order-last xl:mt-0 mt-5">
+          {/* Thumbnail Images - Fixed container to prevent layout shift */}
+          <div className="flex xl:flex-col items-center xl:gap-4 gap-3 xl:w-28 xl:h-auto overflow-auto xl:pb-0 p-3 max-h-[600px] xl:order-first order-last xl:mt-0 mt-5">
             {variant?.media?.map((item, index) => (
               <div
                 key={index}
                 onClick={() => handleThumbClick(item.secure_url)}
-                className={`relative group cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden ${
+                className={`relative group cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden flex-shrink-0 ${
                   item.secure_url.trim() === activeThumb
                     ? "ring-4 ring-gray-400 scale-105"
                     : "ring-2 ring-gray-200 hover:ring-gray-300"
                 }`}
+                style={{ width: "100px", height: "100px" }}
               >
                 <Image
                   src={item.secure_url || imagePlaceholder.src}
                   alt={product.name}
                   width={100}
                   height={100}
-                  className="md:max-w-full max-w-16 object-cover aspect-square"
+                  className="w-full h-full object-cover"
                   sizes="100px"
                   loading="lazy"
                 />
@@ -181,11 +182,11 @@ const ProductDetails = ({
             ))}
           </div>
 
-          {/* Main Image */}
-          <div className="xl:flex-1 relative group">
+          {/* Main Image - Fixed aspect ratio to prevent layout shift */}
+          <div className="xl:flex-1 w-full relative group">
             <div
-              className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 border border-gray-200"
-              style={{ aspectRatio: "1 / 1" }}
+              className="relative overflow-hidden rounded-3xl bg-gray-50 p-8 border border-gray-200 w-full"
+              style={{ aspectRatio: "1 / 1", minHeight: "400px" }}
             >
               <Image
                 src={activeThumb || imagePlaceholder.src}
