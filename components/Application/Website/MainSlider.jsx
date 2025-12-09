@@ -6,31 +6,53 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Image from "next/image";
-import { sliderFour, sliderOne, sliderThree, sliderTwo } from "@/public/image";
+import {
+  sliderOnePc,
+  sliderTwoPc,
+  sliderThreePc,
+  sliderFourPc,
+  sliderFivePc,
+  sliderSixPc,
+  sliderOneMobile,
+  sliderTwoMobile,
+  sliderThreeMobile,
+  sliderFourMobile,
+  sliderFiveMobile,
+  sliderSixMobile,
+} from "@/public/image";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 const MainSlider = () => {
-  // TODO: Replace 'mobile' images with your dedicated vertical images (e.g., 800x1200px)
   const slides = [
     {
-      desktop: sliderOne,
-      mobile: sliderOne,
+      desktop: sliderOnePc,
+      mobile: sliderOneMobile,
       alt: "New Arrivals at E-Store",
     },
     {
-      desktop: sliderTwo,
-      mobile: sliderTwo,
+      desktop: sliderTwoPc,
+      mobile: sliderTwoMobile,
       alt: "Premium Fashion Collection",
     },
     {
-      desktop: sliderThree,
-      mobile: sliderThree,
+      desktop: sliderThreePc,
+      mobile: sliderThreeMobile,
       alt: "Trending Hoodies",
     },
     {
-      desktop: sliderFour,
-      mobile: sliderFour,
+      desktop: sliderFourPc,
+      mobile: sliderFourMobile,
       alt: "Oversized T-shirts",
+    },
+    {
+      desktop: sliderFivePc,
+      mobile: sliderFiveMobile,
+      alt: "Exclusive Deals",
+    },
+    {
+      desktop: sliderSixPc,
+      mobile: sliderSixMobile,
+      alt: "Shop the Look",
     },
   ];
 
