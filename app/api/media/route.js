@@ -5,6 +5,8 @@ import MediaModel from "@/Models/Media.model";
 import { NextResponse } from "next/server";
 import { escapeRegex } from "@/lib/escapeRegex";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   try {
     const auth = await isAuthenticated("admin");
@@ -35,14 +37,44 @@ export async function GET(request) {
     }
     // If deleteType is not provided or empty, show all (no filter)
 
-    // Add search filter
+    // Add search filter - search by filename, public_id, title, and alt
     if (search && search.trim()) {
+      const searchTerm = search.trim();
+      // Remove file extension if present for searching
+      const searchWithoutExt = searchTerm.replace(/\.[a-zA-Z0-9]+$/, '');
+      
+      // Escape the original search for exact matching
+      const escapedSearch = escapeRegex(searchWithoutExt);
+      const searchRegex = { $regex: escapedSearch, $options: "i" };
+      
+      // Normalize the search term: convert spaces/hyphens to underscores for flexible matching
+      const normalizedForUnderscore = searchWithoutExt
+        .replace(/[\s-]+/g, '_')  // Replace spaces and hyphens with underscores
+        .toLowerCase();
+      
+      // Also create a pattern that matches any combination of separators
+      // This will match "Single Jersey" with "Single_Jersey", "Single-Jersey", "Single Jersey" etc.
+      const flexiblePattern = searchWithoutExt
+        .replace(/[\s_-]+/g, '[\\s_-]*')  // Allow any whitespace/underscore/hyphen
+        .toLowerCase();
+      
+      // Build comprehensive OR conditions
+      const searchConditions = [
+        // Exact match in any field
+        { filename: searchRegex },
+        { public_id: searchRegex },
+        { title: searchRegex },
+        { alt: searchRegex },
+        // Flexible matching (spaces, underscores, hyphens are interchangeable)
+        { filename: { $regex: flexiblePattern, $options: "i" } },
+        { public_id: { $regex: flexiblePattern, $options: "i" } },
+        // Normalized underscore matching
+        { filename: { $regex: escapeRegex(normalizedForUnderscore), $options: "i" } },
+        { public_id: { $regex: escapeRegex(normalizedForUnderscore), $options: "i" } },
+      ];
+      
       filterConditions.push({
-        $or: [
-          { title: { $regex: escapeRegex(search.trim()), $options: "i" } },
-          { alt: { $regex: escapeRegex(search.trim()), $options: "i" } },
-          { public_id: { $regex: escapeRegex(search.trim()), $options: "i" } },
-        ],
+        $or: searchConditions,
       });
     }
 

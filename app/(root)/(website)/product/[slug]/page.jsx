@@ -3,6 +3,7 @@ import { preload } from "react-dom";
 
 import Script from "next/script";
 import xss from "xss";
+import { markdownToHtml } from "@/lib/markdownToHtml";
 import { getProductDetails } from "@/lib/actions/product.action";
 import {
   Breadcrumb,
@@ -172,7 +173,7 @@ const ProductPage = async ({ params, searchParams }) => {
     }
 
     const { products: product, variant, getColor, getSize, reviewCount } = data;
-    const sanitizedDescription = xss(product.description || "");
+    const sanitizedDescription = markdownToHtml(product.description || "");
 
     const imageUrl =
       variant?.media?.[0]?.secure_url || product?.media?.[0]?.secure_url;

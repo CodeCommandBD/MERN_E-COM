@@ -21,18 +21,19 @@ export async function POST(request) {
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
+      stock: true,
       description: true,
       media: true,
     });
     const validate = schema.safeParse(payload);
     if (!validate.success) {
-      return res(false, 400, "Invalid or missing fields.", validate.error);
+      console.error('Validation error:', validate.error);
+      return res(false, 400, "Invalid or missing fields.", validate.error.errors);
     }
     const produductData = validate.data;
 
     const existingProduct = await ProductModel.findOne({
       name: produductData.name,
-      
     });
     if (existingProduct) {
       return res(false, 200, "Product already created.");
@@ -45,8 +46,10 @@ export async function POST(request) {
       mrp: produductData.mrp,
       sellingPrice: produductData.sellingPrice,
       discountPercentage: produductData.discountPercentage,
-      description:encode(produductData.description),
+      stock: produductData.stock || 0,
+      description: encode(produductData.description),
       media: produductData.media,
+      sku: `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     });
     await newProduct.save();
 

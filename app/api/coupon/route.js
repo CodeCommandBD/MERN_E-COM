@@ -1,7 +1,9 @@
 import { isAuthenticated } from "@/lib/authentication";
+
+export const dynamic = "force-dynamic";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
-import CouponModel from "@/Models/Coupon.model"; 
+import CouponModel from "@/Models/Coupon.model";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
@@ -67,15 +69,16 @@ export async function GET(request) {
     // Column filteration
 
     filters.forEach((element) => {
-        if(element.id === 'discountPercentage' || element.id === 'miniShoppingAmount'){
-            matchQuery[element.id] =  Number(element.value)
-        }
-        else if(element.id === 'validity'){
-            matchQuery[element.id] =  {$gte: new Date(element.value)}
-        }
-        else{
-            matchQuery[element.id] = { $regex: element.value, $options: "i" };
-        }
+      if (
+        element.id === "discountPercentage" ||
+        element.id === "miniShoppingAmount"
+      ) {
+        matchQuery[element.id] = Number(element.value);
+      } else if (element.id === "validity") {
+        matchQuery[element.id] = { $gte: new Date(element.value) };
+      } else {
+        matchQuery[element.id] = { $regex: element.value, $options: "i" };
+      }
     });
 
     // sorting
@@ -87,7 +90,6 @@ export async function GET(request) {
 
     // Aggregate pipeline
     const aggregatePipeline = [
-     
       { $match: matchQuery },
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
       { $skip: start },

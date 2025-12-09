@@ -92,6 +92,7 @@ const AddProduct = () => {
       category: "",
       sellingPrice: "",
       discountPercentage: "",
+      stock: "",
       // media: [],
     },
   });
@@ -299,6 +300,27 @@ const AddProduct = () => {
                             readOnly
                             type="number"
                             placeholder="00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="stock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Stock <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Stock Quantity"
                             {...field}
                           />
                         </FormControl>

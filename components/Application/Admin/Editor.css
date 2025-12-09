@@ -1,0 +1,10 @@
+/* Ensure CKEditor SVGs are not blown up by Tailwind */
+.ck.ck-reset svg {
+  width: auto;
+  height: auto;
+}
+
+.ck.ck-icon svg {
+  width: auto;
+  height: auto;
+}

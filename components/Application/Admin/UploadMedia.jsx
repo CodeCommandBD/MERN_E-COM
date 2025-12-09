@@ -16,13 +16,33 @@ const UploadMedia = ({ isMultiple }) => {
     }
     const handleOnQueueEnd = async (results) => {
         const files = results.info.files 
-        const uploadedFiles = files.filter(file => file.uploadInfo).map(file => ({
-            asset_id: file.uploadInfo.asset_id,
-            public_id: file.uploadInfo.public_id,
-            secure_url: file.uploadInfo.secure_url,
-            path: file.uploadInfo.path,
-            thumbnail_url: file.uploadInfo.thumbnail_url,
-        }))
+        const uploadedFiles = files.filter(file => file.uploadInfo).map(file => {
+            // Try multiple ways to get the original filename
+            const uploadInfo = file.uploadInfo;
+            const filename = uploadInfo.original_filename || 
+                           uploadInfo.display_name || 
+                           uploadInfo.public_id ||
+                           file.name ||
+                           'unknown';
+            
+            console.log('File upload info:', {
+                original_filename: uploadInfo.original_filename,
+                display_name: uploadInfo.display_name,
+                public_id: uploadInfo.public_id,
+                file_name: uploadInfo.file_name,
+                extracted_filename: filename,
+                full_uploadInfo: uploadInfo
+            });
+            
+            return {
+                asset_id: uploadInfo.asset_id,
+                public_id: uploadInfo.public_id,
+                secure_url: uploadInfo.secure_url,
+                path: uploadInfo.path,
+                thumbnail_url: uploadInfo.thumbnail_url,
+                filename: filename,
+            };
+        })
         if(uploadedFiles.length > 0 ){
             try {
                 const{data: mediaUploadResponse } = await axios.post('/api/media/create', uploadedFiles)

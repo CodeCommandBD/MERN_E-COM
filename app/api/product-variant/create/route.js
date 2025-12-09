@@ -42,7 +42,11 @@ export async function POST(request) {
       return res(false, 404, "Product not found.");
     }
 
+    // Auto-generate name: Product Name - Color - Size
+    const variantName = `${existingProduct.name} - ${variantData.color} - ${variantData.size}`;
+
     const newProductVariant = new ProductVariantModel({
+      name: variantName,
       color: variantData.color,
       sku: variantData.sku,
       size: variantData.size,

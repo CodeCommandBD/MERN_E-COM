@@ -26,6 +26,10 @@ const mediaSchema =  new mongoose.Schema({
         required: false,
         trim: true
     },
+    filename: {
+        type: String,
+        trim: true
+    },
     alt: {
         type: String,
         trim: true

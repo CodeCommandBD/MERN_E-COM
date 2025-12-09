@@ -1,4 +1,8 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  keepPreviousData,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
 import {
@@ -70,10 +74,76 @@ const DataTable = ({
     deleteType: "",
   });
 
+  const queryClient = useQueryClient();
+
   const deleteMutation = useDeleteMutation(
     queryKey,
     deleteEndpoint,
-    onDeleteSuccess
+    onDeleteSuccess,
+    {
+      onMutate: async ({ ids, deleteType: actionType }) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({ queryKey: [queryKey] });
+
+        // Snapshot the previous value
+        const previousQueries = queryClient.getQueriesData({
+          queryKey: [queryKey],
+        });
+
+        // Optimistically update to the new value
+        queryClient.setQueriesData({ queryKey: [queryKey] }, (old) => {
+          if (!old) return old;
+          // Expected structure: { data: [...], meta: {...} } or { data: [...] }
+          // We need to filter 'old.data' or 'old' if it's an array
+          let newData = [];
+          let newTotal = 0;
+
+          // Optimization: Use Set for O(1) lookup
+          const idSet = new Set(ids);
+          const filterFn = (item) => !idSet.has(item._id);
+
+          if (Array.isArray(old)) {
+            // Direct array
+            newData = old.filter(filterFn);
+            return newData;
+          } else if (old.data && Array.isArray(old.data)) {
+            // API Response wrapper
+            newData = old.data.filter(filterFn);
+            newTotal = Math.max(
+              0,
+              (old.meta?.totalRowCount || old.data.length) - ids.length
+            );
+
+            return {
+              ...old,
+              data: newData,
+              meta: {
+                ...old.meta,
+                totalRowCount: newTotal,
+              },
+            };
+          }
+          return old;
+        });
+
+        // Optimistically update external status counts if onStatusUpdate provided
+        // (This is harder to do generic without knowing structure, skipping for now)
+
+        // Return a context object with the snapshotted value
+        return { previousQueries };
+      },
+      onError: (err, newTodo, context) => {
+        if (context?.previousQueries) {
+          context.previousQueries.forEach(([key, data]) => {
+            queryClient.setQueryData(key, data);
+          });
+        }
+      },
+      onSettled: () => {
+        // Invalidate to trigger cache-busted refetch
+        queryClient.invalidateQueries({ queryKey: [queryKey] });
+      },
+    }
   );
 
   // Delete method
@@ -188,6 +258,7 @@ const DataTable = ({
       Url.searchParams.set("globalFilters", globalFilter ?? "");
       Url.searchParams.set("sorting", JSON.stringify(sorting ?? []));
       Url.searchParams.set("deleteType", deleteType);
+      Url.searchParams.set("_t", Date.now());
 
       //use whatever fetch library you want, fetch, axios, etc
       const { data } = await axios.get(Url.href);

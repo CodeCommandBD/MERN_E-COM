@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import OrderModel from "@/Models/Order.model";
 import { escapeRegex } from "@/lib/escapeRegex";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   try {
     const auth = await isAuthenticated("admin");

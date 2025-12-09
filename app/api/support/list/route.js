@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import SupportChatModel from "@/Models/SupportChat.model";
 import { escapeRegex } from "@/lib/escapeRegex";
 
+export const dynamic = "force-dynamic";
+
 // Get all support tickets (for admin) - Updated to support DataTableWrapper
 export async function GET(request) {
   try {

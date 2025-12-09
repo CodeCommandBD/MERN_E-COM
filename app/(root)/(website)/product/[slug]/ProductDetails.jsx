@@ -406,7 +406,7 @@ const ProductDetails = ({
           {/* Content */}
           <div className="p-8">
             <div
-              className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
+              className="text-gray-700 leading-relaxed space-y-3"
               dangerouslySetInnerHTML={{
                 __html: sanitizedDescription,
               }}

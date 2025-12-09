@@ -5,6 +5,8 @@ import ProductModel from "@/Models/Product.model";
 import { NextResponse } from "next/server";
 import { escapeRegex } from "@/lib/escapeRegex";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   try {
     const auth = await isAuthenticated("admin");
@@ -241,6 +243,7 @@ export async function GET(request) {
           mrp: 1,
           sellingPrice: 1,
           discountPercentage: 1,
+          stock: 1,
           category: "$categoryData.name",
           createdAt: 1,
           updatedAt: 1,
