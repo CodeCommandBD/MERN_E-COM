@@ -47,6 +47,7 @@ const AddProductVariant = () => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [productOption, setProductOption] = useState([]);
+  const [productData, setProductData] = useState({}); // Store full product data
   const [editorKey, setEditorKey] = useState(0);
 
   const { data: getProduct } = useFetch(
@@ -67,6 +68,16 @@ const AddProductVariant = () => {
         };
       });
       setProductOption(options);
+      
+      // Store full product data for price lookup
+      const productMap = {};
+      data.forEach((item) => {
+        productMap[item._id] = {
+          mrp: item.mrp,
+          sellingPrice: item.sellingPrice,
+        };
+      });
+      setProductData(productMap);
     }
   }, [getProduct]);
 
@@ -97,6 +108,19 @@ const AddProductVariant = () => {
   });
 
   // discount percentage calculate
+  // Auto-populate MRP and Selling Price when product is selected
+  useEffect(() => {
+    const selectedProductId = form.getValues("product");
+    
+    if (selectedProductId && productData[selectedProductId]) {
+      const { mrp, sellingPrice } = productData[selectedProductId];
+      console.log("Setting prices from product:", { mrp, sellingPrice });
+      form.setValue("mrp", mrp);
+      form.setValue("sellingPrice", sellingPrice);
+    }
+  }, [form.watch("product"), productData]);
+
+  // Calculate discount percentage when MRP or Selling Price changes
   useEffect(() => {
     const mrp = form.getValues("mrp");
     const sellingPrice = form.getValues("sellingPrice");
@@ -106,6 +130,52 @@ const AddProductVariant = () => {
       form.setValue("discountPercentage", Math.round(discountPercentage));
     }
   }, [form.watch("mrp"), form.watch("sellingPrice")]);
+
+  // Auto-generate SKU from product name, color, and size
+  const generateSKU = (productId, colorVal, sizeVal) => {
+    if (!productId || !colorVal || !sizeVal) return "";
+
+    // Find product name from productOption
+    const selectedProduct = productOption.find(p => p.value === productId);
+    const productName = selectedProduct?.label || "";
+
+    if (!productName) return "";
+
+    // Extract first letter from each word and take first 3 words
+    const productAbbrev = productName
+      .split(" ")
+      .slice(0, 3)
+      .map(word => word.slice(0, 1).toUpperCase())
+      .join("");
+    
+    // Color abbreviation (first 3 letters, uppercase)
+    const colorAbbrev = colorVal.slice(0, 3).toUpperCase();
+    
+    // Size as is
+    const sizeAbbrev = sizeVal.toUpperCase();
+    
+    // Random 6-character alphanumeric code
+    const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    return `${productAbbrev}-${colorAbbrev}-${sizeAbbrev}-${randomCode}`;
+  };
+
+  // Generate SKU whenever product, color, or size changes
+  useEffect(() => {
+    const product = form.getValues("product");
+    const color = form.getValues("color");
+    const size = form.getValues("size");
+
+    console.log("Generating SKU with:", { product, color, size });
+
+    if (product && color && size) {
+      const sku = generateSKU(product, color, size);
+      console.log("Generated SKU:", sku);
+      if (sku) {
+        form.setValue("sku", sku);
+      }
+    }
+  }, [form.watch("product"), form.watch("color"), form.watch("size")]);
 
   // Sync selectedMedia with form media field
   useEffect(() => {
@@ -219,6 +289,7 @@ const AddProductVariant = () => {
                           <Input
                             type="text"
                             placeholder="Enter SKU"
+                            readOnly
                             {...field}
                           />
                         </FormControl>

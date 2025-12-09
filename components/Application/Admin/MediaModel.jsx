@@ -2,11 +2,13 @@ import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import {loader} from "@/public/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import ModalMediaBlock from "./ModalMediaBlock";
 import { showToast } from "@/lib/showToast";
 import React from "react";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const MediaModel = ({
   open,
@@ -19,10 +21,30 @@ const MediaModel = ({
 
 
   const [previouslySelected, setPreviouslySelected] = useState([])
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchMedia = async (pageParam = 0) => {
+    const params = new URLSearchParams({
+      page: pageParam,
+      limit: 50,
+      deleteType: "SD"
+    });
+    
+    if (debouncedSearchTerm.trim()) {
+      params.append("search", debouncedSearchTerm);
+    }
+
     const { data: response } = await axios.get(
-      `/api/media?page=${pageParam}&limit=18&deleteType=SD`
+      `/api/media?${params.toString()}`
     );
     return response;
   };
@@ -35,8 +57,9 @@ const MediaModel = ({
     isFetching,
     fetchNextPage,
     hasNextPage,
+    refetch,
   } = useInfiniteQuery({
-    queryKey: ["MediaModel"],
+    queryKey: ["MediaModel", debouncedSearchTerm],
     queryFn: async ({ pageParam }) => await fetchMedia(pageParam),
     placeholderData: keepPreviousData,
     initialPageParam: 0,
@@ -67,13 +90,22 @@ const MediaModel = ({
       {children}
       <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
         <DialogContent className="p-0">
-          <div className="h-[90vh] bg-white dark:bg-gray-800 p-3">
+          <div className="h-[90vh] bg-white dark:bg-gray-800 p-3 flex flex-col">
             <div className="mb-3 pb-3 border-b">
-              <DialogTitle className="p-0 text-lg font-semibold">
+              <DialogTitle className="p-0 text-lg font-semibold mb-3">
                 Media Selection
               </DialogTitle>
+              <div className="relative">
+                <Input
+                  placeholder="Search by title, alt, or public ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="rounded-lg pl-9"
+                />
+                <Search className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
+              </div>
             </div>
-            <div className="h-[calc(100%-150px)] overflow-auto py-2">
+            <div className="flex-1 overflow-auto py-2">
               {isPending ? (
                 <div className="size-full flex justify-center items-center">
                   <Image
@@ -87,9 +119,13 @@ const MediaModel = ({
                 <div className="size-full flex justify-center items-center">
                   <span>{error.message}</span>
                 </div>
+              ) : data?.pages?.[0]?.mediaData?.length === 0 ? (
+                <div className="size-full flex justify-center items-center">
+                  <span className="text-gray-500">No images found</span>
+                </div>
               ) : (
                 <>
-                  <div className="grid lg:grid-cols-6 grid-cols-3 gap-2">
+                  <div className="grid lg:grid-cols-6 md:grid-cols-5 sm:grid-cols-4 grid-cols-3 gap-2">
                     {data.pages?.map((page, index) => (
                       <React.Fragment key={index}>
                         {page?.mediaData?.map((mediaItem) => (
@@ -105,6 +141,18 @@ const MediaModel = ({
                       </React.Fragment>
                     ))}
                   </div>
+                  {hasNextPage && (
+                    <div className="mt-4 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetching}
+                        className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                      >
+                        {isFetching ? "Loading..." : "Load More Images"}
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </div>

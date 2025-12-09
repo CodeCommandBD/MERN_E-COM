@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, useRef, useMemo } from "react";
+import "./Editor.css";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { decode } from "entities";
 
 import {
   ClassicEditor,
@@ -78,56 +80,19 @@ import {
   Underline,
   WordCount,
 } from "ckeditor5";
-const CKEDITOR_CSS_HREF = "/ckeditor5.css";
+import "ckeditor5/ckeditor5.css";
 
-import { decode } from "entities";
-
-/**
- * Create a free account with a trial: https://portal.ckeditor.com/checkout?plan=free
- */
 const LICENSE_KEY = "GPL"; // or <YOUR_LICENSE_KEY>.
 
 export default function Editor({ onChange, initialData }) {
   const editorContainerRef = useRef(null);
   const editorRef = useRef(null);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
-  const hasLoadedStylesRef = useRef(false);
 
   useEffect(() => {
     setIsLayoutReady(true);
-
     return () => setIsLayoutReady(false);
   }, []);
-
-  useEffect(() => {
-    if (!isLayoutReady || hasLoadedStylesRef.current) return;
-
-    hasLoadedStylesRef.current = true;
-
-    // Defer CKEditor stylesheet so it does not block initial paint.
-    const preload = document.createElement("link");
-    preload.rel = "preload";
-    preload.as = "style";
-    preload.href = CKEDITOR_CSS_HREF;
-    preload.crossOrigin = "anonymous";
-    document.head.appendChild(preload);
-
-    const stylesheet = document.createElement("link");
-    stylesheet.id = "ckeditor5-styles";
-    stylesheet.rel = "stylesheet";
-    stylesheet.href = CKEDITOR_CSS_HREF;
-    stylesheet.media = "print";
-    stylesheet.onload = () => {
-      stylesheet.media = "all";
-    };
-    document.head.appendChild(stylesheet);
-
-    return () => {
-      preload.remove();
-      stylesheet.remove();
-      hasLoadedStylesRef.current = false;
-    };
-  }, [isLayoutReady]);
 
   const { editorConfig } = useMemo(() => {
     if (!isLayoutReady) {

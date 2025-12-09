@@ -2,7 +2,6 @@ import { Checkbox } from "@mui/material";
 import Image from "next/image";
 import React from "react";
 
-
 const ModalMediaBlock = ({
   media,
   selectMedia,
@@ -26,14 +25,14 @@ const ModalMediaBlock = ({
           },
         ];
       }
-      setSelectMedia(newSelectedMedia)
+      setSelectMedia(newSelectedMedia);
     } else {
-        setSelectMedia([
-            {
-                _id: media._id,
-                url: media.secure_url,
-            },
-        ])
+      setSelectMedia([
+        {
+          _id: media._id,
+          url: media.secure_url,
+        },
+      ]);
     }
   };
   return (
@@ -58,6 +57,12 @@ const ModalMediaBlock = ({
           alt={media.public_id}
           className="object-cover md:h-[150px] h-[100px]"
         ></Image>
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300 transition-all z-20">
+          <div className="absolute inset-0 bg-black/20"></div>
+          <p className="relative text-white text-xs font-medium text-center px-4 py-2 bg-black/80 rounded mx-4 break-all shadow-sm">
+            {media.name ? media.name : media.public_id}
+          </p>
+        </div>
       </div>
     </label>
   );

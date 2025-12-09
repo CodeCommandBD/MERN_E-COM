@@ -2,10 +2,16 @@ import { showToast } from "@/lib/showToast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
-const useDeleteMutation = (querykey, deleteEndpoint, onDeleteSuccess) => {
+const useDeleteMutation = (
+  querykey,
+  deleteEndpoint,
+  onDeleteSuccess,
+  options = {}
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: async ({ ids, deleteType }) => {
       const { data: response } = await axios({
         url: deleteEndpoint,

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ADMIN_DASHBOARD, ADMIN_MEDIA_SHOW } from "@/Routes/AdminPanelRoute";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import MediaSection from "@/components/Application/Admin/MediaSection";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -40,9 +40,7 @@ const Media = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const { data: stats, refetch: refetchStats } = useFetch(
-    "/api/media/stats"
-  );
+  const { data: stats, refetch: refetchStats } = useFetch("/api/media/stats");
   const [statsLive, setStatsLive] = useState(null);
 
   const searchParams = useSearchParams();
@@ -91,7 +89,7 @@ const Media = () => {
     const deleteTypeParam = deleteType ? `&&deleteType=${deleteType}` : "";
     const searchParam = search ? `&&search=${encodeURIComponent(search)}` : "";
     const { data: response } = await axios.get(
-      `/api/media?page=${page}&&limit=10${deleteTypeParam}${searchParam}`
+      `/api/media?page=${page}&&limit=10${deleteTypeParam}${searchParam}&_t=${Date.now()}`
     );
 
     return response;
@@ -107,7 +105,8 @@ const Media = () => {
     refetch,
   } = useInfiniteQuery({
     queryKey: ["delete-data", deleteType, debouncedSearchTerm],
-    queryFn: async ({ pageParam }) => await fetchMedia(pageParam, deleteType, debouncedSearchTerm),
+    queryFn: async ({ pageParam }) =>
+      await fetchMedia(pageParam, deleteType, debouncedSearchTerm),
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => {
       const nextPage = pages.length;
@@ -115,7 +114,87 @@ const Media = () => {
     },
   });
 
-  const deleteMutation = useDeleteMutation("delete-data", "/api/media/delete");
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useDeleteMutation(
+    "delete-data",
+    "/api/media/delete",
+    null,
+    {
+      onMutate: async ({ ids, deleteType: actionType }) => {
+        // Cancel any outgoing refetches
+        await queryClient.cancelQueries({ queryKey: ["delete-data"] });
+
+        // Snapshot the previous value of ALL matching queries
+        const previousQueries = queryClient.getQueriesData({
+          queryKey: ["delete-data"],
+        });
+
+        // Optimistically update ALL matching queries
+        queryClient.setQueriesData({ queryKey: ["delete-data"] }, (old) => {
+          if (!old) return old;
+          // If it's an infinite query structure (has pages)
+          if (old.pages && Array.isArray(old.pages)) {
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                mediaData: page.mediaData.filter(
+                  (item) => !ids.includes(item._id)
+                ),
+              })),
+            };
+          }
+          return old;
+        });
+
+        // Optimistically update stats
+        const count = ids.length;
+        setStatsLive((prev) => {
+          if (!prev) return prev;
+          const newStatusData = prev.statusData.map((s) => ({ ...s }));
+          const active = newStatusData.find((s) => s.status === "active");
+          const trashed = newStatusData.find((s) => s.status === "trashed");
+          const total = newStatusData.find((s) => s.status === "total");
+
+          if (actionType === "SD") {
+            if (active) active.count = Math.max(0, active.count - count);
+            if (trashed) trashed.count += count;
+          } else if (actionType === "PD") {
+            if (trashed) trashed.count = Math.max(0, trashed.count - count);
+            if (total) total.count = Math.max(0, total.count - count);
+          } else if (actionType === "RSD") {
+            if (trashed) trashed.count = Math.max(0, trashed.count - count);
+            if (active) active.count += count;
+          }
+          return { ...prev, statusData: newStatusData };
+        });
+
+        // Reset selection immediately
+        setSelectAll(false);
+        setSelectedMedia([]);
+
+        // Return a context object with the snapshotted value
+        return { previousQueries };
+      },
+      onError: (err, newTodo, context) => {
+        // Rollback all queries
+        if (context?.previousQueries) {
+          context.previousQueries.forEach(([key, data]) => {
+            queryClient.setQueryData(key, data);
+          });
+        }
+        refetchStats(); // Revert stats on error
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: ["delete-data"] });
+        refetchStats();
+      },
+      onSuccess: () => {
+        // Additional success logic if needed, but invalidation handles it
+      },
+    }
+  );
 
   const handleDelete = (selectedMedia, deleteType) => {
     if (deleteType === "PD") {
@@ -243,17 +322,36 @@ const Media = () => {
 
           <div className="grid md:grid-cols-3 gap-4 mb-6">
             {(() => {
-              const statusData = statsLive?.statusData || stats?.data?.statusData || [];
-              const by = (name) => statusData.find((s) => s.status === name)?.count || 0;
+              const statusData =
+                statsLive?.statusData || stats?.data?.statusData || [];
+              const by = (name) =>
+                statusData.find((s) => s.status === name)?.count || 0;
               const cards = [
-                { label: "Total Media", value: by("total"), color: "text-black" },
-                { label: "Active", value: by("active"), color: "text-green-600" },
-                { label: "Trashed", value: by("trashed"), color: "text-red-600" },
+                {
+                  label: "Total Media",
+                  value: by("total"),
+                  color: "text-black",
+                },
+                {
+                  label: "Active",
+                  value: by("active"),
+                  color: "text-green-600",
+                },
+                {
+                  label: "Trashed",
+                  value: by("trashed"),
+                  color: "text-red-600",
+                },
               ];
               return cards.map((c, i) => (
-                <div key={i} className="rounded-lg border bg-white dark:bg-card p-4">
+                <div
+                  key={i}
+                  className="rounded-lg border bg-white dark:bg-card p-4"
+                >
                   <p className="text-sm text-muted-foreground">{c.label}</p>
-                  <p className={`mt-1 text-2xl font-semibold ${c.color}`}>{c.value}</p>
+                  <p className={`mt-1 text-2xl font-semibold ${c.color}`}>
+                    {c.value}
+                  </p>
                 </div>
               ));
             })()}

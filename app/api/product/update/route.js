@@ -21,6 +21,7 @@ export async function PUT(request) {
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
+      stock: true,
       description: true,
       media: true,
     });
@@ -44,6 +45,7 @@ export async function PUT(request) {
     getProduct.mrp = validateData.mrp;
     getProduct.sellingPrice = validateData.sellingPrice;
     getProduct.discountPercentage = validateData.discountPercentage;
+    getProduct.stock = validateData.stock;
     getProduct.description = encode(validateData.description);
     getProduct.media = validateData.media;
     await getProduct.save();

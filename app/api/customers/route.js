@@ -1,4 +1,6 @@
 import { isAuthenticated } from "@/lib/authentication";
+
+export const dynamic = "force-dynamic";
 import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { NextResponse } from "next/server";
