@@ -20,8 +20,8 @@ import sliderFourMobile from './assets/images/slideFourMob.webp'
 import sliderFiveMobile from './assets/images/slideFiveMob.webp'
 import sliderSixMobile from './assets/images/slideSixMob.webp'
 
-import bannerOne from './assets/images/banner1.webp'
-import bannerTwo from './assets/images/banner2.webp'
+import bannerOne from './assets/images/bannerOne.webp'
+import bannerTwo from './assets/images/bannerTwo.webp'
 import advertisingBanner from './assets/images/advertising-banner.webp'
 import pageTitle from './assets/images/page-title.webp'
 
