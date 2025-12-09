@@ -13,6 +13,13 @@ const assistant = Assistant({
   display: "swap",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#7c3aed",
+};
+
 export const metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
@@ -75,35 +82,26 @@ export const metadata = {
   verification: {
     google: "your-google-verification-code", // Replace with actual code when available
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <head>
-        {/* Mobile optimization */}
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=5"
-        />
-        <meta name="theme-color" content="#7c3aed" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        {/* Resource hints to pull key assets sooner */}
-
-        {/* Preload critical CSS chunks observed in production Lighthouse */}
-        {/* Preload critical CSS chunks observed in production Lighthouse - REMOVED dynamic chunks to avoid 404s/unused warnings */}
-        <style
-          data-critical="above-the-fold"
-          // Inline only the minimal atoms needed for first paint.
-          dangerouslySetInnerHTML={{ __html: criticalCss }}
-        />
-      </head>
       <body
         className={`${assistant.className} antialiased`}
         suppressHydrationWarning={true}
       >
+        <style
+          data-critical="above-the-fold"
+          dangerouslySetInnerHTML={{ __html: criticalCss }}
+        />
         <GlobalProvider>
           <div suppressHydrationWarning={true}>
             <StylePreloadClient />
