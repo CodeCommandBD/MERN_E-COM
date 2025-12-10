@@ -59,16 +59,14 @@ export async function generateMetadata({ params, searchParams }) {
     const absoluteImage = imageUrl
       ? imageUrl.startsWith("http")
         ? imageUrl
-        : `${
-            process.env.NEXT_PUBLIC_SITE_URL ||
-            process.env.NEXT_PUBLIC_APP_URL ||
-            ""
-          }${imageUrl}`
+        : `${process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        ""
+        }${imageUrl}`
       : undefined;
 
-    const canonicalUrl = `${
-      process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""
-    }/product/${product.slug}`;
+    const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""
+      }/product/${product.slug}`;
 
     return {
       title,
@@ -118,9 +116,8 @@ function ProductJsonLd({ product, variant }) {
     },
     offers: {
       "@type": "Offer",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/product/${
-        product.slug
-      }`,
+      url: `${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/product/${product.slug
+        }`,
       priceCurrency: "BDT",
       price: variant?.sellingPrice || product.sellingPrice,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -187,98 +184,98 @@ const ProductPage = async ({ params, searchParams }) => {
         <ProductJsonLd product={product} variant={variant} />
 
         <main id="main-content" className="w-full">
-          <div className="container mx-auto px-4 lg:px-8 max-w-[1440px]">
-          {/* Breadcrumb */}
-          <div className="my-6 lg:my-10">
-            <div className="bg-white/80 backdrop-blur-md rounded-xl px-4 py-2 border border-gray-200 inline-block">
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem>
-                    <BreadcrumbLink
-                      href="/"
-                      className="hover:text-gray-700 transition-colors text-sm lg:text-base"
-                    >
-                      Home
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbLink
-                      href={WEBSITE_SHOP}
-                      className="hover:text-gray-700 transition-colors text-sm lg:text-base"
-                    >
-                      Shop
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="font-semibold text-gray-900 text-sm lg:text-base line-clamp-1 max-w-[150px] lg:max-w-none">
-                      {product.name}
-                    </BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
-          </div>
-
-          {/* Main Product Section - Responsive Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-16 mb-20 items-start">
-            {/* Visuals (Client Component) */}
-            <div className="w-full">
-              <ProductGallery
-                key={variant?._id || product._id}
-                media={variant.media || product.media}
-                productName={product.name}
-                activeColor={variant.color}
-              />
-            </div>
-
-            {/* Info (Server Component + Client Actions) */}
-            <div className="w-full flex flex-col gap-6">
-              <ProductInfo
-                product={product}
-                variant={variant}
-                Color={getColor}
-                Size={getSize}
-                reviewCount={reviewCount}
-                sanitizedDescription={sanitizedDescription}
-              />
-              {/* Client Actions: Quantity, Add to Cart */}
-              <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden w-full">
-                <ProductActions product={product} variant={variant} />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            {/* Breadcrumb */}
+            <div className="my-6 lg:my-10">
+              <div className="bg-white/80 backdrop-blur-md rounded-xl px-4 py-2 border border-gray-200 inline-block">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href="/"
+                        className="hover:text-gray-700 transition-colors text-sm lg:text-base"
+                      >
+                        Home
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href={WEBSITE_SHOP}
+                        className="hover:text-gray-700 transition-colors text-sm lg:text-base"
+                      >
+                        Shop
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="font-semibold text-gray-900 text-sm lg:text-base line-clamp-1 max-w-[150px] lg:max-w-none">
+                        {product.name}
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
               </div>
             </div>
-          </div>
 
-          {/* Product Description Section */}
-          <div className="mb-20 w-full">
-            <div className="rounded-3xl bg-white border border-gray-200 overflow-hidden w-full">
-              <div className="p-6 bg-gray-50 border-b border-gray-200">
-                <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                  Product Description
-                </h2>
+            {/* Main Product Section - Responsive Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-16 mb-20 items-start">
+              {/* Visuals (Client Component) */}
+              <div className="w-full">
+                <ProductGallery
+                  key={variant?._id || product._id}
+                  media={variant.media || product.media}
+                  productName={product.name}
+                  activeColor={variant.color}
+                />
               </div>
-              <div className="p-6 lg:p-8">
-                <div
-                  className="text-gray-700 leading-relaxed overflow-hidden space-y-3 w-full"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizedDescription,
-                  }}
-                ></div>
+
+              {/* Info (Server Component + Client Actions) */}
+              <div className="w-full flex flex-col gap-6">
+                <ProductInfo
+                  product={product}
+                  variant={variant}
+                  Color={getColor}
+                  Size={getSize}
+                  reviewCount={reviewCount}
+                  sanitizedDescription={sanitizedDescription}
+                />
+                {/* Client Actions: Quantity, Add to Cart */}
+                <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden w-full">
+                  <ProductActions product={product} variant={variant} />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Product Review Section */}
-          <Suspense
-            fallback={
-              <div className="flex justify-center py-20">
-                <Loading />
+            {/* Product Description Section */}
+            <div className="mb-20 w-full">
+              <div className="rounded-3xl bg-white border border-gray-200 overflow-hidden w-full">
+                <div className="p-6 bg-gray-50 border-b border-gray-200">
+                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                    Product Description
+                  </h2>
+                </div>
+                <div className="p-6 lg:p-8">
+                  <div
+                    className="text-gray-700 leading-relaxed overflow-hidden space-y-3 w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizedDescription,
+                    }}
+                  ></div>
+                </div>
               </div>
-            }
-          >
-            <ProductReview product={product} />
-          </Suspense>
+            </div>
+
+            {/* Product Review Section */}
+            <Suspense
+              fallback={
+                <div className="flex justify-center py-20">
+                  <Loading />
+                </div>
+              }
+            >
+              <ProductReview product={product} />
+            </Suspense>
           </div>
         </main>
       </>

@@ -52,7 +52,7 @@ export async function POST(req) {
       "+password"
     );
     if (!getUser) {
-      return res(false, 400, "Invalid login credentials.");
+      return res(false, 400, "No account found with this email address. Please create an account first or check your email.");
     }
 
     // TODO:############# resend email verification link
@@ -85,7 +85,7 @@ export async function POST(req) {
 
     const isPasswordVerified = await getUser.comparePassword(password);
     if (!isPasswordVerified) {
-      return res(false, 400, "Invalid login password.");
+      return res(false, 400, "Incorrect password. Please check and try again or use forgot password to reset it.");
     }
     //TODO: ###########  OTP Generate
     await OTPModel.deleteMany({ email }); //TODO ############ deleting old otp
