@@ -65,7 +65,8 @@ const ProductBox = ({ product }) => {
           onClick={handleProductClick}
         >
           <Suspense fallback={<ImageSkeleton />}>
-            <Image
+            <div className="relative">
+              <Image
               src={imageSrc}
               alt={altText}
               title={mediaItem?.title || product?.name}
@@ -78,6 +79,12 @@ const ProductBox = ({ product }) => {
               blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
               itemProp="image"
             />
+            {product?.stock === 0 && (
+              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                Stock Out
+              </div>
+            )}
+            </div>
           </Suspense>
           <div className="p-3">
             <h2 className="text-sm md:text-lg font-semibold line-clamp-2" itemProp="name">
