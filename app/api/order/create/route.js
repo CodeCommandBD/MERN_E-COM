@@ -45,18 +45,20 @@ export async function POST(request) {
     // If authenticated, we MUST use the authored ID to prevent spoofing
     const auth = await isAuthenticated();
     let validatedUserId = null;
+    let guestId = null;
 
     if (auth.isAuth) {
       validatedUserId = String(auth._id);
-    }
-
-    if (auth.isAuth) {
-      validatedUserId = String(auth._id);
+    } else {
+      // For guest users, generate or use a guestId from request
+      // This can be a UUID stored in browser localStorage
+      guestId = body.guestId || null;
     }
 
     // Create order
     const order = await OrderModel.create({
-      userId: validatedUserId, // Use the verified ID or null
+      userId: validatedUserId, // Use the verified ID or null for guests
+      guestId: guestId, // Track guest orders by guestId
       customerInfo,
       shippingAddress,
       items,

@@ -54,6 +54,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    // Guest identifier - used to track guest orders before login
+    guestId: {
+      type: String,
+      default: null,
+    },
     orderNumber: {
       type: String,
       unique: true,

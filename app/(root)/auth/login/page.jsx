@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zSchema } from "@/lib/zodSchema";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
+import { migrateGuestOrders, getGuestId } from "@/lib/guestOrderTracking";
 
 import {
   Form,
@@ -116,6 +117,16 @@ const LoginPage = () => {
       if (otpResponse.success) {
         showToast("success", "Login successful!");
         dispatch(login(otpResponse.data));
+        
+        // Migrate guest orders to authenticated user
+        const guestId = getGuestId();
+        if (guestId) {
+          const migrationResult = await migrateGuestOrders(guestId);
+          if (migrationResult.success && migrationResult.data?.migratedCount > 0) {
+            console.log(`Migrated ${migrationResult.data.migratedCount} guest orders`);
+          }
+        }
+        
         try {
           if (searchParams?.has("callback")) {
             router.push(searchParams.get("callback"));

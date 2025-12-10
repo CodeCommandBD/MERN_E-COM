@@ -26,6 +26,7 @@ import { showToast } from "@/lib/showToast";
 import axios from "axios";
 import { z } from "zod";
 import { Tag } from "lucide-react";
+import { getOrCreateGuestId } from "@/lib/guestOrderTracking";
 const Checkout = () => {
   const bredCrumb = {
     title: "Checkout",
@@ -206,6 +207,7 @@ const Checkout = () => {
         paymentMethod: formData.paymentMethod,
         orderNote: formData.orderNote,
         couponCode: isCouponApplied ? couponForm.getValues("code") : null,
+        guestId: getOrCreateGuestId(), // Add guest ID for tracking
       };
 
       // If payment method is card, redirect to Stripe
