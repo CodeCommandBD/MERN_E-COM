@@ -31,6 +31,8 @@ export async function POST(request) {
       return res(false, 400, "Invalid or missing fields.", validate.error.errors);
     }
     const produductData = validate.data;
+    
+    console.log("Creating product with stock:", produductData.stock, "Type:", typeof produductData.stock);
 
     const existingProduct = await ProductModel.findOne({
       name: produductData.name,
@@ -46,14 +48,19 @@ export async function POST(request) {
       mrp: produductData.mrp,
       sellingPrice: produductData.sellingPrice,
       discountPercentage: produductData.discountPercentage,
-      stock: produductData.stock || 0,
+      stock: Number(produductData.stock ?? 0),
       description: encode(produductData.description),
       media: produductData.media,
       sku: `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     });
-    await newProduct.save();
+    const savedProduct = await newProduct.save();
 
-    return res(true, 200, "Product added successfully.");
+    return res(true, 200, "Product added successfully.", {
+      _id: savedProduct._id,
+      name: savedProduct.name,
+      slug: savedProduct.slug,
+      stock: savedProduct.stock,
+    });
   } catch (error) {
     return catchError(error);
   }

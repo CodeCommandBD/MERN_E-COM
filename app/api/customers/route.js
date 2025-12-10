@@ -85,6 +85,7 @@ export async function GET(request) {
           phone: 1,
           address: 1,
           avatar: 1,
+          role: 1,
           isEmailVerified: 1,
           createdAt: 1,
           updatedAt: 1,

@@ -71,7 +71,17 @@ export async function GET(request) {
     // Build global search conditions (for aggregation match after lookups)
     let globalSearchConditions = null;
     if (globalFilters) {
+      // Flexible search like media API - spaces, hyphens, underscores interchangeable
+      const normalizedForUnderscore = globalFilters
+        .replace(/[\s-]+/g, '_')
+        .toLowerCase();
+      
+      const flexiblePattern = globalFilters
+        .replace(/[\s_-]+/g, '[\\s_-]*')
+        .toLowerCase();
+
       globalSearchConditions = [
+        // Exact match
         { name: { $regex: escapeRegex(globalFilters), $options: "i" } },
         { slug: { $regex: escapeRegex(globalFilters), $options: "i" } },
         {
@@ -80,6 +90,12 @@ export async function GET(request) {
             $options: "i",
           },
         },
+        // Flexible pattern matching for name and slug
+        { name: { $regex: flexiblePattern, $options: "i" } },
+        { slug: { $regex: flexiblePattern, $options: "i" } },
+        // Normalized underscore matching
+        { name: { $regex: escapeRegex(normalizedForUnderscore), $options: "i" } },
+        { slug: { $regex: escapeRegex(normalizedForUnderscore), $options: "i" } },
         {
           $expr: {
             $regexMatch: {
@@ -113,9 +129,25 @@ export async function GET(request) {
     // Build base search conditions (for base match before lookups)
     let baseSearchConditions = null;
     if (globalFilters) {
+      // Flexible search like media API
+      const normalizedForUnderscore = globalFilters
+        .replace(/[\s-]+/g, '_')
+        .toLowerCase();
+      
+      const flexiblePattern = globalFilters
+        .replace(/[\s_-]+/g, '[\\s_-]*')
+        .toLowerCase();
+
       baseSearchConditions = [
+        // Exact match
         { name: { $regex: escapeRegex(globalFilters), $options: "i" } },
         { slug: { $regex: escapeRegex(globalFilters), $options: "i" } },
+        // Flexible pattern matching
+        { name: { $regex: flexiblePattern, $options: "i" } },
+        { slug: { $regex: flexiblePattern, $options: "i" } },
+        // Normalized underscore matching
+        { name: { $regex: escapeRegex(normalizedForUnderscore), $options: "i" } },
+        { slug: { $regex: escapeRegex(normalizedForUnderscore), $options: "i" } },
         {
           $expr: {
             $regexMatch: {
@@ -243,7 +275,7 @@ export async function GET(request) {
           mrp: 1,
           sellingPrice: 1,
           discountPercentage: 1,
-          stock: 1,
+          stock: { $ifNull: ["$stock", 0] },
           category: "$categoryData.name",
           createdAt: 1,
           updatedAt: 1,
