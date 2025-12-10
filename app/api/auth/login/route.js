@@ -71,7 +71,7 @@ export async function POST(req) {
         "Email Verification request from Developer Shanto",
         email,
         emailVerificationLink(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`
+          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/auth/verify-email/${token}`
         )
       );
       return res(
