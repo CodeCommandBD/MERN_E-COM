@@ -25,6 +25,7 @@ import Editor from "@/components/Application/Admin/Editor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import { use } from "react";
+import { useRouter } from "next/navigation";
 
 const breadcrumbData = [
   {
@@ -42,6 +43,7 @@ const breadcrumbData = [
 ];
 
 const EditProduct = ({ params }) => {
+  const router = useRouter();
   const { id } = use(params);
   const [loading, setLoading] = useState(false);
   const [categoryOption, setCategoryOption] = useState([]);
@@ -174,6 +176,7 @@ const EditProduct = ({ params }) => {
       }
 
       showToast("success", response.message);
+      router.push(ADMIN_PRODUCT_SHOW);
     } catch (error) {
       showToast("error", error.message);
     } finally {
