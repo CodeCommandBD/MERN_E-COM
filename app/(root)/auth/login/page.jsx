@@ -96,10 +96,16 @@ const LoginPage = () => {
       }
     } catch (error) {
       // Extract error message from API response
-      const errorMessage =
+      let errorMessage =
         error.response?.data?.message ||
         error.message ||
         "Login failed. Please try again.";
+
+      // Check if it's a rate limit error
+      if (error.response?.status === 429) {
+        errorMessage = "Too many login attempts. Please try again later.";
+      }
+
       showToast("error", errorMessage);
     } finally {
       setLoading(false);

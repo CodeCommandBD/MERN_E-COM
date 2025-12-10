@@ -78,10 +78,12 @@ const RegisterPage = () => {
       showToast("success", registerResponse.message);
       router.push(WEBSITE_LOGIN);
     } catch (error) {
-      showToast(
-        "error",
-        error.message || "Registration failed. Please try again."
-      );
+      // Get error message from API response or fallback to error message
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed. Please try again.";
+      showToast("error", errorMessage);
     } finally {
       setLoading(false);
     }
