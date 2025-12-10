@@ -396,7 +396,7 @@ export default function Editor({ onChange, initialData }) {
 
   return (
     <div className="w-full max-w-[85vw] md:max-w-full">
-      <div ref={editorContainerRef}>
+      <div ref={editorContainerRef} >
         <div ref={editorRef}>
           {editorConfig && (
             <CKEditor

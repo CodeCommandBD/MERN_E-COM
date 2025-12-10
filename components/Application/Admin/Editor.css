@@ -8,3 +8,9 @@
   width: auto;
   height: auto;
 }
+
+/* Add padding to CKEditor editable area */
+.ck-rounded-corners .ck.ck-editor__main > .ck-editor__editable,
+.ck.ck-editor__main > .ck-editor__editable.ck-rounded-corners {
+  padding: 30px;
+}
