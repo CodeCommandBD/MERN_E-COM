@@ -25,6 +25,7 @@ import Editor from "@/components/Application/Admin/Editor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import PageLoader from "@/components/Application/Admin/PageLoader";
+import { useQueryClient } from "@tanstack/react-query";
 
 const breadcrumbData = [
   {
@@ -77,7 +78,8 @@ const AddProduct = () => {
     mrp: true,
     sellingPrice: true,
     discountPercentage: true,
-    // media: true,
+    stock: true,
+    media: true,
     description: true,
   });
   // TODO: ########## Form Define
@@ -93,7 +95,7 @@ const AddProduct = () => {
       sellingPrice: "",
       discountPercentage: "",
       stock: "",
-      // media: [],
+      media: [],
     },
   });
 
@@ -119,21 +121,19 @@ const AddProduct = () => {
   useEffect(() => {
     const mediaIds = selectedMedia.map((media) => media._id);
     form.setValue("media", mediaIds);
-    if (mediaIds.length > 0) {
-      form.clearErrors("media");
-    }
   }, [selectedMedia, form]);
+
+  const queryClient = useQueryClient();
 
   const onSubmit = async (value) => {
     try {
-      if (selectedMedia.length <= 0) {
-        showToast("error", "Please select at least one media.");
-        return;
-      }
 
       setLoading(true);
       const mediaIds = selectedMedia.map((media) => media._id);
       value.media = mediaIds;
+      
+
+      console.log("Submitting product with stock:", value.stock, value);
 
       const { data: response } = await axios.post("/api/product/create", value);
 
@@ -142,6 +142,10 @@ const AddProduct = () => {
       }
 
       showToast("success", response.message);
+      
+      // Invalidate the products query to refresh the list with new product
+      await queryClient.invalidateQueries({ queryKey: ["product-data"] });
+      
       form.reset();
       setEditorKey((prev) => prev + 1);
       setSelectedMedia([]);
@@ -330,15 +334,30 @@ const AddProduct = () => {
                   />
                 </div>
                 <div className="mb-5 md:col-span-2">
-                  <FormLabel className={"mb-2"}>
-                    Description <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <Editor
-                    key={editorKey}
-                    initialData={form.getValues("description")}
-                    onChange={(event, editor) => {
-                      form.setValue("description", editor.getData());
-                    }}
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Description <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Editor
+                            key={editorKey}
+                            initialData={field.value}
+                            onChange={(event, editor) => {
+                              const data = editor.getData();
+                              field.onChange(data);
+                              if (data) {
+                                form.trigger("description");
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
               </div>
