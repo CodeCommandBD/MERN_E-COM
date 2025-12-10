@@ -207,7 +207,7 @@ const Checkout = () => {
         paymentMethod: formData.paymentMethod,
         orderNote: formData.orderNote,
         couponCode: isCouponApplied ? couponForm.getValues("code") : null,
-        guestId: getOrCreateGuestId(), // Add guest ID for tracking
+        guestId: typeof window !== 'undefined' ? getOrCreateGuestId() : null,
       };
 
       // If payment method is card, redirect to Stripe
