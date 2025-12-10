@@ -35,18 +35,29 @@ const MediaModel = ({
   const fetchMedia = async (pageParam = 0) => {
     const params = new URLSearchParams({
       page: pageParam,
-      limit: 50,
+      limit: 100,
       deleteType: "SD"
     });
     
+    // Search in filename, public_id, title, alt, and any related product names
     if (debouncedSearchTerm.trim()) {
       params.append("search", debouncedSearchTerm);
     }
 
-    const { data: response } = await axios.get(
-      `/api/media?${params.toString()}`
-    );
-    return response;
+    try {
+      const { data: response } = await axios.get(
+        `/api/media?${params.toString()}`
+      );
+      console.log("Media fetch response:", {
+        searchTerm: debouncedSearchTerm,
+        mediaCount: response.mediaData?.length || 0,
+        response
+      });
+      return response;
+    } catch (error) {
+      console.error("Media fetch error:", error);
+      throw error;
+    }
   };
 
   const {
@@ -97,7 +108,7 @@ const MediaModel = ({
               </DialogTitle>
               <div className="relative">
                 <Input
-                  placeholder="Search by title, alt, or public ID..."
+                  placeholder="Search by product name, filename, or image ID... (e.g., Premium Casual Shirt)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="rounded-lg pl-9"
