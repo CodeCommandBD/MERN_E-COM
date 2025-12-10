@@ -90,6 +90,7 @@ export async function GET(request) {
     const totalMedia = await MediaModel.countDocuments(filter);
 
     return NextResponse.json({
+      success: true,
       mediaData: mediaData,
       hasMore: (page + 1) * limit < totalMedia,
     });
