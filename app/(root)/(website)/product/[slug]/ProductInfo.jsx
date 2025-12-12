@@ -1,7 +1,10 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { WEBSITE_PRODUCT_DETAILS } from "@/Routes/WebsiteRoute";
+import { useRouter } from "next/navigation";
 
 const ProductInfo = ({
   product,
@@ -10,7 +13,28 @@ const ProductInfo = ({
   Size,
   reviewCount,
   sanitizedDescription,
+  onLoadingChange,
 }) => {
+  const router = useRouter();
+
+  const handleVariantClick = (e, type, value) => {
+    e.preventDefault();
+    
+    // Don't navigate if already at this variant
+    if ((type === 'color' && value === variant?.color) || (type === 'size' && value === variant?.size)) {
+      return;
+    }
+
+    if (onLoadingChange) {
+      onLoadingChange(true);
+    }
+
+    const newColor = type === 'color' ? value : variant?.color;
+    const newSize = type === 'size' ? value : variant?.size;
+    
+    router.push(`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${newColor}&size=${newSize}`);
+  };
+
   return (
     <div className="w-full">
       {/* Product Title */}
@@ -89,19 +113,17 @@ const ProductInfo = ({
           </p>
           <div className="flex items-center gap-2 flex-wrap">
             {Color.map((item, index) => (
-              <Link
-                href={`${WEBSITE_PRODUCT_DETAILS(
-                  product.slug
-                )}?color=${item}&size=${variant?.size}`}
+              <button
                 key={index}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
+                onClick={(e) => handleVariantClick(e, 'color', item)}
+                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border-2 cursor-pointer ${
                   item === variant?.color
                     ? "bg-primary !text-white border-primary"
                     : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                 }`}
               >
                 {item}
-              </Link>
+              </button>
             ))}
           </div>
         </div>
@@ -117,19 +139,17 @@ const ProductInfo = ({
           </p>
           <div className="flex items-center gap-2 flex-wrap">
             {Size.map((item, index) => (
-              <Link
-                href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${
-                  variant?.color
-                }&size=${item}`}
+              <button
                 key={index}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
+                onClick={(e) => handleVariantClick(e, 'size', item)}
+                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border-2 cursor-pointer ${
                   item === variant?.size
                     ? "bg-primary !text-white border-primary"
                     : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                 }`}
               >
                 {item}
-              </Link>
+              </button>
             ))}
           </div>
         </div>
