@@ -14,9 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
-import ProductGallery from "./ProductGallery";
-import ProductInfo from "./ProductInfo";
-import ProductActions from "./ProductActions";
+import ProductDetailsWrapper from "./ProductDetailsWrapper";
 import Loading from "@/components/Application/Loading";
 
 // Lazy load Reviews to reduce initial bundle
@@ -220,31 +218,15 @@ const ProductPage = async ({ params, searchParams }) => {
 
             {/* Main Product Section - Responsive Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-16 mb-20 items-start">
-              {/* Visuals (Client Component) */}
-              <div className="w-full">
-                <ProductGallery
-                  key={variant?._id || product._id}
-                  media={variant.media || product.media}
-                  productName={product.name}
-                  activeColor={variant.color}
-                />
-              </div>
-
-              {/* Info (Server Component + Client Actions) */}
-              <div className="w-full flex flex-col gap-6">
-                <ProductInfo
-                  product={product}
-                  variant={variant}
-                  Color={getColor}
-                  Size={getSize}
-                  reviewCount={reviewCount}
-                  sanitizedDescription={sanitizedDescription}
-                />
-                {/* Client Actions: Quantity, Add to Cart */}
-                <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden w-full">
-                  <ProductActions product={product} variant={variant} />
-                </div>
-              </div>
+              {/* Product Details Wrapper (Gallery + Info + Actions) */}
+              <ProductDetailsWrapper
+                product={product}
+                variant={variant}
+                Color={getColor}
+                Size={getSize}
+                reviewCount={reviewCount}
+                sanitizedDescription={sanitizedDescription}
+              />
             </div>
 
             {/* Product Description Section */}

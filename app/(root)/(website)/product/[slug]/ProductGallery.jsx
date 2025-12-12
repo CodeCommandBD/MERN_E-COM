@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { imagePlaceholder } from "@/public/image";
+import { imagePlaceholder, loader } from "@/public/image";
 
-const ProductGallery = ({ media = [], productName, activeColor }) => {
+const ProductGallery = ({ media = [], productName, activeColor, isLoading = false }) => {
   const [activeThumb, setActiveThumb] = useState(media[0]?.secure_url || "");
 
   // Reset active image when color changes (new media passed)
@@ -62,6 +62,23 @@ const ProductGallery = ({ media = [], productName, activeColor }) => {
             sizes="(max-width: 1024px) 100vw, 50vw"
             fetchPriority="high"
           />
+          
+          {/* Loader Overlay */}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-20 rounded-3xl">
+              <div className="flex flex-col items-center gap-3">
+                <Image
+                  src={loader.src}
+                  alt="Loading..."
+                  width={60}
+                  height={60}
+                  className="animate-spin"
+                  priority
+                />
+                <p className="text-sm font-medium text-gray-600">Loading...</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
