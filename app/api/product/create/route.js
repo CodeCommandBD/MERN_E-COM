@@ -21,7 +21,6 @@ export async function POST(request) {
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
-      stock: true,
       description: true,
       media: true,
     });
@@ -32,7 +31,7 @@ export async function POST(request) {
     }
     const produductData = validate.data;
     
-    console.log("Creating product with stock:", produductData.stock, "Type:", typeof produductData.stock);
+    console.log("Creating product");
 
     const existingProduct = await ProductModel.findOne({
       name: produductData.name,
@@ -48,7 +47,6 @@ export async function POST(request) {
       mrp: produductData.mrp,
       sellingPrice: produductData.sellingPrice,
       discountPercentage: produductData.discountPercentage,
-      stock: Number(produductData.stock ?? 0),
       description: encode(produductData.description),
       media: produductData.media,
       sku: `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

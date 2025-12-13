@@ -22,6 +22,7 @@ export async function PUT(request) {
         product: true,
         mrp: true,
         sellingPrice: true,
+        stock: true,
         discountPercentage: true,
         media: true,
         category: true,
@@ -48,6 +49,9 @@ export async function PUT(request) {
     getProductVariant.product = validateData.product;
     getProductVariant.mrp = validateData.mrp;
     getProductVariant.sellingPrice = validateData.sellingPrice;
+    if (typeof validateData.stock !== 'undefined') {
+      getProductVariant.stock = validateData.stock;
+    }
     getProductVariant.discountPercentage = validateData.discountPercentage;
     getProductVariant.media = validateData.media;
 

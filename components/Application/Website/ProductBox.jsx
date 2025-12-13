@@ -47,6 +47,13 @@ const ProductBox = ({ product }) => {
     router.push(WEBSITE_PRODUCT_DETAILS(product?.slug));
   };
 
+  // Determine stock status: use variants if present; otherwise, use product-level stock
+  const allVariants = Array.isArray(product?.variants) ? product.variants : [];
+  const hasVariantInfo = allVariants.length > 0;
+  const isOutOfStock = hasVariantInfo
+    ? allVariants.every((v) => (v?.stock ?? 0) <= 0)
+    : typeof product?.stock === "number" && product.stock <= 0;
+
   return (
     <>
       {isNavigating && (
@@ -79,7 +86,7 @@ const ProductBox = ({ product }) => {
               blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
               itemProp="image"
             />
-            {product?.stock === 0 && (
+            {isOutOfStock && (
               <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                 Stock Out
               </div>

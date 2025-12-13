@@ -78,7 +78,6 @@ const AddProduct = () => {
     mrp: true,
     sellingPrice: true,
     discountPercentage: true,
-    stock: true,
     media: true,
     description: true,
   });
@@ -94,7 +93,6 @@ const AddProduct = () => {
       category: "",
       sellingPrice: "",
       discountPercentage: "",
-      stock: "",
       media: [],
     },
   });
@@ -133,7 +131,7 @@ const AddProduct = () => {
       value.media = mediaIds;
       
 
-      console.log("Submitting product with stock:", value.stock, value);
+      console.log("Submitting product:", value);
 
       const { data: response } = await axios.post("/api/product/create", value);
 
@@ -312,27 +310,7 @@ const AddProduct = () => {
                     )}
                   />
                 </div>
-                <div className="mb-5">
-                  <FormField
-                    control={form.control}
-                    name="stock"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Stock <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Stock Quantity"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                
                 <div className="mb-5 md:col-span-2">
                   <FormField
                     control={form.control}

@@ -207,26 +207,29 @@ const LoginPage = () => {
                       control={form.control}
                       name="password"
                       render={({ field }) => (
-                        <FormItem className={"relative"}>
+                        <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              type={isTypePassword ? "password" : "text"}
-                              placeholder="**************"
-                              {...field}
-                            />
-                          </FormControl>
-                          <button
-                            type="button"
-                            className="absolute right-2 top-1/2 cursor-pointer"
-                            onClick={() => setIsTypePassword(!isTypePassword)}
-                          >
-                            {isTypePassword ? (
-                              <FaRegEyeSlash></FaRegEyeSlash>
-                            ) : (
-                              <FaRegEye></FaRegEye>
-                            )}
-                          </button>
+                          <div className="relative">
+                            <FormControl>
+                              <Input
+                                type={isTypePassword ? "password" : "text"}
+                                placeholder="**************"
+                                className="pr-10"
+                                {...field}
+                              />
+                            </FormControl>
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-2 flex items-center cursor-pointer"
+                              onClick={() => setIsTypePassword(!isTypePassword)}
+                            >
+                              {isTypePassword ? (
+                                <FaRegEyeSlash></FaRegEyeSlash>
+                              ) : (
+                                <FaRegEye></FaRegEye>
+                              )}
+                            </button>
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}

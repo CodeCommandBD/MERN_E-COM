@@ -39,7 +39,9 @@ const ShowProductVariant = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const { data: stats, refetch: refetchStats } = useFetch(
-    "/api/product-variant/stats"
+    "/api/product-variant/stats",
+    "GET",
+    { pollInterval: 5000 }
   );
   const [statsLive, setStatsLive] = useState(null);
 
@@ -138,6 +140,7 @@ const ShowProductVariant = () => {
             createAction={action}
             initialGlobalFilter={debouncedSearchTerm}
             onDeleteSuccess={refetchStats}
+            refetchInterval={5000}
           />
         </CardContent>
       </Card>

@@ -136,6 +136,7 @@ export async function GET(request) {
           size: 1,
           mrp: 1,
           sellingPrice: 1,
+          stock: 1,
           discountPercentage: 1,
           createdAt: 1,
           updatedAt: 1,

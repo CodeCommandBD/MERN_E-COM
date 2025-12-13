@@ -1,34 +1,31 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/dbConnection";
 import OrderModel from "@/Models/Order.model.js";
+import { isAuthenticated } from "@/lib/authentication";
 
 export async function GET(request) {
   try {
-    await connectDB();
-
-    const { searchParams } = new URL(request.url);
-    const email = searchParams.get("email");
-    const userId = searchParams.get("userId");
-
-    if (!email && !userId) {
+    // SECURITY: Authenticate user first - prevent unauthorized order access
+    const auth = await isAuthenticated();
+    
+    if (!auth.isAuth) {
       return NextResponse.json(
-        { success: false, message: "Email or User ID is required" },
-        { status: 400 }
+        { success: false, message: "Unauthorized. Please login to view your orders." },
+        { status: 401 }
       );
     }
 
-    // Build query - search by userId OR email
-    let query = {};
+    await connectDB();
 
-    if (userId) {
-      // If userId provided, find orders with this userId OR this user's email
-      query = {
-        $or: [{ userId: userId }, { "customerInfo.email": email }],
-      };
-    } else if (email) {
-      // If only email provided, find all orders with this email
-      query = { "customerInfo.email": email };
-    }
+    // SECURITY: Only allow users to query their own orders
+    // Ignore any email/userId from query params - use authenticated user's data
+    const query = {
+      $or: [
+        { userId: auth._id }, // Orders placed when logged in
+        { "customerInfo.email": auth.email } // Guest orders with same email
+      ],
+      deletedAt: null, // Exclude soft-deleted orders
+    };
 
     // Fetch orders sorted by newest first
     const orders = await OrderModel.find(query)

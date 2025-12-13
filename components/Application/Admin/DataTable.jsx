@@ -39,6 +39,7 @@ const DataTable = ({
   initialColumnFilters = [],
   onDeleteSuccess,
   onStatusUpdate,
+  refetchInterval,
 }) => {
   const [columnFilters, setColumnFilters] = useState(initialColumnFilters);
   const [globalFilter, setGlobalFilter] = useState(initialGlobalFilter);
@@ -265,6 +266,7 @@ const DataTable = ({
       return data;
     },
     placeholderData: keepPreviousData, //don't go to 0 rows when refetching or paginating to next page
+    refetchInterval: typeof refetchInterval === "number" ? refetchInterval : false,
   });
   const table = useMaterialReactTable({
     columns: columnsConfig,

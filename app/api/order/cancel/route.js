@@ -42,6 +42,12 @@ export async function PUT(request) {
       }
     }
 
+    // IDEMPOTENCY: If order is already cancelled, return success
+    // This prevents errors when user clicks cancel button multiple times
+    if (order.orderStatus === "cancelled") {
+      return res(true, 200, "Order already cancelled", order);
+    }
+
     // specific status check
     if (!["pending", "confirmed"].includes(order.orderStatus)) {
       return res(
