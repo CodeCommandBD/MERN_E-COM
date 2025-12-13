@@ -31,6 +31,7 @@ export const POST = async (req) => {
               size: variant.size,
               mrp: variant.mrp,
               sellingPrice: variant.sellingPrice,
+              stock: variant.stock,
               image:
                 variant.media && variant.media.length > 0
                   ? variant.media[0].secure_url

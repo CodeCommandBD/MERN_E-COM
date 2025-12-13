@@ -5,10 +5,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import persistStore from "redux-persist/es/persistStore";
 import authReducer from "./reducer/authReducer";
 import cartReducer from "./reducer/cartReducer";
+import orderReducer from "./reducer/orderReducer";
 
 const rootReducer = combineReducers({
     authStore: authReducer,
-    cartStore: cartReducer
+    cartStore: cartReducer,
+    orderStore: orderReducer
 });
 
 const persistConfig = {

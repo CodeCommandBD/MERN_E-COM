@@ -257,6 +257,40 @@ export async function GET(request) {
       }
     );
 
+    // Aggregate variant stock and override stock field for read-only view
+    aggregatePipeline.push(
+      {
+        $lookup: {
+          from: "productVariants",
+          let: { pid: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$product", "$$pid"] },
+                    {
+                      $or: [
+                        { $eq: ["$deletedAt", null] },
+                        { $eq: [ { $type: "$deletedAt" }, "missing" ] }
+                      ]
+                    }
+                  ],
+                },
+              },
+            },
+            { $group: { _id: null, totalStock: { $sum: "$stock" } } },
+          ],
+          as: "variantAgg",
+        },
+      },
+      {
+        $addFields: {
+          stock: { $ifNull: [ { $arrayElemAt: ["$variantAgg.totalStock", 0] }, 0 ] },
+        },
+      }
+    );
+
     // Add match after lookups (for fields that need lookups or combined conditions)
     if (needsPostMatch && Object.keys(finalAggregationMatchQuery).length > 0) {
       aggregatePipeline.push({ $match: finalAggregationMatchQuery });
@@ -319,6 +353,40 @@ export async function GET(request) {
         $unwind: {
           path: "$categoryData",
           preserveNullAndEmptyArrays: true,
+        },
+      }
+    );
+
+    // Mirror variant stock aggregation so any stock-based filter matches counts
+    countPipeline.push(
+      {
+        $lookup: {
+          from: "productVariants",
+          let: { pid: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$product", "$$pid"] },
+                    {
+                      $or: [
+                        { $eq: ["$deletedAt", null] },
+                        { $eq: [ { $type: "$deletedAt" }, "missing" ] }
+                      ]
+                    }
+                  ],
+                },
+              },
+            },
+            { $group: { _id: null, totalStock: { $sum: "$stock" } } },
+          ],
+          as: "variantAgg",
+        },
+      },
+      {
+        $addFields: {
+          stock: { $ifNull: [ { $arrayElemAt: ["$variantAgg.totalStock", 0] }, 0 ] },
         },
       }
     );

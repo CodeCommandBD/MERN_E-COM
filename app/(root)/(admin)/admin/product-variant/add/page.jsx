@@ -90,6 +90,7 @@ const AddProductVariant = () => {
     product: true,
     mrp: true,
     sellingPrice: true,
+    stock: true,
     discountPercentage: true,
   });
   // TODO: ########## Form Define
@@ -103,6 +104,7 @@ const AddProductVariant = () => {
       product: "",
       mrp: "",
       sellingPrice: "",
+      stock: "",
       discountPercentage: "",
     },
   });
@@ -371,6 +373,23 @@ const AddProductVariant = () => {
                         </FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="00.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="stock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Stock <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="number" min={0} placeholder="0" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -13,7 +13,7 @@ import { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 
 import { VscAccount } from "react-icons/vsc";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
@@ -31,22 +31,26 @@ const CartSidebar = dynamic(() => import("./CartSidebar"), {
 });
 const Search = dynamic(() => import("./Search"), { ssr: false });
 
+import { ORDER_COUNT_CHANGED } from "@/lib/orderEvents";
+import { setOrderCount } from "@/store/reducer/orderReducer";
+
 const Header = () => {
   const auth = useSelector((store) => store.authStore.auth);
+  const orderCount = useSelector((store) => store.orderStore.count);
+  const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [orderCount, setOrderCount] = useState(0);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNavigatingToAbout, setIsNavigatingToAbout] = useState(false);
   const [isNavigatingToShop, setIsNavigatingToShop] = useState(false);
   const [isNavigatingToHome, setIsNavigatingToHome] = useState(false);
   const [isNavigatingToCategory, setIsNavigatingToCategory] = useState(false);
 
-  // Fetch active order count - deferred to not block initial render
+  // Sync order count with server on initial load and when auth changes
   useEffect(() => {
-    const fetchOrderCount = async () => {
+    const syncOrderCount = async () => {
       // If user is authenticated
       if (auth?._id) {
         try {
@@ -66,10 +70,10 @@ const Header = () => {
 
           const response = await axios.get(`/api/order/count?${params}`);
           if (response.data.success) {
-            setOrderCount(response.data.count);
+            dispatch(setOrderCount(response.data.count));
           }
         } catch (error) {
-          console.error("Failed to fetch order count:", error);
+          console.error("Failed to sync order count:", error);
         }
       } else {
         // If guest user, check local storage and validate with API
@@ -87,27 +91,32 @@ const Header = () => {
               `/api/order/count?orderIds=${validGuestOrders.join(",")}`
             );
             if (response.data.success) {
-              setOrderCount(response.data.count);
+              dispatch(setOrderCount(response.data.count));
             }
           } else {
-            setOrderCount(0);
+            dispatch(setOrderCount(0));
           }
         } catch (error) {
-          console.error("Failed to parse guest orders or fetch count:", error);
-          setOrderCount(0);
+          console.error("Failed to parse guest orders or sync count:", error);
+          dispatch(setOrderCount(0));
         }
       }
     };
 
-    // Defer API call to after initial render to not block LCP
-    const timeoutId = setTimeout(fetchOrderCount, 100);
-    // Refresh count every 30 seconds
-    const interval = setInterval(fetchOrderCount, 30000);
-    return () => {
-      clearTimeout(timeoutId);
-      clearInterval(interval);
+    // Initial sync on mount
+    syncOrderCount();
+    
+    // Listen for order count change events to trigger sync
+    const handleOrderCountChange = () => {
+      syncOrderCount();
     };
-  }, [auth]);
+    
+    window.addEventListener(ORDER_COUNT_CHANGED, handleOrderCountChange);
+    
+    return () => {
+      window.removeEventListener(ORDER_COUNT_CHANGED, handleOrderCountChange);
+    };
+  }, [auth, dispatch]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);

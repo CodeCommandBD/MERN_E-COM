@@ -3,11 +3,27 @@ import Stripe from "stripe";
 import { connectDB } from "@/lib/dbConnection";
 import OrderModel from "@/Models/Order.model.js";
 import StripePaymentModel from "@/Models/StripePayment.model.js";
+import ProductVariantModel from "@/Models/Product.Variant.model.js";
+import { isAuthenticated } from "@/lib/authentication";
+import xss from "xss";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
   try {
+    // SECURITY: Verify userId from JWT, not request body to prevent spoofing
+    const auth = await isAuthenticated();
+    let validatedUserId = null;
+    let guestId = null;
+
+    if (auth.isAuth) {
+      // User is logged in - use authenticated user ID
+      validatedUserId = auth._id.toString();
+    } else {
+      // Guest checkout - use guestId from request or generate server-side
+      guestId = null; // Will be set by body.guestId below
+    }
+
     await connectDB();
 
     const body = await request.json();
@@ -20,8 +36,14 @@ export async function POST(request) {
       paymentMethod,
       orderNote,
       couponCode,
-      userId,
+      guestId: clientGuestId,
+      // userId removed - no longer accept from client
     } = body;
+
+    // For guest users, use client's guestId if not authenticated
+    if (!auth.isAuth && clientGuestId) {
+      guestId = clientGuestId;
+    }
 
     // Validate required fields
     if (!customerInfo || !shippingAddress || !items || !pricing) {
@@ -31,25 +53,108 @@ export async function POST(request) {
       );
     }
 
+    // SECURITY: Validate prices against database to prevent price manipulation
+    const validatedItems = [];
+    let calculatedSubtotal = 0;
+
+    for (const item of items) {
+      // Fetch actual price and stock from database
+      const variant = await ProductVariantModel.findById(item.variantId)
+        .select('sellingPrice mrp stock name');
+
+      if (!variant) {
+        return NextResponse.json(
+          { success: false, message: `Product variant not found: ${item.name}` },
+          { status: 400 }
+        );
+      }
+
+      // Check stock availability
+      if (variant.stock < item.quantity) {
+        return NextResponse.json(
+          { success: false, message: `Insufficient stock for ${variant.name}. Available: ${variant.stock}` },
+          { status: 400 }
+        );
+      }
+
+      // Use DB price, not client-provided price
+      const validatedItem = {
+        ...item,
+        sellingPrice: variant.sellingPrice, // ← Use DB value, ignore client
+        mrp: variant.mrp,
+      };
+
+      validatedItems.push(validatedItem);
+      calculatedSubtotal += variant.sellingPrice * item.quantity;
+    }
+
+    // Calculate server-side pricing
+    const productDiscount = validatedItems.reduce((total, item) => {
+      return total + (item.mrp - item.sellingPrice) * item.quantity;
+    }, 0);
+
+    const serverPricing = {
+      subtotal: calculatedSubtotal + productDiscount, // MRP total
+      discount: productDiscount,
+      couponDiscount: pricing.couponDiscount || 0,
+      shippingFee: 0,
+      total: calculatedSubtotal - (pricing.couponDiscount || 0),
+    };
+
+    // CRITICAL: Verify client's total matches server calculation
+    const priceDifference = Math.abs(serverPricing.total - pricing.total);
+    if (priceDifference > 0.01) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: "Price mismatch detected. Please refresh your cart and try again.",
+          debug: process.env.NODE_ENV === "development" ? {
+            clientTotal: pricing.total,
+            serverTotal: serverPricing.total,
+            difference: priceDifference
+          } : undefined
+        },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Sanitize all text inputs to prevent XSS attacks
+    const sanitizedCustomerInfo = {
+      name: xss(customerInfo.name?.trim() || ''),
+      email: customerInfo.email?.trim().toLowerCase() || '',
+      phone: xss(customerInfo.phone?.trim() || ''),
+    };
+
+    const sanitizedShippingAddress = {
+      landmark: xss(shippingAddress.landmark?.trim() || ''),
+      city: xss(shippingAddress.city?.trim() || ''),
+      state: xss(shippingAddress.state?.trim() || ''),
+      country: xss(shippingAddress.country?.trim() || ''),
+      pincode: xss(shippingAddress.pincode?.trim() || ''),
+    };
+
+    const sanitizedOrderNote = xss(orderNote?.trim() || '');
+
     // Create pending order using new + save to trigger pre-save hook
     const order = new OrderModel({
-      userId: userId || null,
-      customerInfo,
-      shippingAddress,
-      items,
-      pricing,
+      userId: validatedUserId, // Use verified ID from JWT, not client
+      guestId: guestId, // Track guest orders
+      customerInfo: sanitizedCustomerInfo,
+      shippingAddress: sanitizedShippingAddress,
+      items: validatedItems, // Use validated items with DB prices
+      pricing: serverPricing, // Use server-calculated pricing
       paymentMethod: "card",
       paymentStatus: "pending",
       orderStatus: "pending",
-      orderNote: orderNote || "",
+      orderNote: sanitizedOrderNote,
       couponCode: couponCode || null,
     });
 
     // Save to trigger pre-save hook that generates orderNumber
     await order.save();
 
-    // Create Stripe line items from cart items
-    const lineItems = items.map((item) => ({
+    // Create Stripe line items from server-validated items
+    const lineItems = validatedItems.map((item) => ({
       price_data: {
         currency: "usd", // Change to 'bdt' if your Stripe account supports it
         product_data: {

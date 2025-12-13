@@ -16,7 +16,7 @@ export async function POST(req) {
   try {
     // Rate limiting: 3 registrations per hour per IP
     const clientIP = getClientIP(req);
-    const rateCheck = checkRateLimit(`register:${clientIP}`, 3, 3600000);
+    const rateCheck = await checkRateLimit(`register:${clientIP}`, 3, 3600000);
     if (!rateCheck.allowed) {
       return rateLimitResponse(rateCheck.resetIn);
     }

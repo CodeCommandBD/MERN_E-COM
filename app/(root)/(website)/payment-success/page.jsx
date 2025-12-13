@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import Link from "next/link";
@@ -10,10 +10,13 @@ import { WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
 import OrderStatusTracker from "@/components/Order/OrderStatusTracker";
 import { clearCart } from "@/store/reducer/cartReducer";
+import { addOrder } from "@/store/reducer/orderReducer";
+import { emitOrderCountChange } from "@/lib/orderEvents";
 
 export default function PaymentSuccess() {
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
+  const router = useRouter();
   const sessionId = searchParams.get("session_id");
   const [loading, setLoading] = useState(true);
   const [orderData, setOrderData] = useState(null);
@@ -34,8 +37,16 @@ export default function PaymentSuccess() {
 
         if (response.data.success) {
           setOrderData(response.data.data);
+          // Push the freshly completed order into Redux so My Orders shows it immediately
+          if (response?.data?.data?.order) {
+            dispatch(addOrder(response.data.data.order));
+          }
           // Clear cart after successful payment
           dispatch(clearCart());
+          // Emit event to update order count and trigger refetch listeners
+          emitOrderCountChange();
+          // Redirect immediately to My Orders so user sees the order without waiting
+          router.push("/my-orders");
         } else {
           setError(response.data.message);
         }

@@ -14,7 +14,7 @@ export async function POST(req) {
   try {
     // Rate limiting: 5 OTP attempts per minute per IP
     const clientIP = getClientIP(req);
-    const rateCheck = checkRateLimit(`otp:${clientIP}`, 5, 60000);
+    const rateCheck = await checkRateLimit(`otp:${clientIP}`, 5, 60000);
     if (!rateCheck.allowed) {
       return rateLimitResponse(rateCheck.resetIn);
     }

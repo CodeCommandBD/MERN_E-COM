@@ -27,6 +27,7 @@ import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import { sizes } from "@/lib/utils";
 import { use } from "react";
+import { useRouter } from "next/navigation";
 
 const breadcrumbData = [
   {
@@ -45,6 +46,7 @@ const breadcrumbData = [
 
 const EditProductVariant = ({ params }) => {
   const { id } = use(params);
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [productOption, setProductOption] = useState([]);
   const [editorKey, setEditorKey] = useState(0);
@@ -86,6 +88,7 @@ const EditProductVariant = ({ params }) => {
     product: true,
     mrp: true,
     sellingPrice: true,
+    stock: true,
     discountPercentage: true,
   });
   // TODO: ########## Form Define
@@ -100,6 +103,7 @@ const EditProductVariant = ({ params }) => {
       product: "",
       mrp: "",
       sellingPrice: "",
+      stock: "",
       discountPercentage: "",
     },
   });
@@ -115,6 +119,7 @@ const EditProductVariant = ({ params }) => {
         product: variant?.product,
         mrp: variant?.mrp,
         sellingPrice: variant?.sellingPrice,
+        stock: variant?.stock,
         discountPercentage: variant?.discountPercentage,
       });
 
@@ -169,6 +174,7 @@ const EditProductVariant = ({ params }) => {
       }
 
       showToast("success", response.message);
+      router.push(ADMIN_PRODUCT_VARIANT_SHOW);
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message;
       showToast("error", errorMessage);
@@ -315,6 +321,23 @@ const EditProductVariant = ({ params }) => {
                         </FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="00.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mb-5">
+                  <FormField
+                    control={form.control}
+                    name="stock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Stock <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="number" min={0} placeholder="0" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -14,6 +14,7 @@ import { ShoppingBag } from "lucide-react";
 import useFetch from "@/hooks/useFetch";
 import { useDispatch } from "react-redux";
 import { addIntoCart, clearCart } from "@/store/reducer/cartReducer";
+import { incrementOrderCount, decrementOrderCount, addOrder } from "@/store/reducer/orderReducer";
 import Image from "next/image";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
@@ -27,13 +28,16 @@ import axios from "axios";
 import { z } from "zod";
 import { Tag } from "lucide-react";
 import { getOrCreateGuestId } from "@/lib/guestOrderTracking";
+import { emitOrderCountChange } from "@/lib/orderEvents";
+import { useRouter } from "next/navigation";
 const Checkout = () => {
   const bredCrumb = {
     title: "Checkout",
     links: [{ label: "Checkout" }],
   };
   const cart = useSelector((state) => state.cartStore);
-  const auth = useSelector((state) => state.authStore);
+  const auth = useSelector((state) => state.authStore.auth);
+  const router = useRouter();
   const [verfiyCartData, setVerfiyCartData] = useState([]);
   const { data: getVerfiyCartData } = useFetch(
     "/api/cart-verification",
@@ -174,16 +178,44 @@ const Checkout = () => {
       state: "",
       orderNote: "",
       paymentMethod: "",
-      userId: auth?._id,
+      userId: auth?._id || "",
     },
   });
 
+  // Update userId when auth becomes available (auth loads asynchronously)
+  useEffect(() => {
+    if (auth?._id) {
+      orderForm.setValue("userId", auth._id);
+    }
+  }, [auth?._id, orderForm]);
+
   const placeOrder = async (formData) => {
     setPlacingOrder(true);
+    
+    // OPTIMISTIC UPDATE: Increment order count immediately for instant UI feedback
+    dispatch(incrementOrderCount());
+    
     try {
-      // Prepare order data
+      // PRE-CHECK: Validate stock from verified cart data before proceeding
+      if (!verfiyCartData || verfiyCartData.length === 0) {
+        showToast("error", "Validating cart... Please try again in a moment.");
+        dispatch(decrementOrderCount());
+        setPlacingOrder(false);
+        return;
+      }
+      const outOfStock = verfiyCartData.find((v) => (v.stock ?? 0) < v.quantity);
+      if (outOfStock) {
+        showToast(
+          "error",
+          `Insufficient stock for ${outOfStock.name} - ${outOfStock.color} - ${outOfStock.size}. Available: ${outOfStock.stock}`
+        );
+        dispatch(decrementOrderCount());
+        setPlacingOrder(false);
+        return;
+      }
+      // Prepare order data - use auth._id directly for reliable userId
       const orderData = {
-        userId: formData.userId,
+        userId: auth?._id || formData.userId || null,
         customerInfo: {
           name: formData.name,
           email: formData.email,
@@ -214,7 +246,8 @@ const Checkout = () => {
       if (formData.paymentMethod === "card") {
         const response = await axios.post(
           "/api/stripe/create-checkout-session",
-          orderData
+          orderData,
+          { withCredentials: true }
         );
 
         if (response.data.success) {
@@ -231,6 +264,8 @@ const Checkout = () => {
           window.location.href = response.data.data.url;
         } else {
           showToast("error", response.data.message);
+          // REVERT optimistic update on failure
+          dispatch(decrementOrderCount());
           setPlacingOrder(false);
         }
       } else {
@@ -238,6 +273,9 @@ const Checkout = () => {
         const response = await axios.post("/api/order/create", orderData);
         if (response.data.success) {
           showToast("success", response.data.message);
+          
+          // Store order in Redux for instant display in My Orders
+          dispatch(addOrder(response.data.data.order));
 
           // Save guest order to local storage (for both guests and logged-in users to persist on device)
           const guestOrders = JSON.parse(
@@ -251,10 +289,14 @@ const Checkout = () => {
 
           // Clear cart after successful order
           dispatch(clearCart());
-          // Redirect to order tracking page
-          window.location.href = `/order/${response.data.data.orderId}`;
+          // Emit event to update order count in header instantly
+          emitOrderCountChange();
+          // Redirect to order tracking page (use router.push to preserve React state)
+          router.push(`/my-orders`);
         } else {
           showToast("error", response.data.message);
+          // REVERT optimistic update on failure
+          dispatch(decrementOrderCount());
           setPlacingOrder(false);
         }
       }
@@ -263,6 +305,8 @@ const Checkout = () => {
         "error",
         error.response?.data?.message || "Failed to place order"
       );
+      // REVERT optimistic update on error
+      dispatch(decrementOrderCount());
       setPlacingOrder(false);
     }
   };

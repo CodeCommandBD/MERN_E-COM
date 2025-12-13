@@ -136,6 +136,12 @@
   }
 }
 
+/* Hide native password reveal/clear icons (Edge/IE) to avoid double eye icons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
 /* .css-1c75kno-MuiButtonBase-root-MuiIconButton-root{
   padding-left: 4px !important;
   padding-right: 0px !important;

@@ -71,10 +71,11 @@ export async function GET(request) {
       }
     }
 
-    // Count active orders (not delivered or cancelled)
+    // Count active orders (not delivered or cancelled) and not soft-deleted
     query.orderStatus = {
       $nin: ["delivered", "cancelled"],
     };
+    query.deletedAt = null;
 
     const count = await OrderModel.countDocuments(query);
 

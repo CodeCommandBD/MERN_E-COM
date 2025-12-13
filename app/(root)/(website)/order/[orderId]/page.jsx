@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
 import { ArrowLeft, Package, Mail, Phone, MapPin, LogIn } from "lucide-react";
@@ -9,6 +9,7 @@ import { WEBSITE_LOGIN, WEBSITE_SHOP } from "@/Routes/WebsiteRoute";
 import Image from "next/image";
 import OrderStatusTracker from "@/components/Order/OrderStatusTracker";
 import { useSelector } from "react-redux";
+import { emitOrderCountChange } from "@/lib/orderEvents";
 
 import {
   Dialog,
@@ -22,6 +23,7 @@ import {
 
 export default function OrderTracking() {
   const params = useParams();
+  const pathname = usePathname();
   const orderId = params?.orderId;
   const auth = useSelector((state) => state.authStore.auth);
   const [loading, setLoading] = useState(true);
@@ -29,55 +31,76 @@ export default function OrderTracking() {
   const [error, setError] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [cancelInProgress, setCancelInProgress] = useState(false);
 
+  // Extract fetchOrder as a separate function for reusability
+  const fetchOrder = async () => {
+    if (!orderId) {
+      setError("Invalid order ID");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.get(`/api/order/${orderId}`);
+
+      if (response.data.success) {
+        setOrder(response.data.data);
+        setError(null);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (err) {
+      console.error("Order fetch error:", err);
+      setError(err.response?.data?.message || "Failed to fetch order");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial fetch on mount
   useEffect(() => {
-    const fetchOrder = async () => {
-      if (!orderId) {
-        setError("Invalid order ID");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get(`/api/order/${orderId}`);
-
-        if (response.data.success) {
-          setOrder(response.data.data);
-        } else {
-          setError(response.data.message);
-        }
-      } catch (err) {
-        console.error("Order fetch error:", err);
-        setError(err.response?.data?.message || "Failed to fetch order");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrder();
   }, [orderId]);
 
+  // Refetch when navigating to this page (handles browser back/forward navigation)
+  useEffect(() => {
+    if (pathname && pathname.includes("/order/") && orderId) {
+      fetchOrder();
+    }
+  }, [pathname]);
+
   const handleCancelOrder = async () => {
+    if (cancelInProgress) return;
+
+    setCancelInProgress(true);
     try {
       const response = await axios.put("/api/order/cancel", {
         orderId: order._id,
       });
       if (response.data.success) {
-        // Refresh order data
+        // Update local state to reflect cancellation
         setOrder({
           ...order,
           orderStatus: "cancelled",
           cancelledAt: new Date(),
         });
         setIsDialogOpen(false);
+        // Emit event to update order count in header instantly
+        emitOrderCountChange();
+        // No need to refetch - local state update is sufficient
       } else {
         alert(response.data.message);
         setIsDialogOpen(false);
       }
     } catch (err) {
       console.error("Cancel order error:", err);
+      // Handle errors gracefully (API is now idempotent)
       alert(err.response?.data?.message || "Failed to cancel order");
       setIsDialogOpen(false);
+    } finally {
+      setCancelInProgress(false);
     }
   };
 
@@ -210,7 +233,8 @@ export default function OrderTracking() {
                       setIsDialogOpen(true);
                     }
                   }}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  disabled={cancelInProgress}
+                  className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel Order
                 </Button>

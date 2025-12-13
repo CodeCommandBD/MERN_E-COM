@@ -21,6 +21,7 @@ export async function POST(request) {
       product: true,
       mrp: true,
       sellingPrice: true,
+      stock: true,
       discountPercentage: true,
       media: true,
     });
@@ -54,6 +55,7 @@ export async function POST(request) {
       category: existingProduct.category,
       mrp: variantData.mrp,
       sellingPrice: variantData.sellingPrice,
+      stock: variantData.stock,
       discountPercentage: variantData.discountPercentage,
       media: variantData.media,
     });

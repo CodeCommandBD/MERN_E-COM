@@ -20,6 +20,7 @@ const DataTableWrapper = ({
   initialColumnFilters = [],
   onDeleteSuccess,
   onStatusUpdate,
+  refetchInterval,
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -45,6 +46,7 @@ const DataTableWrapper = ({
         initialColumnFilters={initialColumnFilters}
         onDeleteSuccess={onDeleteSuccess}
         onStatusUpdate={onStatusUpdate}
+        refetchInterval={refetchInterval}
       ></DataTable>
     </ThemeProvider>
   );

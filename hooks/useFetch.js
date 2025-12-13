@@ -49,6 +49,16 @@ const useFetch = (url, method = "GET", options = {}) => {
     setRefreshIndex((prev) => prev + 1);
   }, []);
 
+  useEffect(() => {
+    const interval = options?.pollInterval;
+    if (typeof interval === "number" && interval > 0) {
+      const id = setInterval(() => {
+        setRefreshIndex((prev) => prev + 1);
+      }, interval);
+      return () => clearInterval(id);
+    }
+  }, [options?.pollInterval]);
+
   return { data, loading, error, refetch };
 };
 
