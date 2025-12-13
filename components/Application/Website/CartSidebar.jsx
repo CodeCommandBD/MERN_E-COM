@@ -120,7 +120,7 @@ const CartSidebar = () => {
                               })
                             )
                           }
-                          className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors uppercase tracking-wider"
+                          className="text-xs font-medium px-2 py-1 bg-red-600 text-white hover:bg-red-700 transition-colors uppercase tracking-wider rounded-md"
                         >
                           Remove
                         </button>
@@ -176,7 +176,7 @@ const CartSidebar = () => {
                   variant={"outline"}
                   className="w-full border-primary text-primary hover:bg-primary hover:text-white transition-colors rounded-none"
                 >
-                  <Link href={WEBSITE_CART}>View Cart</Link>
+                  <Link href={WEBSITE_CART} className="text-primary">View Cart</Link>
                 </Button>
                 <Button
                   onClick={() => setOpen(false)}
@@ -185,7 +185,9 @@ const CartSidebar = () => {
                   className="w-full bg-primary text-white hover:bg-primary/90 transition-colors rounded-none shadow-none"
                 >
                   {cart.count ? (
-                    <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
+                    <Link href={WEBSITE_CHECKOUT} className="text-white" style={{ color: '#ffffff' }}>
+                      Checkout
+                    </Link>
                   ) : (
                     <button
                       type="button"
