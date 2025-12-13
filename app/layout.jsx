@@ -80,7 +80,7 @@ export const metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code", // Replace with actual code when available
+    google: "q72GTx9vQx8amQEiUaIHVUoQ5xAKAN_0MIVghqEzA4E",
   },
   appleWebApp: {
     capable: true,
