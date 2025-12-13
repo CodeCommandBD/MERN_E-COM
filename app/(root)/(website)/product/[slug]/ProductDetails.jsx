@@ -385,9 +385,9 @@ const ProductDetails = ({
               <Button
                 asChild
                 type="button"
-                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-green-600 hover:bg-green-700"
+                className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-green-600 hover:bg-green-700 text-white"
               >
-                <Link href={WEBSITE_CART}>Go to Cart</Link>
+                <Link href={WEBSITE_CART} className="text-white" style={{ color: '#ffffff' }}>Go to Cart</Link>
               </Button>
             </div>
           )}

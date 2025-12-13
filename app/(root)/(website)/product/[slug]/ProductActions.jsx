@@ -130,7 +130,7 @@ const ProductActions = ({ product, variant }) => {
             asChild
             className="w-full cursor-pointer py-6 text-lg font-bold rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 transition-all active:scale-[0.98]"
           >
-            <Link href={WEBSITE_CART}>Go to Cart</Link>
+            <Link href={WEBSITE_CART} className="text-white" style={{ color: '#ffffff' }}>Go to Cart</Link>
           </Button>
         )}
       </div>
