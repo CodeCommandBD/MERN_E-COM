@@ -50,9 +50,15 @@ const ProductBox = ({ product }) => {
   // Determine stock status: use variants if present; otherwise, use product-level stock
   const allVariants = Array.isArray(product?.variants) ? product.variants : [];
   const hasVariantInfo = allVariants.length > 0;
-  const isOutOfStock = hasVariantInfo
-    ? allVariants.every((v) => (v?.stock ?? 0) <= 0)
-    : typeof product?.stock === "number" && product.stock <= 0;
+  const isOutOfStock = typeof product?.anyInStock === "boolean"
+    ? !product.anyInStock
+    : hasVariantInfo
+      ? allVariants.every((v) => (v?.stock ?? 0) <= 0)
+      : typeof product?.stock === "number" && product.stock <= 0;
+
+  const matchedVariant = product?.matchedVariant || null;
+  const displayMrp = matchedVariant?.mrp ?? product?.mrp;
+  const displayPrice = matchedVariant?.sellingPrice ?? product?.sellingPrice;
 
   return (
     <>
@@ -107,15 +113,15 @@ const ProductBox = ({ product }) => {
                 className="line-through text-gray-500 text-xs md:text-sm"
                 aria-label="Original price"
               >
-                {formatPrice(product?.mrp)}
+                {formatPrice(displayMrp)}
               </span>
               <span
                 className="text-purple-700 font-semibold text-base md:text-lg"
                 itemProp="price"
-                content={product?.sellingPrice}
+                content={displayPrice}
                 aria-label="Sale price"
               >
-                {formatPrice(product?.sellingPrice)}
+                {formatPrice(displayPrice)}
               </span>
               <meta itemProp="priceCurrency" content="BDT" />
               <meta

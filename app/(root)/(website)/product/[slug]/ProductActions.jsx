@@ -113,7 +113,7 @@ const ProductActions = ({ product, variant }) => {
             <Button
               type="button"
               disabled
-              className="w-full cursor-not-allowed py-6 text-lg font-bold rounded-2xl bg-gray-300 text-gray-600"
+              className="w-full cursor-not-allowed py-6 text-lg font-bold rounded-2xl bg-gray-300 text-gray-700"
             >
               Out of Stock
             </Button>

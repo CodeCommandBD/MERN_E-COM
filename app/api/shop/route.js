@@ -186,6 +186,29 @@ export async function GET(request) {
         },
       },
       {
+        $addFields: {
+          matchedVariant: { $arrayElemAt: ["$variants", 0] },
+          minVariantSellingPrice: { $min: "$variants.sellingPrice" },
+          maxVariantSellingPrice: { $max: "$variants.sellingPrice" },
+          minVariantMrp: { $min: "$variants.mrp" },
+          maxVariantMrp: { $max: "$variants.mrp" },
+          anyInStock: {
+            $gt: [
+              {
+                $size: {
+                  $filter: {
+                    input: "$variants",
+                    as: "v",
+                    cond: { $gt: ["$$v.stock", 0] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
+        },
+      },
+      {
         $project: {
           _id: 1,
           name: 1,
@@ -201,11 +224,18 @@ export async function GET(request) {
           variants: {
             color: 1,
             size: 1,
+            stock: 1,
             sellingPrice: 1,
             discountPercentage: 1,
             mrp: 1,
             categoryName: 1,
           },
+          matchedVariant: 1,
+          minVariantSellingPrice: 1,
+          maxVariantSellingPrice: 1,
+          minVariantMrp: 1,
+          maxVariantMrp: 1,
+          anyInStock: 1,
         },
       }
     );

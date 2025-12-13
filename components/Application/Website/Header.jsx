@@ -47,6 +47,7 @@ const Header = () => {
   const [isNavigatingToShop, setIsNavigatingToShop] = useState(false);
   const [isNavigatingToHome, setIsNavigatingToHome] = useState(false);
   const [isNavigatingToCategory, setIsNavigatingToCategory] = useState(false);
+  const [navCategories, setNavCategories] = useState([]);
 
   // Sync order count with server on initial load and when auth changes
   useEffect(() => {
@@ -198,6 +199,18 @@ const Header = () => {
     }
   }, [pathname, isNavigatingToCategory]);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/api/category/get-category");
+        if (res?.data?.success && Array.isArray(res.data.data)) {
+          setNavCategories(res.data.data.slice(0, 3));
+        }
+      } catch (e) {}
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <div className="bg-white border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -231,30 +244,26 @@ const Header = () => {
                   Shop
                 </button>
               </li>
-              <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <button
-                  onClick={(e) => handleCategoryClick(e, "t-shirts")}
-                  className="py-2 px-3"
+              {(navCategories.length > 0
+                ? navCategories
+                : [
+                    { _id: "tshirts", name: "T-shirt", slug: "t-shirts" },
+                    { _id: "hoodies", name: "Hoodies", slug: "hoodies" },
+                    { _id: "oversized", name: "Oversized", slug: "oversized" },
+                  ]
+              ).map((cat) => (
+                <li
+                  key={cat._id}
+                  className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300"
                 >
-                  T-shirt
-                </button>
-              </li>
-              <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <button
-                  onClick={(e) => handleCategoryClick(e, "hoodies")}
-                  className="py-2 px-3"
-                >
-                  Hoodies
-                </button>
-              </li>
-              <li className="text-gray-500 hover:text-primary transition-colors hover:font-semibold duration-300">
-                <button
-                  onClick={(e) => handleCategoryClick(e, "oversized")}
-                  className="py-2 px-3"
-                >
-                  Oversized
-                </button>
-              </li>
+                  <button
+                    onClick={(e) => handleCategoryClick(e, cat.slug)}
+                    className="py-2 px-3"
+                  >
+                    {cat.name}
+                  </button>
+                </li>
+              ))}
             </ul>
           </nav>
 
@@ -395,30 +404,23 @@ const Header = () => {
                   Shop
                 </button>
               </li>
-              <li className="border-b">
-                <button
-                  onClick={(e) => handleCategoryClick(e, "t-shirts")}
-                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                >
-                  T-shirt
-                </button>
-              </li>
-              <li className="border-b">
-                <button
-                  onClick={(e) => handleCategoryClick(e, "hoodies")}
-                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                >
-                  Hoodies
-                </button>
-              </li>
-              <li className="border-b">
-                <button
-                  onClick={(e) => handleCategoryClick(e, "oversized")}
-                  className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
-                >
-                  Oversized
-                </button>
-              </li>
+              {(navCategories.length > 0
+                ? navCategories
+                : [
+                    { _id: "tshirts", name: "T-shirt", slug: "t-shirts" },
+                    { _id: "hoodies", name: "Hoodies", slug: "hoodies" },
+                    { _id: "oversized", name: "Oversized", slug: "oversized" },
+                  ]
+              ).map((cat) => (
+                <li key={cat._id} className="border-b">
+                  <button
+                    onClick={(e) => handleCategoryClick(e, cat.slug)}
+                    className="block w-full text-left py-4 px-6 text-gray-600 hover:text-primary hover:bg-gray-50 transition-all duration-300"
+                  >
+                    {cat.name}
+                  </button>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
