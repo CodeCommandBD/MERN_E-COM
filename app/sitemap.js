@@ -2,8 +2,11 @@ import { connectDB } from "@/lib/dbConnection";
 import Product from "@/Models/Product.model";
 import Category from "@/Models/category.model";
 
+// Use the public site URL, not the API base, to avoid "/api" in sitemap links
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 export default async function sitemap() {
   // Connect to database
@@ -56,10 +59,10 @@ export default async function sitemap() {
     },
   ];
 
-  // Fetch all published products
+  // Fetch all active (non-deleted) products
   let productPages = [];
   try {
-    const products = await Product.find({ status: "published" })
+    const products = await Product.find({ deletedAt: null })
       .select("slug updatedAt")
       .lean();
 
@@ -73,15 +76,15 @@ export default async function sitemap() {
     console.error("Error fetching products for sitemap:", error);
   }
 
-  // Fetch all categories for category pages
+  // Fetch all active categories for category pages
   let categoryPages = [];
   try {
-    const categories = await Category.find({ status: "active" })
+    const categories = await Category.find({ deletedAt: null })
       .select("slug updatedAt")
       .lean();
 
     categoryPages = categories.map((category) => ({
-      url: `${BASE_URL}/shop?category=${category.slug}`,
+      url: `${BASE_URL}/shop/category/${category.slug}`,
       lastModified: category.updatedAt || new Date(),
       changeFrequency: "weekly",
       priority: 0.6,
