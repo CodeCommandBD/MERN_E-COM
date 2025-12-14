@@ -245,3 +245,5 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
+
+// EOF

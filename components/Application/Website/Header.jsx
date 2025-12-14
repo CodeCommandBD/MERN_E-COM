@@ -14,7 +14,7 @@ import { IoIosSearch } from "react-icons/io";
 
 import { VscAccount } from "react-icons/vsc";
 import { useSelector, useDispatch } from "react-redux";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { Package } from "lucide-react";
@@ -41,6 +41,14 @@ const Header = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Avatar URL getter
+  const getAvatarUrl = () => {
+    return auth?.avatar?.url || userIcon.src;
+  };
+  
+  // Version for React Key
+  const avatarVersion = auth?._avatarVersion || 0;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -348,11 +356,14 @@ const Header = () => {
               </div>
             ) : (
               <Link href={USER_DASHBOARD} aria-label="My Account">
-                <Avatar className="cursor-pointer w-8 h-8">
+                <Avatar className="cursor-pointer w-8 h-8" key={`navbar-${avatarVersion}`}>
                   <AvatarImage
-                    src={auth?.avatar?.url || userIcon.src}
+                    src={getAvatarUrl()}
                     alt={auth?.name || "User Profile"}
                   />
+                  <AvatarFallback className="bg-primary text-white text-xs">
+                    {auth?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
                 </Avatar>
               </Link>
             )}

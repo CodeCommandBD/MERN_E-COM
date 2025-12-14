@@ -76,6 +76,24 @@ export default function MyAccountPage() {
   });
   const [newAvatar, setNewAvatar] = useState(null);
 
+  // Cache-busting helper: uses Redux timestamp to force fresh load when avatar changes
+  const addCacheBuster = (url) => {
+    if (!url || typeof url !== 'string') {
+      console.log('addCacheBuster: URL is null or not string:', url);
+      return url; // Return as-is instead of null
+    }
+    try {
+      const separator = url.includes('?') ? '&' : '?';
+      const timestamp = auth?.avatarUpdatedAt || Date.now();
+      const result = `${url}${separator}v=${timestamp}`;
+      console.log('addCacheBuster:', { url, timestamp, result });
+      return result;
+    } catch (e) {
+      console.error('addCacheBuster error:', e);
+      return url; // Fallback to original URL on error
+    }
+  };
+
   const handleLoginRedirect = async () => {
     try {
       await axios.post("/api/auth/logout");
@@ -105,6 +123,16 @@ export default function MyAccountPage() {
             phone: userData.phone || "",
             address: userData.address || "",
           });
+
+          // Ensure avatarUpdatedAt exists for cache-busting (for existing users)
+          if (!auth?.avatarUpdatedAt && userData.avatar) {
+            dispatch(
+              login({
+                ...auth,
+                avatarUpdatedAt: Date.now(),
+              })
+            );
+          }
 
           // Generate Gravatar URL
           if (userData.email) {
@@ -142,7 +170,7 @@ export default function MyAccountPage() {
     };
 
     fetchUserData();
-  }, [auth, router]);
+  }, [auth?._id, router]); // Changed from [auth, router] to prevent re-fetch when avatar updates
 
   const generateMD5 = async (string) => {
     const encoder = new TextEncoder();
@@ -174,17 +202,26 @@ export default function MyAccountPage() {
       if (newAvatar) payload.avatar = newAvatar;
       const response = await axios.put("/api/user/update", payload);
       if (response.data.success) {
-        setUser(response.data.data);
-        // Update global auth store so Header avatar updates immediately and persists
-        try {
-          dispatch(
-            login({
-              ...auth,
-              name: response.data.data?.name || auth?.name,
-              avatar: response.data.data?.avatar || auth?.avatar,
-            })
-          );
-        } catch (e) {}
+        const updatedUser = response.data.data;
+        
+        console.log('🔥 SAVE SUCCESS');
+        console.log('Backend Updated User:', updatedUser);
+        
+        // Update Redux with fresh data from backend
+        // We increment _avatarVersion to trigger component re-renders
+        const nextVersion = (auth?._avatarVersion || 0) + 1;
+        
+        const newAuthState = {
+          ...auth,          // Keep existing client-side props (if any)
+          ...updatedUser,   // OVERWRITE with fresh backend data
+          _avatarVersion: nextVersion
+        };
+        
+        console.log('Dispatching New Auth State:', newAuthState);
+        dispatch(login(newAuthState));
+        
+        // Update local state is redundant if using Redux for auth, but good for form fields
+        setUser(updatedUser);
         setNewAvatar(null);
         setIsEditing(false);
         showToast("success", "Profile updated successfully");
@@ -402,7 +439,20 @@ export default function MyAccountPage() {
     );
   }
 
-  const avatarUrl = newAvatar?.url || user.avatar?.url || gravatarUrl;
+  // Resolve Avatar URL:
+  // 1. New Upload (Preview)
+  // 2. Redux Auth State (Source of Truth)
+  // 3. Local User State (Fallback)
+  // 4. Gravatar (Last Resort)
+  const avatarUrl = newAvatar?.url || auth?.avatar?.url || user?.avatar?.url || gravatarUrl;
+  
+  // React Key Version: Forces component remount on update
+  const avatarVersion = auth?._avatarVersion || 0;
+
+  console.log('=== Avatar Render Info ===');
+  console.log('URL:', avatarUrl);
+  console.log('Version:', avatarVersion);
+  console.log('==========================');
 
   const menuItems = [
     { icon: User, label: "My Accounts", section: "account" },
@@ -425,8 +475,11 @@ export default function MyAccountPage() {
                 {/* User Info Header */}
                 <div className="p-6 border-b">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={avatarUrl} alt={user.name} />
+                    <Avatar className="w-12 h-12" key={`sidebar-${avatarVersion}`}>
+                      <AvatarImage 
+                        src={avatarUrl}
+                        alt={user.name}
+                      />
                       <AvatarFallback className="bg-primary text-white">
                         {user.name?.charAt(0)?.toUpperCase() || "U"}
                       </AvatarFallback>
@@ -497,8 +550,11 @@ export default function MyAccountPage() {
                   {/* Avatar */}
                   <div className="flex justify-center mb-8">
                     <div className="relative">
-                      <Avatar className="w-32 h-32 border-4 border-gray-100">
-                        <AvatarImage src={avatarUrl} alt={user.name} />
+                      <Avatar className="w-32 h-32 border-4 border-gray-100" key={`profile-${avatarVersion}`}>
+                        <AvatarImage 
+                          src={avatarUrl}
+                          alt={user.name}
+                        />
                         <AvatarFallback className="text-4xl bg-primary text-white">
                           {user.name?.charAt(0)?.toUpperCase() || "U"}
                         </AvatarFallback>
@@ -1004,3 +1060,4 @@ export default function MyAccountPage() {
     </div>
   );
 }
+// EOF
