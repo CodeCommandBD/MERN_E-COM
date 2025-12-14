@@ -150,3 +150,5 @@ const ResetPassword = () => {
 }
 
 export default ResetPassword
+
+// EOF
