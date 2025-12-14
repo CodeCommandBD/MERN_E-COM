@@ -12,7 +12,7 @@ export async function PUT(request) {
     }
 
     const body = await request.json();
-    const { name, phone, dateOfBirth, gender, address } = body;
+    const { name, phone, dateOfBirth, gender, address, avatar } = body;
 
     // Connect to database
     await connectDB();
@@ -30,6 +30,12 @@ export async function PUT(request) {
     if (dateOfBirth) user.dateOfBirth = dateOfBirth;
     if (gender) user.gender = gender;
     if (address !== undefined) user.address = address;
+    if (avatar && (avatar.url || avatar.public_id)) {
+      user.avatar = {
+        ...(user.avatar || {}),
+        ...avatar,
+      };
+    }
 
     await user.save();
 
