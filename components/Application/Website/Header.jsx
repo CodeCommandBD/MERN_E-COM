@@ -33,6 +33,7 @@ const Search = dynamic(() => import("./Search"), { ssr: false });
 
 import { ORDER_COUNT_CHANGED } from "@/lib/orderEvents";
 import { setOrderCount } from "@/store/reducer/orderReducer";
+import { login } from "@/store/reducer/authReducer";
 
 const Header = () => {
   const auth = useSelector((store) => store.authStore.auth);
@@ -57,12 +58,29 @@ const Header = () => {
         try {
           // Get user email
           let userEmail = auth.email;
-          if (!userEmail) {
+          let fetchedUser = null;
+          try {
             const userResponse = await axios.get(`/api/user/${auth._id}`);
             if (userResponse.data.success) {
-              userEmail = userResponse.data.data.email;
+              fetchedUser = userResponse.data.data;
+              if (!userEmail) userEmail = fetchedUser.email;
+
+              // If avatar or name changed on server, update persisted auth so navbar avatar stays after hard reload
+              if (
+                (fetchedUser?.avatar?.url || "") !== (auth?.avatar?.url || "") ||
+                (fetchedUser?.name || "") !== (auth?.name || "")
+              ) {
+                dispatch(
+                  login({
+                    ...auth,
+                    name: fetchedUser?.name ?? auth?.name,
+                    email: fetchedUser?.email ?? auth?.email,
+                    avatar: fetchedUser?.avatar ?? auth?.avatar,
+                  })
+                );
+              }
             }
-          }
+          } catch (_) {}
 
           // Fetch order count
           let params = "";

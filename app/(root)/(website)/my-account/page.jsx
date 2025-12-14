@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "@/store/reducer/authReducer";
+import { logout, login } from "@/store/reducer/authReducer";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ import { WEBSITE_LOGIN, USER_DASHBOARD } from "@/Routes/WebsiteRoute";
 import { showToast } from "@/lib/showToast";
 import { persistor } from "@/store/store";
 import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrumb";
+import { CldUploadWidget } from "next-cloudinary";
 
 const breadcrumb = {
   title: "My Account",
@@ -73,6 +74,7 @@ export default function MyAccountPage() {
     phone: "",
     address: "",
   });
+  const [newAvatar, setNewAvatar] = useState(null);
 
   const handleLoginRedirect = async () => {
     try {
@@ -168,9 +170,22 @@ export default function MyAccountPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await axios.put("/api/user/update", formData);
+      const payload = { ...formData };
+      if (newAvatar) payload.avatar = newAvatar;
+      const response = await axios.put("/api/user/update", payload);
       if (response.data.success) {
         setUser(response.data.data);
+        // Update global auth store so Header avatar updates immediately and persists
+        try {
+          dispatch(
+            login({
+              ...auth,
+              name: response.data.data?.name || auth?.name,
+              avatar: response.data.data?.avatar || auth?.avatar,
+            })
+          );
+        } catch (e) {}
+        setNewAvatar(null);
         setIsEditing(false);
         showToast("success", "Profile updated successfully");
       }
@@ -191,6 +206,7 @@ export default function MyAccountPage() {
       phone: user.phone || "",
       address: user.address || "",
     });
+    setNewAvatar(null);
     setIsEditing(false);
   };
 
@@ -386,7 +402,7 @@ export default function MyAccountPage() {
     );
   }
 
-  const avatarUrl = user.avatar?.url || gravatarUrl;
+  const avatarUrl = newAvatar?.url || user.avatar?.url || gravatarUrl;
 
   const menuItems = [
     { icon: User, label: "My Accounts", section: "account" },
@@ -488,12 +504,43 @@ export default function MyAccountPage() {
                         </AvatarFallback>
                       </Avatar>
                       {isEditing && (
-                        <button
-                          aria-label="Change profile picture"
-                          className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors"
+                        <CldUploadWidget
+                          signatureEndpoint="/api/cloudinary-signature"
+                          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                          onQueuesEnd={(results) => {
+                            try {
+                              const files = results?.info?.files || [];
+                              const first = files.find((f) => f.uploadInfo)?.uploadInfo;
+                              if (first) {
+                                setNewAvatar({
+                                  url: first.secure_url,
+                                  public_id: first.public_id,
+                                });
+                                showToast("success", "Image selected. Click Save to update.");
+                              }
+                            } catch (e) {}
+                          }}
+                          config={{
+                            cloud: {
+                              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+                              apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+                            },
+                          }}
+                          options={{ multiple: false, sources: ["local", "url", "google_drive"] }}
                         >
-                          <Edit2 className="w-4 h-4" aria-hidden="true" />
-                        </button>
+                          {({ open }) => (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                open();
+                              }}
+                              aria-label="Change profile picture"
+                              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors"
+                            >
+                              <Edit2 className="w-4 h-4" aria-hidden="true" />
+                            </button>
+                          )}
+                        </CldUploadWidget>
                       )}
                     </div>
                   </div>
