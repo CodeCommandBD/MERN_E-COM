@@ -1,18 +1,16 @@
-import { ListItemIcon, MenuItem } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import React from "react";
+import { Trash2 } from 'lucide-react';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 const DeleteAction = ({ handleDelete, row, deleteType, label = "Delete" }) => {
   return (
-    <MenuItem
-      key="delete"
+    <DropdownMenuItem
       onClick={() => handleDelete([row.original._id], deleteType)}
+      className="flex items-center gap-2 cursor-pointer"
     >
-      <ListItemIcon>
-        <DeleteIcon></DeleteIcon>
-      </ListItemIcon>
+      <Trash2 className="w-4 h-4" />
       {label}
-    </MenuItem>
+    </DropdownMenuItem>
   );
 };
 

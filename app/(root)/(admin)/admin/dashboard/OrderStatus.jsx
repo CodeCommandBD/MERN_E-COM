@@ -76,9 +76,9 @@ export function OrderStatus({ data = [] }) {
   };
 
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm h-full p-4 overflow-hidden flex flex-col">
+    <div className="rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full p-4 overflow-hidden flex flex-col">
       <div className="mb-4 flex-shrink-0">
-        <h2 className="text-xl font-semibold">Order Summary</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Order Summary</h2>
       </div>
       <CardContent className="flex-1 pb-0 min-h-0 flex flex-col">
         <div className="flex-shrink-0">
@@ -140,7 +140,7 @@ export function OrderStatus({ data = [] }) {
                 key={item.status}
                 className="flex items-center justify-between mb-3 text-sm"
               >
-                <span className="capitalize text-muted-foreground font-medium">
+                <span className="capitalize text-gray-600 dark:text-gray-300 font-medium">
                   {chartConfig[item.status]?.label || item.status}
                 </span>
                 <span

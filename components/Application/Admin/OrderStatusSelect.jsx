@@ -1,7 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Select, MenuItem, FormControl } from "@mui/material";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStatsUpdate } from "@/app/(root)/(admin)/admin/orders/page";
 
@@ -24,13 +30,11 @@ export default function OrderStatusSelect({
   const queryClient = useQueryClient();
   const updateStatsLive = useStatsUpdate();
 
-  // Sync status when currentStatus prop changes
   useEffect(() => {
     setStatus(currentStatus);
   }, [currentStatus]);
 
-  const handleChange = async (e) => {
-    const newStatus = e.target.value;
+  const handleChange = async (newStatus) => {
     const oldStatus = status;
     setLoading(true);
     try {
@@ -41,10 +45,8 @@ export default function OrderStatusSelect({
       if (response.data.success) {
         setStatus(newStatus);
         
-        // Invalidate order-data query to refresh the table
         await queryClient.invalidateQueries({ queryKey: ["order-data"] });
         
-        // Update stats live if context is available
         if (updateStatsLive) {
           updateStatsLive(oldStatus, newStatus);
         }
@@ -65,32 +67,24 @@ export default function OrderStatusSelect({
     ORDER_STATUSES.find((s) => s.value === status)?.color || "#6b7280";
 
   return (
-    <FormControl size="small" disabled={loading}>
-      <Select
-        value={status}
-        onChange={handleChange}
-        sx={{
-          minWidth: 120,
-          fontSize: "0.75rem",
-          fontWeight: "bold",
+    <Select value={status} onValueChange={handleChange} disabled={loading}>
+      <SelectTrigger 
+        className="w-[120px] h-8 text-xs font-bold rounded-full border"
+        style={{
           backgroundColor: `${currentColor}20`,
           color: currentColor,
-          border: `1px solid ${currentColor}`,
-          borderRadius: "9999px",
-          "& .MuiSelect-select": {
-            padding: "4px 12px",
-          },
-          "& .MuiOutlinedInput-notchedOutline": {
-            border: "none",
-          },
+          borderColor: currentColor,
         }}
       >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
         {ORDER_STATUSES.map((s) => (
-          <MenuItem key={s.value} value={s.value}>
+          <SelectItem key={s.value} value={s.value}>
             {s.label}
-          </MenuItem>
+          </SelectItem>
         ))}
-      </Select>
-    </FormControl>
+      </SelectContent>
+    </Select>
   );
 }

@@ -4,27 +4,62 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  MRT_ShowHideColumnsButton,
-  MRT_ToggleFullScreenButton,
-  MRT_ToggleDensePaddingButton,
-} from "material-react-table";
-import { Tooltip, IconButton } from "@mui/material";
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  flexRender,
+} from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Link from "next/link";
-import RecyclingIcon from "@mui/icons-material/Recycling";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import RestoreIcon from "@mui/icons-material/Restore";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import {
+  Recycle,
+  Trash2,
+  Trash,
+  RotateCcw,
+  RefreshCw,
+  MoreVertical,
+  Filter,
+  Maximize,
+  Minimize,
+  AlignJustify,
+  AlignLeft,
+  Download,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import useDeleteMutation from "@/hooks/useDeleteMutation";
 import { ButtonLoading } from "../ButtonLoading";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { showToast } from "@/lib/showToast";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import ConfirmModal from "./ConfirmModal";
+
 const DataTable = ({
   queryKey,
   fetchUrl,
@@ -48,17 +83,22 @@ const DataTable = ({
     pageIndex: 0,
     pageSize: initialPageSize,
   });
-  const [selectedRows, setSelectedRows] = useState({});
-  const prevColumnFiltersRef = React.useRef(
+  const [rowSelection, setRowSelection] = useState({});
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [density, setDensity] = useState("normal");
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showColumnFilters, setShowColumnFilters] = useState(true);
+
+  const prevColumnFiltersRef = useRef(
     JSON.stringify(initialColumnFilters)
   );
 
   // Sync external filters with internal state
-  React.useEffect(() => {
+  useEffect(() => {
     setGlobalFilter(initialGlobalFilter);
   }, [initialGlobalFilter]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const currentFiltersStr = JSON.stringify(initialColumnFilters);
     if (prevColumnFiltersRef.current !== currentFiltersStr) {
       setColumnFilters(initialColumnFilters);
@@ -83,32 +123,23 @@ const DataTable = ({
     onDeleteSuccess,
     {
       onMutate: async ({ ids, deleteType: actionType }) => {
-        // Cancel any outgoing refetches
         await queryClient.cancelQueries({ queryKey: [queryKey] });
-
-        // Snapshot the previous value
         const previousQueries = queryClient.getQueriesData({
           queryKey: [queryKey],
         });
 
-        // Optimistically update to the new value
         queryClient.setQueriesData({ queryKey: [queryKey] }, (old) => {
           if (!old) return old;
-          // Expected structure: { data: [...], meta: {...} } or { data: [...] }
-          // We need to filter 'old.data' or 'old' if it's an array
           let newData = [];
           let newTotal = 0;
 
-          // Optimization: Use Set for O(1) lookup
           const idSet = new Set(ids);
           const filterFn = (item) => !idSet.has(item._id);
 
           if (Array.isArray(old)) {
-            // Direct array
             newData = old.filter(filterFn);
             return newData;
           } else if (old.data && Array.isArray(old.data)) {
-            // API Response wrapper
             newData = old.data.filter(filterFn);
             newTotal = Math.max(
               0,
@@ -127,10 +158,6 @@ const DataTable = ({
           return old;
         });
 
-        // Optimistically update external status counts if onStatusUpdate provided
-        // (This is harder to do generic without knowing structure, skipping for now)
-
-        // Return a context object with the snapshotted value
         return { previousQueries };
       },
       onError: (err, newTodo, context) => {
@@ -141,13 +168,11 @@ const DataTable = ({
         }
       },
       onSettled: () => {
-        // Invalidate to trigger cache-busted refetch
         queryClient.invalidateQueries({ queryKey: [queryKey] });
       },
     }
   );
 
-  // Delete method
   const handleDelete = (ids, deleteType) => {
     let title = "";
     let message = "";
@@ -178,7 +203,7 @@ const DataTable = ({
       ids: confirmModal.ids,
       deleteType: confirmModal.deleteType,
     });
-    setSelectedRows({});
+    setRowSelection({});
     setConfirmModal({
       open: false,
       title: "",
@@ -198,8 +223,7 @@ const DataTable = ({
     });
   };
 
-  // Export method
-  const handleExport = async (table) => {
+  const handleExport = async () => {
     setExportLoading(true);
     try {
       const csvConfig = mkConfig({
@@ -209,9 +233,9 @@ const DataTable = ({
         filename: "csv-data",
       });
       let csv;
-      const selectedRowModel = table.getSelectedRowModel();
-      if (selectedRowModel.rows.length > 0) {
-        const rowData = selectedRowModel.rows.map((row) => row.original);
+      const selectedRows = table.getSelectedRowModel().rows;
+      if (selectedRows.length > 0) {
+        const rowData = selectedRows.map((row) => row.original);
         csv = generateCsv(csvConfig)(rowData);
       } else {
         const { data: response } = await axios.get(exportEndpoint);
@@ -231,7 +255,7 @@ const DataTable = ({
   };
 
   const {
-    data: { data = [], meta } = {}, //your data and api response will probably be different
+    data: { data = [], meta } = {},
     isError,
     isRefetching,
     isLoading,
@@ -240,11 +264,11 @@ const DataTable = ({
     queryKey: [
       queryKey,
       {
-        columnFilters, //refetch when columnFilters changes
-        globalFilter, //refetch when globalFilter changes
-        pagination, //refetch when pagination changes
-        sorting, //refetch when sorting changes
-        deleteType, //refetch when deleteType changes
+        columnFilters,
+        globalFilter,
+        pagination,
+        sorting,
+        deleteType,
       },
     ],
     queryFn: async () => {
@@ -261,148 +285,501 @@ const DataTable = ({
       Url.searchParams.set("deleteType", deleteType);
       Url.searchParams.set("_t", Date.now());
 
-      //use whatever fetch library you want, fetch, axios, etc
       const { data } = await axios.get(Url.href);
       return data;
     },
-    placeholderData: keepPreviousData, //don't go to 0 rows when refetching or paginating to next page
+    placeholderData: keepPreviousData,
     refetchInterval: typeof refetchInterval === "number" ? refetchInterval : false,
   });
-  const table = useMaterialReactTable({
-    columns: columnsConfig,
+
+  // Create columns with selection and actions
+  const columns = useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableColumnFilter: false,
+      },
+      ...columnsConfig,
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {createAction(row, deleteType, handleDelete).map((action, index) => (
+                <React.Fragment key={index}>{action}</React.Fragment>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+        enableSorting: false,
+        enableColumnFilter: false,
+      },
+    ],
+    [columnsConfig, createAction, deleteType]
+  );
+
+  const table = useReactTable({
     data,
+    columns,
+    pageCount: meta?.totalRowCount
+      ? Math.ceil(meta.totalRowCount / pagination.pageSize)
+      : -1,
+    state: {
+      columnFilters,
+      globalFilter,
+      pagination,
+      sorting,
+      rowSelection,
+      columnVisibility,
+    },
     enableRowSelection: true,
-    columnFilterDisplayMode: "popover",
-    paginationDisplayMode: "pages",
-    enableColumnOrdering: true,
-    enableStickyHeader: true,
-    enableStickyFooter: true,
-    initialState: { showColumnFilters: true },
-    manualFiltering: true, //turn off built-in client-side filtering
-    manualPagination: true, //turn off built-in client-side pagination
-    manualSorting: true, //turn off built-in client-side sorting
-    muiToolbarAlertBannerProps: isError
-      ? {
-          color: "error",
-          children: "Error loading data",
-        }
-      : undefined,
+    onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
-    rowCount: meta?.totalRowCount ?? 0,
-    onRowSelectionChange: setSelectedRows,
-    state: {
-      columnFilters,
-      globalFilter,
-      isLoading,
-      pagination,
-      showAlertBanner: isError,
-      showProgressBars: isRefetching,
-      sorting,
-      rowSelection: selectedRows,
-    },
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    getRowId: (originalRow) => originalRow._id,
     meta: {
       onStatusUpdate,
     },
-    getRowId: (originalRow) => originalRow._id,
-    renderToolbarInternalActions: ({ table }) => (
-      <>
-        <MRT_ShowHideColumnsButton table={table} />
-        <MRT_ToggleFullScreenButton table={table} />
-        <MRT_ToggleDensePaddingButton table={table} />
-
-        {deleteType !== "PD" && trashView && (
-          <Tooltip title={"Recycle Bin"}>
-            <Link href={trashView}>
-              <IconButton>
-                <RecyclingIcon></RecyclingIcon>
-              </IconButton>
-            </Link>
-          </Tooltip>
-        )}
-        {/* Delete all */}
-        {deleteType === "SD" && (
-          <>
-            <Tooltip title={"Delete All"}>
-              <IconButton
-                disabled={Object.keys(selectedRows).length === 0}
-                onClick={() =>
-                  handleDelete(Object.keys(selectedRows), deleteType)
-                }
-              >
-                <DeleteIcon></DeleteIcon>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={"Permanently Delete"}>
-              <IconButton
-                disabled={Object.keys(selectedRows).length === 0}
-                onClick={() => handleDelete(Object.keys(selectedRows), "PD")}
-              >
-                <DeleteForeverIcon></DeleteForeverIcon>
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-        {/* Restore */}
-        {deleteType === "PD" && (
-          <>
-            <Tooltip title={"Restore Data"}>
-              <IconButton
-                disabled={Object.keys(selectedRows).length === 0}
-                onClick={() => handleDelete(Object.keys(selectedRows), "RSD")}
-              >
-                <RestoreIcon></RestoreIcon>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={"Permanently Delete"}>
-              <IconButton
-                disabled={Object.keys(selectedRows).length === 0}
-                onClick={() => handleDelete(Object.keys(selectedRows), "PD")}
-              >
-                <DeleteForeverIcon></DeleteForeverIcon>
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-      </>
-    ),
-    enableRowActions: true,
-    positionActionsColumn: "last",
-    renderRowActionMenuItems: ({ row }) =>
-      createAction(row, deleteType, handleDelete),
-
-    renderTopToolbarCustomActions: ({ table }) => (
-      <div
-        style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}
-      >
-        {exportEndpoint && (
-          <Tooltip arrow title="Export Data">
-            <ButtonLoading
-              type="button"
-              text={
-                <div>
-                  <div className="semi-bold cursor-pointer hidden md:block">
-                    Export <FileDownloadIcon />
-                  </div>
-                  <div className="semi-bold cursor-pointer md:hidden">
-                    <FileDownloadIcon />
-                  </div>
-                </div>
-              }
-              loading={exportLoading}
-              onClick={() => handleExport(table)}
-            ></ButtonLoading>
-          </Tooltip>
-        )}
-      </div>
-    ),
   });
 
+  const getPaddingByDensity = () => {
+    switch (density) {
+      case "compact":
+        return "py-1 px-2";
+      case "comfortable":
+        return "py-3 px-4";
+      default:
+        return "py-2 px-3";
+    }
+  };
+
   return (
-    <div>
-      <MaterialReactTable table={table} />
+    <div
+      className={`w-full ${
+        isFullScreen
+          ? "fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-background p-4"
+          : ""
+      }`}
+    >
+      <div className="w-full mb-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-800">
+        {/* Toolbar */}
+        <TooltipProvider>
+          <div className="flex items-center gap-2 p-4 flex-wrap border-b">
+            <div className="flex-1">
+              {Object.keys(rowSelection).length > 0 && (
+                <p className="text-sm font-medium">
+                  {Object.keys(rowSelection).length} selected
+                </p>
+              )}
+            </div>
+
+            {exportEndpoint && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <ButtonLoading
+                    type="button"
+                    text={
+                      <div className="flex items-center gap-2">
+                        <Download className="h-4 w-4" />
+                        <span className="hidden md:inline">Export</span>
+                      </div>
+                    }
+                    loading={exportLoading}
+                    onClick={handleExport}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Export to CSV</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowColumnFilters(!showColumnFilters)}
+                >
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle Filters</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    setDensity((prev) =>
+                      prev === "normal"
+                        ? "compact"
+                        : prev === "compact"
+                        ? "comfortable"
+                        : "normal"
+                    )
+                  }
+                >
+                  {density === "compact" ? (
+                    <AlignLeft className="h-4 w-4" />
+                  ) : (
+                    <AlignJustify className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Change Density</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsFullScreen(!isFullScreen)}
+                >
+                  {isFullScreen ? (
+                    <Minimize className="h-4 w-4" />
+                  ) : (
+                    <Maximize className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isFullScreen ? "Exit Fullscreen" : "Fullscreen"}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {deleteType !== "PD" && trashView && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href={trashView}>
+                    <Button variant="outline" size="icon">
+                      <Recycle className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>View Trash</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            {deleteType === "SD" && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={Object.keys(rowSelection).length === 0}
+                      onClick={() =>
+                        handleDelete(Object.keys(rowSelection), deleteType)
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Move to Trash</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={Object.keys(rowSelection).length === 0}
+                      onClick={() => handleDelete(Object.keys(rowSelection), "PD")}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete Permanently</p>
+                  </TooltipContent>
+                </Tooltip>
+              </>
+            )}
+
+            {deleteType === "PD" && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={Object.keys(rowSelection).length === 0}
+                      onClick={() => handleDelete(Object.keys(rowSelection), "RSD")}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Restore</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={Object.keys(rowSelection).length === 0}
+                      onClick={() => handleDelete(Object.keys(rowSelection), "PD")}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete Permanently</p>
+                  </TooltipContent>
+                </Tooltip>
+              </>
+            )}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => refetch()}>
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Refresh</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+
+        {isError && (
+          <div className="m-4 p-4 bg-destructive/10 text-destructive dark:bg-red-900/30 dark:text-red-400 rounded-md">
+            Error loading data
+          </div>
+        )}
+
+        {isRefetching && <Progress value={undefined} className="h-1" />}
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <React.Fragment key={headerGroup.id}>
+                  <TableRow>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className={`font-bold ${getPaddingByDensity()}`}
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div className="flex items-center gap-2">
+                            {header.column.getCanSort() ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="-ml-3 h-8"
+                                onClick={header.column.getToggleSortingHandler()}
+                              >
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                                {{
+                                  asc: <ArrowUp className="ml-2 h-4 w-4" />,
+                                  desc: <ArrowDown className="ml-2 h-4 w-4" />,
+                                }[header.column.getIsSorted()] ?? null}
+                              </Button>
+                            ) : (
+                              flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )
+                            )}
+                          </div>
+                        )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                  {showColumnFilters && (
+                    <TableRow>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          className={getPaddingByDensity()}
+                        >
+                          {header.column.getCanFilter() && (
+                            <Input
+                              placeholder="Filter..."
+                              value={
+                                (columnFilters.find(
+                                  (f) => f.id === header.column.id
+                                )?.value || "")
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setColumnFilters((prev) => {
+                                  const existing = prev.filter(
+                                    (f) => f.id !== header.column.id
+                                  );
+                                  if (value) {
+                                    return [
+                                      ...existing,
+                                      { id: header.column.id, value },
+                                    ];
+                                  }
+                                  return existing;
+                                });
+                              }}
+                              className="h-8"
+                            />
+                          )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="text-center py-8"
+                  >
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="text-center py-8"
+                  >
+                    No data found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={getPaddingByDensity()}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between px-4 py-4 border-t">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {Object.keys(rowSelection).length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="flex items-center space-x-6 lg:space-x-8">
+            <div className="flex items-center space-x-2">
+              <p className="text-sm font-medium">Rows per page</p>
+              <select
+                value={pagination.pageSize}
+                onChange={(e) => {
+                  setPagination({
+                    pageIndex: 0,
+                    pageSize: Number(e.target.value),
+                  });
+                }}
+                className="h-8 w-[70px] rounded-md border border-input bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 px-2 text-sm"
+              >
+                {[5, 10, 25, 50, 100].map((pageSize) => (
+                  <option key={pageSize} value={pageSize}>
+                    {pageSize}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+              Page {pagination.pageIndex + 1} of{" "}
+              {table.getPageCount() || 1}
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    pageIndex: prev.pageIndex - 1,
+                  }))
+                }
+                disabled={pagination.pageIndex === 0}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    pageIndex: prev.pageIndex + 1,
+                  }))
+                }
+                disabled={
+                  pagination.pageIndex >= (table.getPageCount() || 1) - 1
+                }
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <ConfirmModal
         open={confirmModal.open}
         onClose={handleCloseModal}

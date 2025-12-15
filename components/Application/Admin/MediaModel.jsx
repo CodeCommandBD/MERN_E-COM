@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import {loader} from "@/public/image";

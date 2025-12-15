@@ -1,12 +1,13 @@
 import React from "react";
 import {
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  Button,
-} from "@mui/material";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const ConfirmModal = ({
   open,
@@ -18,38 +19,21 @@ const ConfirmModal = ({
   cancelText = "Cancel",
 }) => {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      aria-labelledby="confirm-dialog-title"
-      aria-describedby="confirm-dialog-description"
-      PaperProps={{
-        elevation: 0,
-        sx: {
-          boxShadow:
-            "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-        },
-      }}
-    >
-      <DialogTitle id="confirm-dialog-title">{title}</DialogTitle>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent>
-        <DialogContentText id="confirm-dialog-description">
-          {message}
-        </DialogContentText>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{message}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            {cancelText}
+          </Button>
+          <Button onClick={onConfirm} autoFocus>
+            {confirmText}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="inherit">
-          {cancelText}
-        </Button>
-        <Button
-          onClick={onConfirm}
-          color="primary"
-          variant="contained"
-          autoFocus
-        >
-          {confirmText}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
