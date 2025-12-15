@@ -146,6 +146,37 @@ export default function AdminOrderDetails() {
         </div>
       </div>
 
+      {/* Cancellation Notice Banner */}
+      {order.orderStatus === "cancelled" && (
+        <div className="bg-red-50 border border-red-300 rounded-lg p-4 flex items-start gap-3">
+          <div className="bg-red-100 rounded-full p-2">
+            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-red-800 font-semibold">Order Cancelled</h3>
+            <p className="text-red-600 text-sm mt-1">
+              This order has been cancelled by the customer.
+              {order.cancelledAt && (
+                <span className="block mt-1">
+                  Cancelled on: {new Date(order.cancelledAt).toLocaleDateString()} at{" "}
+                  {new Date(order.cancelledAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              )}
+            </p>
+            {order.paymentStatus === "paid" && (
+              <p className="text-red-700 text-sm font-medium mt-2">
+                ⚠️ Customer has already paid. Please process the refund.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Content - Items */}
         <div className="md:col-span-2 space-y-6">
