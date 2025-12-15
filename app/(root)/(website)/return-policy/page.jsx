@@ -2,9 +2,9 @@ import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrum
 
 // SEO Metadata for Return Policy
 export const metadata = {
-  title: "Return Policy | E-Store",
+  title: "Return Policy | WearPoint",
   description:
-    "Learn about E-Store's 7-day return policy. Easy returns and refunds for your peace of mind when shopping with us.",
+    "Learn about WearPoint's 7-day return policy. Easy returns and refunds for your peace of mind when shopping with us.",
   alternates: {
     canonical: "/return-policy",
   },

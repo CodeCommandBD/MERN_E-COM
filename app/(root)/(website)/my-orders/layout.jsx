@@ -1,8 +1,8 @@
 // SEO Metadata for My Orders Page (noindex for privacy)
 export const metadata = {
-  title: "My Orders – E-Store | Track Your Orders",
+  title: "My Orders | WearPoint",
   description:
-    "View and track your E-Store orders. Check order status, delivery updates, and manage your purchases securely.",
+    "View and track your WearPoint orders. Check order status, delivery updates, and manage your purchases securely.",
   robots: {
     index: false,
     follow: false,

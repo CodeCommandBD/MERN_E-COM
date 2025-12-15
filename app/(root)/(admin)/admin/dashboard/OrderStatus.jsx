@@ -76,7 +76,7 @@ export function OrderStatus({ data = [] }) {
   };
 
   return (
-    <div className="rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full p-4 overflow-hidden flex flex-col">
+    <div className="rounded-lg border bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full p-4 overflow-hidden flex flex-col">
       <div className="mb-4 flex-shrink-0">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Order Summary</h2>
       </div>

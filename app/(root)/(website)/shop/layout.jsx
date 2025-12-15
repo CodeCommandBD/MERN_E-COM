@@ -1,22 +1,21 @@
 // SEO Metadata for Shop Page
 export const metadata = {
-  title: "Shop All Products | T-shirts, Hoodies, Oversized | E-Store",
+  title: "Shop All Products | Men's Fashion | WearPoint",
   description:
-    "Browse our complete collection of premium T-shirts, Hoodies, and Oversized clothing. Filter by size, color, and price. Free shipping on all orders!",
+    "Browse WearPoint's complete collection of premium men's fashion. Shop shirts, shorts, casual wear, and formal attire. Free shipping on orders over $50.",
   alternates: {
     canonical: "/shop",
   },
   openGraph: {
-    title: "Shop All Products | E-Store",
+    title: "Shop All Products | WearPoint",
     description:
-      "Browse our complete collection of premium fashion. Filter by category, size, color, and price.",
-    type: "website",
+      "Browse WearPoint's complete collection of premium men's fashion. Quality clothing at great prices.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shop All Products | E-Store",
+    title: "Shop All Products | WearPoint",
     description:
-      "Browse our collection of premium T-shirts, Hoodies, and Oversized clothing.",
+      "Browse WearPoint's complete collection of premium men's fashion.",
   },
 };
 

@@ -87,7 +87,7 @@ const HomeContent = ({ testimonials }) => {
     <div className="bg-white">
       {/* Hidden H1 for accessibility/SEO */}
       <h1 className="sr-only">
-        E-Store - Premium Fashion & Clothing | Shop T-shirts, Hoodies, Oversized
+        WearPoint - Premium Quality Men's Fashion | Shop Shirts, Shorts & More
       </h1>
 
       {/* Hero Slider */}

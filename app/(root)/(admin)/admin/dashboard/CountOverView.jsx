@@ -29,7 +29,7 @@ const CountOverView = () => {
   return (
     <div className="grid lg:grid-cols-4 sm:grid-cols-2  sm:gap-10 gap-5">
       <Link href={ADMIN_CATEGORY_SHOW}>
-        <div className="flex items-center justify-between p-3 border border-l-4 border-l-green-400 rounded-lg bg-white dark:bg-gray-700 dark:shadow-xl dark:border-gray-800 dark:border-l-green-400 dark:text-white">
+        <div className="flex items-center justify-between p-3 border border-l-4 border-l-green-400 rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-800 dark:border-l-green-400 dark:text-white">
           <div>
             <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">
               Total categories
@@ -46,7 +46,7 @@ const CountOverView = () => {
         </div>
       </Link>
       <Link href={ADMIN_PRODUCT_SHOW}>
-        <div className="flex items-center justify-between p-3 border border-l-4 border-l-blue-400 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-800 dark:border-l-blue-400 dark:text-white">
+        <div className="flex items-center justify-between p-3 border border-l-4 border-l-blue-400 rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-800 dark:border-l-blue-400 dark:text-white">
           <div>
             <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">
               Total products
@@ -63,7 +63,7 @@ const CountOverView = () => {
         </div>
       </Link>
       <Link href={ADMIN_CUSTOMER_SHOW}>
-        <div className="flex items-center justify-between p-3 border border-l-4 border-l-yellow-400 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-800 dark:border-l-yellow-400 dark:text-white">
+        <div className="flex items-center justify-between p-3 border border-l-4 border-l-yellow-400 rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-800 dark:border-l-yellow-400 dark:text-white">
           <div>
             <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">
               Total customers
@@ -80,7 +80,7 @@ const CountOverView = () => {
         </div>
       </Link>
       <Link href={ADMIN_ORDER_SHOW}>
-        <div className="flex items-center justify-between p-3 border border-l-4 border-l-cyan-400 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-800 dark:border-l-cyan-400 dark:text-white">
+        <div className="flex items-center justify-between p-3 border border-l-4 border-l-cyan-400 rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-800 dark:border-l-cyan-400 dark:text-white">
           <div>
             <h4 className="text-md font-medium text-gray-500 dark:text-gray-300">
               Total orders

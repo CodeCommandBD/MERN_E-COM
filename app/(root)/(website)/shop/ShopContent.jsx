@@ -90,8 +90,8 @@ const ShopContent = ({
       <WebsiteBreadCrumb props={breadcrumb} />
 
       {/* SEO H1 - visually hidden but accessible to screen readers and search engines */}
-      <h1 className="sr-only">
-        Shop All Products - E-Store Fashion Collection
+      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+        Shop All Products - WearPoint Fashion Collection
       </h1>
 
       {/* Main Shop Container */}

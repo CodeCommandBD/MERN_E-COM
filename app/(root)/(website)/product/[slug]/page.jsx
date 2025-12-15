@@ -44,12 +44,12 @@ export async function generateMetadata({ params, searchParams }) {
       return html.replace(/<[^>]*>/g, "");
     };
 
-    let description = stripHtml(product.description).slice(0, 160);
+    let description = stripHtml(product.description).slice(0, 120);
 
     if (description.length < 10) {
-      description = `Shop ${product.name} at E-Store. Premium quality fashion with free shipping.`;
+      description = `Buy ${product.name} at WearPoint. Premium quality, free shipping over $50.`;
     } else {
-      description += "...";
+      description = `Buy ${product.name} at WearPoint. ${description}... Premium quality, free shipping over $50.`;
     }
     const imageUrl =
       variant?.media?.[0]?.secure_url || product?.media?.[0]?.secure_url;
@@ -69,21 +69,30 @@ export async function generateMetadata({ params, searchParams }) {
     return {
       title,
       description,
+      keywords: [
+        product.name,
+        product.category?.name || "fashion",
+        variant?.color?.name || "clothing",
+        "WearPoint",
+        "buy online",
+        "premium quality",
+        "men's fashion",
+      ],
       alternates: {
         canonical: canonicalUrl,
       },
       openGraph: {
-        title: `${product.name} | E-Store`,
+        title: `${product.name} | WearPoint`,
         description,
         url: canonicalUrl,
         images: absoluteImage
           ? [{ url: absoluteImage, width: 800, height: 800, alt: product.name }]
           : [],
-        type: "website",
+        type: "product.item",
       },
       twitter: {
         card: "summary_large_image",
-        title: `${product.name} | E-Store`,
+        title: `${product.name} | WearPoint`,
         description,
         images: absoluteImage ? [absoluteImage] : [],
       },
@@ -97,6 +106,11 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 function ProductJsonLd({ product, variant }) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://wearpoint-nu.vercel.app";
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -108,21 +122,25 @@ function ProductJsonLd({ product, variant }) {
       product?.media?.map((m) => m.secure_url) ||
       [],
     sku: variant?._id || product._id,
+    mpn: `WP-${product._id?.toString().slice(-8).toUpperCase()}`,
     brand: {
       "@type": "Brand",
-      name: "E-Store",
+      name: "WearPoint",
     },
     offers: {
       "@type": "Offer",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/product/${product.slug
-        }`,
-      priceCurrency: "BDT",
+      url: `${baseUrl}/product/${product.slug}`,
+      priceCurrency: "USD",
       price: variant?.sellingPrice || product.sellingPrice,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0],
       itemCondition: "https://schema.org/NewCondition",
       availability: "https://schema.org/InStock",
+      seller: {
+        "@type": "Organization",
+        name: "WearPoint",
+      },
     },
   };
 

@@ -117,7 +117,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Welcome to <span className="text-primary">E-Store</span>
+              Welcome to <span className="text-primary">WearPoint</span>
             </h1>
             <p className="text-gray-600 text-lg leading-relaxed">
               We are passionate about bringing you the latest fashion trends at
@@ -159,7 +159,7 @@ export default function AboutPage() {
               </h2>
               <p className="text-gray-600 mb-4 leading-relaxed">
                 Founded with a vision to revolutionize the way people shop for
-                fashion, E-Store has grown from a small startup to a trusted
+                fashion, WearPoint has grown from a small startup to a trusted
                 destination for fashion enthusiasts across the country.
               </p>
               <p className="text-gray-600 leading-relaxed">
@@ -225,7 +225,7 @@ export default function AboutPage() {
               Why Choose Us
             </div>
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-              The E-Store Advantage
+              The WearPoint Advantage
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
