@@ -8,7 +8,15 @@ export default function robots() {
         allow: "/",
         disallow: [
           "/admin/", // Admin dashboard
-          "/api/", // API routes
+          // Sensitive API routes only (allow public data APIs)
+          "/api/auth/", // Authentication APIs
+          "/api/order/", // Order APIs
+          "/api/user/", // User APIs
+          "/api/stripe/", // Payment APIs
+          "/api/support/", // Support chat APIs
+          "/api/customers/", // Customer data APIs
+          "/api/dashboard/", // Admin dashboard APIs
+          "/api/coupon/validate", // Coupon validation
           "/auth/", // Authentication routes
           "/checkout/", // Checkout process
           "/checkout",
