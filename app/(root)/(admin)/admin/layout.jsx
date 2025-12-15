@@ -18,12 +18,12 @@ const layout = ({ children }) => {
           <PageTransitionLoader />
           <AppSidebar />
           <main className=' md:w-[calc(100vw-16rem)] w-full'>
-            <div className='px-4 md:px-8 pt-18 min-h-[calc(100vh-40px)] pb-10'>
+            <div className='px-4 md:px-8 pt-18 min-h-[calc(100vh-40px)] pb-10 dark:bg-card'>
               {/* <SidebarTrigger></SidebarTrigger> */}
               <TopBar></TopBar>
               {children}
             </div>
-            <div className='border-t h-[40px] flex justify-center items-center bg-gray-50 dark:bg-background text-shadow-md'>
+            <div className='border-t h-[40px] flex justify-center items-center bg-gray-50 dark:bg-card dark:text-white text-shadow-md'>
               &copy; 2025 Developer SHANTO<sup style={{ fontSize: '0.3em' }}>TM</sup>.{'  '}All Rights Reserved.
             </div>
           </main>
