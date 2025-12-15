@@ -5,9 +5,21 @@ import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
 import OTPModel from "@/Models/Otp.model";
 import UserModel from "@/Models/user.models";
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+} from "@/lib/rateLimit";
 
 export async function POST(req){
     try {
+        // Rate limiting: 3 OTP requests per 5 minutes per IP
+        const clientIP = getClientIP(req);
+        const rateCheck = await checkRateLimit(`reset-otp-send:${clientIP}`, 3, 300000);
+        if (!rateCheck.allowed) {
+            return rateLimitResponse(rateCheck.resetIn);
+        }
+
         await connectDB()
         const payload = await req.json()
         const validationSchema = zSchema.pick({

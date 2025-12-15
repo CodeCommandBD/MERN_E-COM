@@ -2,9 +2,21 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/Models/user.models";
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+} from "@/lib/rateLimit";
 
 export async function PUT(req){
     try {
+        // Rate limiting: 5 password update attempts per 15 minutes per IP
+        const clientIP = getClientIP(req);
+        const rateCheck = await checkRateLimit(`reset-password-update:${clientIP}`, 5, 900000);
+        if (!rateCheck.allowed) {
+            return rateLimitResponse(rateCheck.resetIn);
+        }
+
         await connectDB()
         const payload = await req.json()
         const validationSchema = zSchema.pick({
