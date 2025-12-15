@@ -102,36 +102,30 @@ export default function MyOrders() {
       });
 
       if (response.data.success) {
-        // Reconcile server with local so UI updates immediately without flicker
+        // Server data is authoritative - always use server orders
+        // Only keep local orders that don't exist on server yet (brand new, within 60 seconds)
         const serverOrders = response.data.data || [];
         const byId = new Map();
-        // Seed with server orders first
+        
+        // Server orders are authoritative
         serverOrders.forEach((o) => byId.set(o._id, o));
-        // Merge local orders: keep local if it's cancelled or has newer updatedAt; also include local-only
+        
+        // Only add local orders that don't exist on server yet (newly created, not yet synced)
         const localOrders = ordersRef.current || [];
         const now = Date.now();
         localOrders.forEach((local) => {
-          const server = byId.get(local._id);
-          if (!server) {
+          const existsOnServer = byId.has(local._id);
+          if (!existsOnServer) {
+            // Keep very recent local orders (created within last 60 seconds) that haven't synced yet
             const createdAtMs = local.createdAt ? new Date(local.createdAt).getTime() : 0;
             const ageMs = now - createdAtMs;
             if (ageMs < 60000) {
               byId.set(local._id, local);
             }
-            return;
           }
-          const localCancelled = local.orderStatus === "cancelled";
-          const serverCancelled = server.orderStatus === "cancelled";
-          if (localCancelled && !serverCancelled) {
-            byId.set(local._id, local);
-            return;
-          }
-          const localUpdated = local.updatedAt ? new Date(local.updatedAt).getTime() : 0;
-          const serverUpdated = server.updatedAt ? new Date(server.updatedAt).getTime() : 0;
-          if (localUpdated > serverUpdated) {
-            byId.set(local._id, local);
-          }
+          // Server data always wins for existing orders - this ensures admin status updates are reflected
         });
+        
         const merged = Array.from(byId.values()).sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
