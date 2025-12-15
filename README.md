@@ -827,7 +827,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 | Resource | Link |
 |----------|------|
 | 🚀 **Live Demo** | [https://wearpoint-nu.vercel.app](https://wearpoint-nu.vercel.app) |
-| 📧 **Support Email** | [support@wearpoint.com](mailto:support@wearpoint.com) |
+| 📧 **Support Email** | [shantokumar00@gmail.com](mailto:support@wearpoint.com) |
 | 📞 **Phone** | +8801638063569 |
 | 📍 **Location** | Uttara, Dhaka 1207, Bangladesh |
 
@@ -890,7 +890,7 @@ Full-stack developer specializing in modern web technologies. Building premium e
 
 | Channel | Contact |
 |---------|---------|
-| 📧 Email | support@wearpoint.com |
+| 📧 Email | shantokumar00@gmail.com |
 | 🌐 Website | [wearpoint-nu.vercel.app](https://wearpoint-nu.vercel.app) |
 | 📍 Location | Uttara, Dhaka, Bangladesh |
 
