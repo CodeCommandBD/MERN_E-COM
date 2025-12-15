@@ -1,9 +1,3 @@
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.NEXT_PUBLIC_APP_URL ||
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "http://localhost:3000";
-
 export default function robots() {
   return {
     rules: [
@@ -28,6 +22,6 @@ export default function robots() {
         ],
       },
     ],
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: "https://wearpoint-nu.vercel.app/sitemap.xml",
   };
 }
