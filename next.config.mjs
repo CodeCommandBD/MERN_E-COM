@@ -43,6 +43,14 @@ const nextConfig = {
   poweredByHeader: false,
   headers: async () => {
     return [
+      // Force correct Content-Type for sitemap (Google Search Console fix)
+      {
+        source: "/sitemap.xml",
+        headers: [
+          { key: "Content-Type", value: "application/xml" },
+          { key: "Cache-Control", value: "public, max-age=3600, must-revalidate" },
+        ],
+      },
       // Main HTML documents (bfcache friendly)
       {
         source: "/product/:slug",
