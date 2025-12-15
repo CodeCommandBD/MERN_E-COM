@@ -51,3 +51,4 @@ export const ADMIN_SUPPORT_SHOW = "/admin/support";
 
 // admin Login routes
 export const ADMIN_LOGIN = "/admin/login";
+

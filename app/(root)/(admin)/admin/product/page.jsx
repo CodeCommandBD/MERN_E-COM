@@ -134,7 +134,7 @@ const ShowProduct = () => {
               const statusData = statsLive?.statusData || stats?.data?.statusData || [];
               const by = (name) => statusData.find((s) => s.status === name)?.count || 0;
               const cards = [
-                { label: "Total Products", value: by("total"), color: "text-black" },
+                { label: "Total Products", value: by("total"), color: "text-black dark:text-white" },
                 { label: "Active", value: by("active"), color: "text-green-600" },
                 { label: "Trashed", value: by("trashed"), color: "text-red-600" },
               ];

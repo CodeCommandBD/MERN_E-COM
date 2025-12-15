@@ -148,7 +148,7 @@ const ShowReviews = () => {
                 { 
                   label: "Total Reviews", 
                   value: totalData?.count || 0, 
-                  color: "text-black" 
+                  color: "dark:text-white" 
                 },
                 { 
                   label: "5 Stars", 

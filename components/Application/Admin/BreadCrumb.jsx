@@ -20,12 +20,12 @@ const BreadCrumb = ({ breadcrumbData }) => {
                             <React.Fragment key={key}>
                                 <BreadcrumbItem>
                                     {isLast ? (
-                                        <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
+                                        <BreadcrumbPage className="dark:text-white">{breadcrumb.label}</BreadcrumbPage>
                                     ) : (
-                                        <BreadcrumbLink href={breadcrumb.href}>{breadcrumb.label}</BreadcrumbLink>
+                                        <BreadcrumbLink href={breadcrumb.href} className="dark:text-white hover:text-gray-300">{breadcrumb.label}</BreadcrumbLink>
                                     )}
                                 </BreadcrumbItem>
-                                {!isLast && <BreadcrumbSeparator />}
+                                {!isLast && <BreadcrumbSeparator className="dark:text-white" />}
                             </React.Fragment>
                         )
                     })
@@ -34,9 +34,9 @@ const BreadCrumb = ({ breadcrumbData }) => {
                         <>
                             <BreadcrumbItem>
                                 {typeof breadcrumbData === 'object' && breadcrumbData?.href ? (
-                                    <BreadcrumbLink href={breadcrumbData.href}>{breadcrumbData.label}</BreadcrumbLink>
+                                    <BreadcrumbLink href={breadcrumbData.href} className="dark:text-white hover:text-gray-300">{breadcrumbData.label}</BreadcrumbLink>
                                 ) : (
-                                    <BreadcrumbPage>{typeof breadcrumbData === 'string' ? breadcrumbData : breadcrumbData?.label}</BreadcrumbPage>
+                                    <BreadcrumbPage className="dark:text-white">{typeof breadcrumbData === 'string' ? breadcrumbData : breadcrumbData?.label}</BreadcrumbPage>
                                 )}
                             </BreadcrumbItem>
                         </>

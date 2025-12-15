@@ -88,7 +88,7 @@ export async function generateMetadata({ params, searchParams }) {
         images: absoluteImage
           ? [{ url: absoluteImage, width: 800, height: 800, alt: product.name }]
           : [],
-        type: "product.item",
+        type: "website",
       },
       twitter: {
         card: "summary_large_image",

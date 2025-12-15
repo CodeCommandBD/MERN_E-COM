@@ -19,7 +19,7 @@ import Image from "next/image";
 import { zSchema } from "@/lib/zodSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormMessage, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 import { ButtonLoading } from "@/components/Application/ButtonLoading";

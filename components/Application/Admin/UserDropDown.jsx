@@ -10,9 +10,6 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useSelector } from "react-redux"
-import { IoShirtOutline } from "react-icons/io5";
-import { MdOutlineShoppingBag } from "react-icons/md";
-import Link from "next/link";
 import LogOutButton from "./LogOutButton";
 
 const UserDropDown = () => {
@@ -20,29 +17,22 @@ const UserDropDown = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Avatar>
+                <Avatar className="cursor-pointer">
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className={'me-5 w-44'}>
-                <DropdownMenuLabel>
-                    <p className="font-semibold">{auth?.name}</p>
-                    <span className="font-normal text-sm">{auth?.email}</span>
+            <DropdownMenuContent 
+                align="end" 
+                sideOffset={10}
+                collisionPadding={16}
+                className={'w-44 max-w-[min(11rem,calc(100vw-2rem))]'}
+            >
+                <DropdownMenuLabel className="pb-2">
+                    <p className="font-semibold text-sm truncate">{auth?.name}</p>
+                    <span className="font-normal text-xs block truncate text-muted-foreground">{auth?.email}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href={''} className="cursor-pointer">
-                        <IoShirtOutline></IoShirtOutline>
-                        New Product
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href={''} className="cursor-pointer">
-                        <MdOutlineShoppingBag></MdOutlineShoppingBag>
-                        Orders
-                    </Link>
-                </DropdownMenuItem>
                <LogOutButton></LogOutButton>
             </DropdownMenuContent>
         </DropdownMenu>

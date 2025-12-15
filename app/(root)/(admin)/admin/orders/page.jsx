@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Eye, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectTrigger,
@@ -142,34 +143,35 @@ const ShowOrders = () => {
   const action = useCallback((row, deleteType, handleDelete) => {
     const status = row?.original?.orderStatus;
     const id = row?.original?._id;
+    console.log("Order ID for View link:", id, "Full row:", row?.original);
     const items = [
-      <MenuItem key="view">
+      <DropdownMenuItem key="view" asChild>
         <Link href={`/admin/orders/${id}`}>View</Link>
-      </MenuItem>,
+      </DropdownMenuItem>,
     ];
     if (status === "pending") {
       items.push(
-        <MenuItem key="confirm" onClick={() => updateOrderStatus(id, "confirmed", status)}>Confirm</MenuItem>
+        <DropdownMenuItem key="confirm" onClick={() => updateOrderStatus(id, "confirmed", status)}>Confirm</DropdownMenuItem>
       );
     }
     if (status === "confirmed") {
       items.push(
-        <MenuItem key="processing" onClick={() => updateOrderStatus(id, "processing", status)}>Processing</MenuItem>
+        <DropdownMenuItem key="processing" onClick={() => updateOrderStatus(id, "processing", status)}>Processing</DropdownMenuItem>
       );
     }
     if (status === "processing") {
       items.push(
-        <MenuItem key="shipped" onClick={() => updateOrderStatus(id, "shipped", status)}>Mark Shipped</MenuItem>
+        <DropdownMenuItem key="shipped" onClick={() => updateOrderStatus(id, "shipped", status)}>Mark Shipped</DropdownMenuItem>
       );
     }
     if (status === "shipped") {
       items.push(
-        <MenuItem key="delivered" onClick={() => updateOrderStatus(id, "delivered", status)}>Mark Delivered</MenuItem>
+        <DropdownMenuItem key="delivered" onClick={() => updateOrderStatus(id, "delivered", status)}>Mark Delivered</DropdownMenuItem>
       );
     }
     if (status !== "delivered" && status !== "cancelled") {
       items.push(
-        <MenuItem key="cancel" onClick={() => updateOrderStatus(id, "cancelled", status)}>Cancel</MenuItem>
+        <DropdownMenuItem key="cancel" onClick={() => updateOrderStatus(id, "cancelled", status)}>Cancel</DropdownMenuItem>
       );
     }
     return items;
@@ -235,7 +237,7 @@ const ShowOrders = () => {
               const total = statusData.reduce((acc, s) => acc + (s.count || 0), 0);
               const by = (name) => statusData.find((s) => s.status === name)?.count || 0;
               const cards = [
-                { label: "Total Orders", value: total, color: "text-black" },
+                { label: "Total Orders", value: total, color: "text-black dark:text-white" },
                 { label: "Pending", value: by("pending"), color: "text-yellow-600" },
                 { label: "Processing", value: by("processing"), color: "text-blue-600" },
                 { label: "Delivered", value: by("delivered"), color: "text-green-600" },

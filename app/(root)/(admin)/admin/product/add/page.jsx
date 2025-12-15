@@ -21,7 +21,7 @@ import axios from "axios";
 import { showToast } from "@/lib/showToast";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/Application/Select";
-import Editor from "@/components/Application/Admin/Editor";
+import TiptapEditor from "@/components/Application/Admin/TiptapEditor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import PageLoader from "@/components/Application/Admin/PageLoader";
@@ -321,7 +321,7 @@ const AddProduct = () => {
                           Description <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Editor
+                          <TiptapEditor
                             key={editorKey}
                             initialData={field.value}
                             onChange={(event, editor) => {

@@ -602,7 +602,7 @@ const DataTable = ({
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
-                        className={`font-bold ${getPaddingByDensity()}`}
+                        className={`font-bold dark:text-white ${getPaddingByDensity()}`}
                       >
                         {header.isPlaceholder ? null : (
                           <div className="flex items-center gap-2">

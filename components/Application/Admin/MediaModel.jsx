@@ -103,7 +103,7 @@ const MediaModel = ({
         <DialogContent className="p-0">
           <div className="h-[90vh] bg-white dark:bg-gray-800 p-3 flex flex-col">
             <div className="mb-3 pb-3 border-b">
-              <DialogTitle className="p-0 text-lg font-semibold mb-3">
+              <DialogTitle className="p-0 text-lg font-semibold mb-3 dark:text-white">
                 Media Selection
               </DialogTitle>
               <div className="relative">
@@ -136,7 +136,7 @@ const MediaModel = ({
                 </div>
               ) : (
                 <>
-                  <div className="grid lg:grid-cols-6 md:grid-cols-5 sm:grid-cols-4 grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {data.pages?.map((page, index) => (
                       <React.Fragment key={index}>
                         {page?.mediaData?.map((mediaItem) => (
