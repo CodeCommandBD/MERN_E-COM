@@ -8,10 +8,10 @@ const OrderDetails = ({ stats }) => {
   return (
     <div>
       <div className="mt-10 flex lg:flex-nowrap flex-wrap gap-10">
-        <div className="lg:w-[70%] w-full h-[400px]">
+        <div className="lg:w-[70%] w-full">
           <OrderOverView data={stats?.monthlyOrders} />
         </div>
-        <div className="lg:w-[30%] w-full h-[400px]">
+        <div className="lg:w-[30%] w-full">
           <OrderStatus data={stats?.statusData} />
         </div>
       </div>

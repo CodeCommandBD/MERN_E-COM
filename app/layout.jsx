@@ -25,30 +25,35 @@ export const metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ||
       process.env.NEXT_PUBLIC_APP_URL ||
       process.env.NEXT_PUBLIC_API_BASE_URL ||
-      "http://localhost:3000"
+      "https://wearpoint-nu.vercel.app"
   ),
   title: {
     default:
-      "E-Store - Premium Fashion & Clothing | T-shirts, Hoodies, Oversized",
-    template: "%s | E-Store",
+      "WearPoint - Premium Quality Men's Fashion & Lifestyle",
+    template: "%s | WearPoint",
   },
   description:
-    "Discover trendy fashion at E-Store. Shop premium T-shirts, Hoodies, Oversized clothing with free shipping, 7-day returns, and 24/7 customer support. Best prices guaranteed!",
+    "Discover premium quality men's fashion at WearPoint. Shop stylish shirts, athletic shorts, casual wear, and formal wear. Designed for men aged 25-45 who value quality and style. Free shipping on orders over $50. Best prices guaranteed!",
   keywords: [
-    "fashion",
-    "clothing",
-    "t-shirts",
-    "hoodies",
-    "oversized",
-    "online shopping",
-    "Bangladesh",
-    "premium fashion",
-    "streetwear",
+    "WearPoint",
+    "premium men's fashion",
+    "men's shirts online",
+    "athletic shorts",
     "casual wear",
+    "formal wear",
+    "quality clothing",
+    "men's fashion store",
+    "online clothing store",
+    "fashion boutique",
+    "men's premium shirts",
+    "business casual",
+    "men's sportswear",
+    "men 25-45 fashion",
+    "quality men's clothing",
   ],
-  authors: [{ name: "E-Store" }],
-  creator: "E-Store",
-  publisher: "E-Store",
+  authors: [{ name: "WearPoint" }],
+  creator: "WearPoint",
+  publisher: "WearPoint",
   formatDetection: {
     email: false,
     address: false,
@@ -57,16 +62,29 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "E-Store",
-    title: "E-Store - Premium Fashion & Clothing",
+    siteName: "WearPoint",
+    title: "WearPoint - Premium Quality Men's Fashion & Lifestyle",
     description:
-      "Discover trendy fashion at E-Store. Shop T-shirts, Hoodies, Oversized clothing with free shipping and 24/7 support.",
+      "Discover premium men's fashion at WearPoint. Shop shirts, shorts, casual wear & formal wear with free shipping and 24/7 support.",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://wearpoint.nu.vercel.app",
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://wearpoint.nu.vercel.app"}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "WearPoint - Premium Men's Fashion",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "E-Store - Premium Fashion & Clothing",
+    title: "WearPoint - Premium Quality Men's Fashion",
     description:
-      "Discover trendy fashion at E-Store. Shop T-shirts, Hoodies, Oversized clothing with free shipping.",
+      "Discover premium men's fashion at WearPoint. Shop shirts, shorts & casual wear with free shipping.",
+    images: [
+      `${process.env.NEXT_PUBLIC_SITE_URL || "https://wearpoint.nu.vercel.app"}/twitter-image.jpg`,
+    ],
+    creator: "@wearpoint",
   },
   robots: {
     index: true,
@@ -80,7 +98,10 @@ export const metadata = {
     },
   },
   verification: {
-    google: "q72GTx9vQx8amQEiUaIHVUoQ5xAKAN_0MIVghqEzA4E",
+    google: "q72GTx9vQx8amQEiUaIHVUoQ5xAKAN_0MIVghqEzA4E", // Keep existing verification code
+  },
+  alternates: {
+    canonical: "/",
   },
   appleWebApp: {
     capable: true,

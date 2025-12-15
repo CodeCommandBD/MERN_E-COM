@@ -1,10 +1,10 @@
 import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrumb";
 
-// SEO Metadata for Privacy Policy
+// SEO Metadata for Privacy Policy Page
 export const metadata = {
-  title: "Privacy Policy | E-Store",
+  title: "Privacy Policy | WearPoint",
   description:
-    "Read E-Store's Privacy Policy. Learn how we collect, use, and protect your personal information when you shop with us.",
+    "Read WearPoint's Privacy Policy. Learn how we collect, use, and protect your personal information when you shop with us.",
   alternates: {
     canonical: "/privacy-policy",
   },
@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
                 <strong>Phone:</strong> +8801777777777
               </li>
               <li>
-                <strong>Address:</strong> E-Store market uttara, Dhaka 1207
+                <strong>Address:</strong> 123 Fashion Avenue, New York, NY 10011, United States
               </li>
             </ul>
           </section>

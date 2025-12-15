@@ -2,9 +2,9 @@ import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrum
 
 // SEO Metadata for Terms & Conditions
 export const metadata = {
-  title: "Terms & Conditions | E-Store",
+  title: "Terms & Conditions | WearPoint",
   description:
-    "Read E-Store's Terms and Conditions. Understand your rights and responsibilities when using our website and making purchases.",
+    "Read WearPoint's Terms and Conditions. Understand your rights and responsibilities when using our website and making purchases.",
   alternates: {
     canonical: "/terms-conditions",
   },
@@ -38,7 +38,7 @@ export default function TermsConditionsPage() {
               1. Agreement to Terms
             </h2>
             <p>
-              By accessing and using E-Store website, you agree to be bound by
+              By accessing and using WearPoint website, you agree to be bound by
               these Terms and Conditions. If you do not agree to these terms,
               please do not use our website.
             </p>
@@ -102,7 +102,7 @@ export default function TermsConditionsPage() {
             </h2>
             <p>
               All content on this website, including text, graphics, logos, and
-              images, is the property of E-Store and protected by copyright
+              images, is the property of WearPoint and protected by copyright
               laws.
             </p>
           </section>

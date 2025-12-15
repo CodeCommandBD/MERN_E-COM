@@ -20,12 +20,12 @@ export function OrderOverView({ data }) {
   if (!data || data.length === 0) return <div>No data available</div>;
 
   return (
-    <div className="rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full p-4 overflow-hidden">
+    <div className="rounded-lg border bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full p-4 overflow-hidden">
       <div className="mb-4">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Order Overview</h2>
       </div>
-      <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-        <BarChart accessibilityLayer data={data}>
+      <ChartContainer config={chartConfig} className="min-h-[250px] h-[280px] w-full">
+        <BarChart accessibilityLayer data={data} margin={{ top: 5, right: 5, bottom: 25, left: 5 }}>
           <CartesianGrid vertical={false} />
           <XAxis
             dataKey="month"

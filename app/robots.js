@@ -1,23 +1,25 @@
 export default function robots() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://wearpoint-nu.vercel.app";
+
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
         disallow: [
-          "/admin/",
-          "/api/",
-          "/auth/", // Assuming auth is a route group or api path
-          "/checkout/", // Likely these pages should be blocked. Adding trailing slash if they have sub-routes or just /checkout
+          "/admin/", // Admin dashboard
+          "/api/", // API routes
+          "/auth/", // Authentication routes
+          "/checkout/", // Checkout process
           "/checkout",
-          "/cart/",
+          "/cart/", // Shopping cart
           "/cart",
-          "/order/",
-          "/payment-success",
+          "/order/", // Order pages
+          "/payment-success", // Payment confirmation pages
           "/payment-cancel",
-          "/my-account/",
+          "/my-account/", // User account pages
           "/my-account",
-          "/my-orders/",
+          "/my-orders/", // User order history
           "/my-orders",
         ],
       },
