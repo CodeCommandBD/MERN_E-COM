@@ -1,18 +1,16 @@
-import { ListItemIcon, MenuItem } from "@mui/material";
-import RestoreIcon from "@mui/icons-material/Restore";
-import React from "react";
+import React from 'react';
+import { RotateCcw } from 'lucide-react';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
-const RestoreAction = ({ handleDelete, row }) => {
+const RestoreAction = ({ handleDelete, row, deleteType }) => {
   return (
-    <MenuItem
-      key="restore"
-      onClick={() => handleDelete([row.original._id], "RSD")}
+    <DropdownMenuItem
+      onClick={() => handleDelete([row.original._id], deleteType)}
+      className="flex items-center gap-2 cursor-pointer"
     >
-      <ListItemIcon>
-        <RestoreIcon></RestoreIcon>
-      </ListItemIcon>
+      <RotateCcw className="w-4 h-4" />
       Restore
-    </MenuItem>
+    </DropdownMenuItem>
   );
 };
 

@@ -1,10 +1,7 @@
 "use client";
 
-import { ThemeProvider } from "@mui/material";
 import DataTable from "./DataTable";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { darkTheme, lightTheme } from "@/lib/materialTheme";
 
 const DataTableWrapper = ({
   queryKey,
@@ -22,7 +19,6 @@ const DataTableWrapper = ({
   onStatusUpdate,
   refetchInterval,
 }) => {
-  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -30,8 +26,8 @@ const DataTableWrapper = ({
   }, []);
 
   if (!mounted) return null;
+  
   return (
-    <ThemeProvider theme={resolvedTheme === "dark" ? darkTheme : lightTheme}>
       <DataTable
         queryKey={queryKey}
         fetchUrl={fetchUrl}
@@ -48,7 +44,6 @@ const DataTableWrapper = ({
         onStatusUpdate={onStatusUpdate}
         refetchInterval={refetchInterval}
       ></DataTable>
-    </ThemeProvider>
   );
 };
 

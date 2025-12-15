@@ -1,7 +1,13 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { Select, MenuItem, FormControl } from "@mui/material";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const PAYMENT_STATUSES = [
   { value: "pending", label: "PENDING", color: "#f59e0b" },
@@ -18,8 +24,7 @@ export default function PaymentStatusSelect({
   const [status, setStatus] = useState(currentStatus);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = async (e) => {
-    const newStatus = e.target.value;
+  const handleChange = async (newStatus) => {
     setLoading(true);
     try {
       const response = await axios.put("/api/dashboard/admin/order/status", {
@@ -44,32 +49,24 @@ export default function PaymentStatusSelect({
     PAYMENT_STATUSES.find((s) => s.value === status)?.color || "#6b7280";
 
   return (
-    <FormControl size="small" disabled={loading}>
-      <Select
-        value={status}
-        onChange={handleChange}
-        sx={{
-          minWidth: 100,
-          fontSize: "0.75rem",
-          fontWeight: "bold",
+    <Select value={status} onValueChange={handleChange} disabled={loading}>
+      <SelectTrigger 
+        className="w-[100px] h-8 text-xs font-bold rounded-full border"
+        style={{
           backgroundColor: `${currentColor}20`,
           color: currentColor,
-          border: `1px solid ${currentColor}`,
-          borderRadius: "9999px",
-          "& .MuiSelect-select": {
-            padding: "4px 12px",
-          },
-          "& .MuiOutlinedInput-notchedOutline": {
-            border: "none",
-          },
+          borderColor: currentColor,
         }}
       >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
         {PAYMENT_STATUSES.map((s) => (
-          <MenuItem key={s.value} value={s.value}>
+          <SelectItem key={s.value} value={s.value}>
             {s.label}
-          </MenuItem>
+          </SelectItem>
         ))}
-      </Select>
-    </FormControl>
+      </SelectContent>
+    </Select>
   );
 }

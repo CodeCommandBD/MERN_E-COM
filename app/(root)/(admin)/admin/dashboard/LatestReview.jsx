@@ -15,9 +15,9 @@ import { ADMIN_REVIEW_SHOW } from "@/Routes/AdminPanelRoute";
 
 const LatestReview = ({ data = [] }) => {
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm h-full overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h3 className="font-semibold text-lg">Latest Review</h3>
+    <div className="rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Latest Review</h3>
         <Link href={ADMIN_REVIEW_SHOW}>
           <Button variant="default" size="sm">
             View All
