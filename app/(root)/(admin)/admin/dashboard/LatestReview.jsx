@@ -17,7 +17,7 @@ const LatestReview = ({ data = [] }) => {
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Latest Review</h3>
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Latest Review</h3>
         <Link href={ADMIN_REVIEW_SHOW}>
           <Button variant="default" size="sm">
             View All
@@ -28,8 +28,8 @@ const LatestReview = ({ data = [] }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className={"font-semibold"}>Product</TableHead>
-              <TableHead className={"font-semibold"}>Rating</TableHead>
+              <TableHead className={"font-semibold dark:text-white"}>Product</TableHead>
+              <TableHead className={"font-semibold dark:text-white"}>Rating</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

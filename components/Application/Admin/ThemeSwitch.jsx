@@ -18,7 +18,7 @@ const ThemeSwitch = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button type="button" variant="ghost" className={'cursor-pointer'}>
+                <Button type="button" variant="ghost" className={'cursor-pointer dark:text-white dark:placeholder:text-white'}>
                     <FiSun className="dark:hidden"></FiSun>
                     <IoMoonOutline className="hidden dark:block"></IoMoonOutline>
                 </Button>

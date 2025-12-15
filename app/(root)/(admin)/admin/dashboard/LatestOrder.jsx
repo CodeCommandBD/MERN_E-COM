@@ -14,7 +14,7 @@ const LatestOrder = ({ data = [] }) => {
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm h-full overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Latest Order</h3>
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Latest Order</h3>
         <Link href={ADMIN_ORDER_SHOW}>
           <Button variant="default" size="sm">
             View All
@@ -25,11 +25,11 @@ const LatestOrder = ({ data = [] }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Payment Method</TableHead>
-              <TableHead>Total Item</TableHead>
-              <TableHead>status</TableHead>
-              <TableHead>Amount</TableHead>
+              <TableHead className="dark:text-white">Order ID</TableHead>
+              <TableHead className="dark:text-white">Payment Method</TableHead>
+              <TableHead className="dark:text-white">Total Item</TableHead>
+              <TableHead className="dark:text-white">status</TableHead>
+              <TableHead className="dark:text-white">Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

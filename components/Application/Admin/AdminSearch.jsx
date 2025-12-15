@@ -6,12 +6,12 @@ import SearchModel from "./SearchModel";
 const AdminSearch = () => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="md:w-[350px] w-ful ">
+    <div className="md:w-[350px] w-full dark:text-white">
       <div className="relative flex items-center justify-between">
         <Input
           placeholder="Search....."
           readOnly
-          className={"rounded-full coursor-pointer"}
+          className={"rounded-full coursor-pointer dark:text-white dark:placeholder:text-white dark:bg-card"}
           onClick={() => setOpen(true)}
         />
         <button
