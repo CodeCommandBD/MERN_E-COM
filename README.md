@@ -707,11 +707,11 @@ pnpm start
 
 ---
 
-## 🔐 Environment Variables
 
-Create a `.env.local` file in the root directory:
 
-```env
+```
+🔐 Environment Variables
+Create a `.env.local` file in the root directory
 # ===========================================
 # 🗄️ DATABASE
 # ===========================================
@@ -828,18 +828,10 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 |----------|------|
 | 🚀 **Live Demo** | [https://wearpoint-nu.vercel.app](https://wearpoint-nu.vercel.app) |
 | 📧 **Support Email** | [support@wearpoint.com](mailto:support@wearpoint.com) |
-| 📞 **Phone** | +8801777777777 |
+| 📞 **Phone** | +8801638063569 |
 | 📍 **Location** | Uttara, Dhaka 1207, Bangladesh |
 
-### 🔑 Admin Demo Credentials
 
-| Field | Value |
-|-------|-------|
-| **Email** | `admin@gmail.com` |
-| **Password** | `Admin@2025` |
-| **OTP** | `123456` |
-
----
 
 ## 🤝 Contributing
 
