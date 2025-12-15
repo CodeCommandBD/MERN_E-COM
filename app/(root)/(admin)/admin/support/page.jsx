@@ -122,7 +122,7 @@ const AdminSupport = () => {
           <div className="grid md:grid-cols-4 gap-4 mb-6">
             <div className="rounded-lg border bg-white dark:bg-card p-4">
               <p className="text-sm text-muted-foreground">Total Tickets</p>
-              <p className="mt-1 text-2xl font-semibold text-black">
+              <p className="mt-1 text-2xl font-semibold dark:text-white">
                 {totalTickets}
               </p>
             </div>

@@ -21,7 +21,7 @@ import axios from "axios";
 import { showToast } from "@/lib/showToast";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/Application/Select";
-import Editor from "@/components/Application/Admin/Editor";
+import TiptapEditor from "@/components/Application/Admin/TiptapEditor";
 import MediaModel from "@/components/Application/Admin/MediaModel";
 import Image from "next/image";
 import { use } from "react";
@@ -353,7 +353,7 @@ const EditProduct = ({ params }) => {
                     Description <span className="text-red-500">*</span>
                   </FormLabel>
                   {!getProductLoading && (
-                    <Editor
+                    <TiptapEditor
                       initialData={form.getValues("description")}
                       onChange={(event, editor) => {
                         form.setValue("description", editor.getData());

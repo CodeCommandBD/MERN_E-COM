@@ -330,7 +330,7 @@ const Media = () => {
                 {
                   label: "Total Media",
                   value: by("total"),
-                  color: "text-black",
+                  color: "dark:text-white",
                 },
                 {
                   label: "Active",

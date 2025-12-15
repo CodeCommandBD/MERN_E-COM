@@ -7,7 +7,7 @@ import React from 'react'
 
 const layout = ({ children }) => {
   return (
-    <div>
+    <div className="overflow-x-hidden max-w-full">
       <ThemeProvider
          attribute="class"
          defaultTheme="system"
@@ -17,7 +17,7 @@ const layout = ({ children }) => {
         <SidebarProvider>
           <PageTransitionLoader />
           <AppSidebar />
-          <main className=' md:w-[calc(100vw-16rem)] w-full'>
+          <main className='md:w-[calc(100vw-16rem)] w-full overflow-x-hidden'>
             <div className='px-4 md:px-8 pt-18 min-h-[calc(100vh-40px)] pb-10 dark:bg-card'>
               {/* <SidebarTrigger></SidebarTrigger> */}
               <TopBar></TopBar>

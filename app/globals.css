@@ -115,8 +115,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    max-width: 100%;
+    position: relative;
+    margin: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Ensure radix portals don't cause overflow */
+  [data-radix-portal] {
+    max-width: 100vw;
+    overflow: hidden;
   }
 
   /* Suppress browser extension interference */
@@ -160,11 +172,13 @@ input[type="password"]::-ms-clear {
 .slick-dots {
   bottom: 15px !important;
 }
+
 /* Shimmer animation for image loading */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
