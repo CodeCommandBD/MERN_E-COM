@@ -105,7 +105,7 @@ export async function generateMetadata({ params, searchParams }) {
   }
 }
 
-function ProductJsonLd({ product, variant }) {
+function ProductJsonLd({ product, variant, reviewCount, averageRating, reviews }) {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -130,7 +130,7 @@ function ProductJsonLd({ product, variant }) {
     offers: {
       "@type": "Offer",
       url: `${baseUrl}/product/${product.slug}`,
-      priceCurrency: "USD",
+      priceCurrency: "BDT",
       price: variant?.sellingPrice || product.sellingPrice,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         .toISOString()
@@ -144,12 +144,35 @@ function ProductJsonLd({ product, variant }) {
     },
   };
 
-  if (product.averageRating && product.reviewCount) {
+  // Add aggregate rating if available
+  if (averageRating && reviewCount > 0) {
     structuredData.aggregateRating = {
       "@type": "AggregateRating",
-      ratingValue: product.averageRating,
-      reviewCount: product.reviewCount,
+      ratingValue: averageRating,
+      reviewCount: reviewCount,
+      bestRating: "5",
+      worstRating: "1",
     };
+  }
+
+  // Add individual reviews for richer structured data
+  if (reviews && reviews.length > 0) {
+    structuredData.review = reviews.map((r) => ({
+      "@type": "Review",
+      author: {
+        "@type": "Person",
+        name: r.user?.name || "WearPoint Customer",
+      },
+      datePublished: r.createdAt ? new Date(r.createdAt).toISOString().split("T")[0] : undefined,
+      reviewBody: r.review || r.title,
+      name: r.title,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: r.rating,
+        bestRating: "5",
+        worstRating: "1",
+      },
+    }));
   }
 
   return (
@@ -185,7 +208,7 @@ const ProductPage = async ({ params, searchParams }) => {
       );
     }
 
-    const { products: product, variant, getColor, getSize, reviewCount } = data;
+    const { products: product, variant, getColor, getSize, reviewCount, averageRating, sampleReviews } = data;
     const sanitizedDescription = markdownToHtml(product.description || "");
 
     const imageUrl =
@@ -197,7 +220,13 @@ const ProductPage = async ({ params, searchParams }) => {
 
     return (
       <>
-        <ProductJsonLd product={product} variant={variant} />
+        <ProductJsonLd 
+          product={product} 
+          variant={variant} 
+          reviewCount={reviewCount}
+          averageRating={averageRating}
+          reviews={sampleReviews}
+        />
 
         <main id="main-content" className="w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
