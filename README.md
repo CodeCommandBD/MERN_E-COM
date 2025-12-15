@@ -871,7 +871,13 @@ Contributions are welcome! Please follow these steps:
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is **proprietary software**. All rights reserved.
+
+⚠️ **Commercial License Required** - This software may not be copied, modified, distributed, or sold without express written permission from the copyright holder.
+
+For licensing inquiries, please contact: shantokumar00@gmail.com
+
+See the [LICENSE](LICENSE) file for complete terms.
 
 ---
 
