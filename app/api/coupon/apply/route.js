@@ -2,9 +2,17 @@ import { connectDB } from "@/lib/dbConnection";
 import { catchError, res } from "@/lib/helper";
 import { zSchema } from "@/lib/zodSchema";
 import couponModel from "@/Models/Coupon.model";
+import { checkRateLimit, getClientIP, rateLimitResponse } from "@/lib/rateLimit";
 
 export async function POST(req) {
   try {
+    // SECURITY: Rate limiting - 10 coupon attempts per minute per IP
+    const clientIP = getClientIP(req);
+    const rateCheck = await checkRateLimit(`coupon:${clientIP}`, 10, 60000);
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetIn);
+    }
+
     await connectDB();
     const payLoad = await req.json();
 

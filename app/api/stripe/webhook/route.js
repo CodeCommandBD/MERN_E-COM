@@ -16,7 +16,19 @@ export async function POST(request) {
     let event;
 
     // Only verify webhook signature if webhook secret is configured
-    if (process.env.STRIPE_WEBHOOK_SECRET) {
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      // SECURITY: Fail-safe - reject in production if webhook secret not configured
+      if (process.env.NODE_ENV === "production") {
+        console.error("STRIPE_WEBHOOK_SECRET not configured in production!");
+        return NextResponse.json(
+          { success: false, message: "Webhook configuration error" },
+          { status: 500 }
+        );
+      }
+      // Development mode: parse event without verification (with warning)
+      console.warn("⚠️ STRIPE_WEBHOOK_SECRET not set - skipping signature verification (dev only)");
+      event = JSON.parse(body);
+    } else {
       try {
         // Verify webhook signature
         event = stripe.webhooks.constructEvent(
@@ -30,10 +42,6 @@ export async function POST(request) {
           { status: 400 }
         );
       }
-    } else {
-      // Development mode: parse event without verification
-
-      event = JSON.parse(body);
     }
 
     // Handle the checkout.session.completed event
