@@ -2,11 +2,21 @@ import { connectDB } from "@/lib/dbConnection";
 import { res } from "@/lib/helper";
 import OTPModel from "@/Models/Otp.model";
 import UserModel from "@/Models/user.models";
-import { SignJWT } from "jose";
-import { cookies } from "next/headers";
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+} from "@/lib/rateLimit";
 
 export async function POST(req) {
   try {
+    // Rate limiting: 5 OTP verification attempts per 10 minutes per IP
+    const clientIP = getClientIP(req);
+    const rateCheck = await checkRateLimit(`reset-otp-verify:${clientIP}`, 5, 600000);
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetIn);
+    }
+
     await connectDB();
     
     const { email, otp } = await req.json();
