@@ -30,7 +30,7 @@ import { WEBSITE_LOGIN, USER_DASHBOARD } from "@/Routes/WebsiteRoute";
 import { showToast } from "@/lib/showToast";
 import { persistor } from "@/store/store";
 import WebsiteBreadCrumb from "@/components/Application/Website/WebsiteBreadCrumb";
-import { CldUploadWidget } from "next-cloudinary";
+import { useUpdateUserMutation } from "@/store/api/userApiSlice";
 
 const breadcrumb = {
   title: "My Account",
@@ -49,7 +49,6 @@ export default function MyAccountPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
   const [gravatarUrl, setGravatarUrl] = useState("");
   const [activeSection, setActiveSection] = useState("account");
@@ -74,22 +73,25 @@ export default function MyAccountPage() {
     phone: "",
     address: "",
   });
-  const [newAvatar, setNewAvatar] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+  const [isUploading, setIsUploading] = useState(false);
 
   // Cache-busting helper: uses Redux timestamp to force fresh load when avatar changes
   const addCacheBuster = (url) => {
-    if (!url || typeof url !== 'string') {
-      console.log('addCacheBuster: URL is null or not string:', url);
+    if (!url || typeof url !== "string") {
+      console.log("addCacheBuster: URL is null or not string:", url);
       return url; // Return as-is instead of null
     }
     try {
-      const separator = url.includes('?') ? '&' : '?';
+      const separator = url.includes("?") ? "&" : "?";
       const timestamp = auth?.avatarUpdatedAt || Date.now();
       const result = `${url}${separator}v=${timestamp}`;
-      console.log('addCacheBuster:', { url, timestamp, result });
+      console.log("addCacheBuster:", { url, timestamp, result });
       return result;
     } catch (e) {
-      console.error('addCacheBuster error:', e);
+      console.error("addCacheBuster error:", e);
       return url; // Fallback to original URL on error
     }
   };
@@ -114,7 +116,9 @@ export default function MyAccountPage() {
       }
 
       try {
-        const response = await axios.get(`/api/user/${auth._id}`);
+        const response = await axios.get(`/api/user/${auth._id}`, {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+        });
         if (response.data.success) {
           const userData = response.data.data;
           setUser(userData);
@@ -124,8 +128,21 @@ export default function MyAccountPage() {
             address: userData.address || "",
           });
 
-          // Ensure avatarUpdatedAt exists for cache-busting (for existing users)
-          if (!auth?.avatarUpdatedAt && userData.avatar) {
+          // Sync globally ONLY if server has strictly NEWER avatar version
+          // This prevents stale server responses from reverting our fresh local state
+          const serverTime = userData.avatarUpdatedAt || 0;
+          const localTime = auth.avatarUpdatedAt || 0;
+
+          if (serverTime > localTime) {
+            dispatch(
+              login({
+                ...auth,
+                avatarUpdatedAt: userData.avatarUpdatedAt,
+                avatar: userData.avatar,
+              })
+            );
+          } else if (!auth?.avatarUpdatedAt && userData.avatar) {
+            // Legacy/Fallback: If no version exists, set one
             dispatch(
               login({
                 ...auth,
@@ -188,52 +205,94 @@ export default function MyAccountPage() {
     }));
   };
 
-  const handleGenderChange = (selectedGender) => {
-    setFormData((prev) => ({
-      ...prev,
-      gender: selectedGender,
-    }));
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("error", "File size too large (max 5MB)");
+        return;
+      }
+      setSelectedImage(file);
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+
+      // Pickup new avatar immediately for preview
+      setPreviewUrl(objectUrl);
+    }
   };
 
   const handleSave = async () => {
-    setSaving(true);
+    // Basic validation
+    if (!formData.name) return showToast("error", "Name is required");
+
     try {
-      const payload = { ...formData };
-      if (newAvatar) payload.avatar = newAvatar;
-      const response = await axios.put("/api/user/update", payload);
-      if (response.data.success) {
-        const updatedUser = response.data.data;
-        
-        console.log('🔥 SAVE SUCCESS');
-        console.log('Backend Updated User:', updatedUser);
-        
-        // Update Redux with fresh data from backend
-        // We increment _avatarVersion to trigger component re-renders
-        const nextVersion = (auth?._avatarVersion || 0) + 1;
-        
-        const newAuthState = {
-          ...auth,          // Keep existing client-side props (if any)
-          ...updatedUser,   // OVERWRITE with fresh backend data
-          _avatarVersion: nextVersion
-        };
-        
-        console.log('Dispatching New Auth State:', newAuthState);
-        dispatch(login(newAuthState));
-        
-        // Update local state is redundant if using Redux for auth, but good for form fields
-        setUser(updatedUser);
-        setNewAvatar(null);
-        setIsEditing(false);
+      let avatarData = null;
+
+      // 1. Upload Image if selected
+      // 1. Upload Image if selected (SERVER-SIDE UPLOAD)
+      if (selectedImage) {
+        setIsUploading(true);
+        try {
+          // Prepare FormData for server upload
+          const uploadFormData = new FormData();
+          uploadFormData.append("file", selectedImage);
+
+          // Send to our own API route
+          const uploadResponse = await axios.post(
+            "/api/user/upload-avatar",
+            uploadFormData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+          );
+
+          if (uploadResponse.data.success) {
+            avatarData = uploadResponse.data.data;
+          } else {
+            throw new Error("Upload failed");
+          }
+        } catch (uploadError) {
+          setIsUploading(false);
+          console.error("Upload error:", uploadError);
+          return showToast(
+            "error",
+            "Failed to upload image. Please try again."
+          );
+        }
+        setIsUploading(false);
+      }
+
+      // 2. Prepare Payload
+      const payload = {
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+      };
+
+      if (avatarData) {
+        payload.avatar = avatarData;
+      }
+
+      // 3. Update User via RTK Query
+      const result = await updateUser(payload).unwrap();
+
+      if (result.success) {
         showToast("success", "Profile updated successfully");
+
+        // Manual Redux Update to Guarantee UI Refresh
+        const updatedUser = {
+          ...auth,
+          ...result.data,
+          avatarUpdatedAt: result.data.avatarUpdatedAt || Date.now(),
+        };
+        dispatch(login(updatedUser)); // Force update
+
+        setIsEditing(false);
+        setSelectedImage(null);
+        setPreviewUrl(null);
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
-      showToast(
-        "error",
-        error.response?.data?.message || "Failed to update profile"
-      );
-    } finally {
-      setSaving(false);
+      showToast("error", error?.data?.message || "Failed to update profile");
+      setIsUploading(false);
     }
   };
 
@@ -243,7 +302,8 @@ export default function MyAccountPage() {
       phone: user.phone || "",
       address: user.address || "",
     });
-    setNewAvatar(null);
+    setSelectedImage(null);
+    setPreviewUrl(null);
     setIsEditing(false);
   };
 
@@ -444,15 +504,17 @@ export default function MyAccountPage() {
   // 2. Redux Auth State (Source of Truth)
   // 3. Local User State (Fallback)
   // 4. Gravatar (Last Resort)
-  const avatarUrl = newAvatar?.url || auth?.avatar?.url || user?.avatar?.url || gravatarUrl;
-  
-  // React Key Version: Forces component remount on update
-  const avatarVersion = auth?._avatarVersion || 0;
+  const avatarUrl =
+    previewUrl || auth?.avatar?.url || user?.avatar?.url || gravatarUrl;
 
-  console.log('=== Avatar Render Info ===');
-  console.log('URL:', avatarUrl);
-  console.log('Version:', avatarVersion);
-  console.log('==========================');
+  // React Key Version: Forces component remount on update
+  // Prefer avatarUpdatedAt (standardized)
+  const avatarVersion = auth?.avatarUpdatedAt || auth?._avatarVersion || 0;
+
+  console.log("=== Avatar Render Info ===");
+  console.log("URL:", avatarUrl);
+  console.log("Version:", avatarVersion);
+  console.log("==========================");
 
   const menuItems = [
     { icon: User, label: "My Accounts", section: "account" },
@@ -475,11 +537,11 @@ export default function MyAccountPage() {
                 {/* User Info Header */}
                 <div className="p-6 border-b">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-12 h-12" key={`sidebar-${avatarVersion}`}>
-                      <AvatarImage 
-                        src={avatarUrl}
-                        alt={user.name}
-                      />
+                    <Avatar
+                      className="w-12 h-12"
+                      key={`sidebar-${avatarVersion}`}
+                    >
+                      <AvatarImage src={avatarUrl} alt={user.name} />
                       <AvatarFallback className="bg-primary text-white">
                         {user.name?.charAt(0)?.toUpperCase() || "U"}
                       </AvatarFallback>
@@ -550,9 +612,12 @@ export default function MyAccountPage() {
                   {/* Avatar */}
                   <div className="flex justify-center mb-8">
                     <div className="relative">
-                      <Avatar className="w-32 h-32 border-4 border-gray-100" key={`profile-${avatarVersion}`}>
-                        <AvatarImage 
-                          src={avatarUrl}
+                      <Avatar
+                        className="w-32 h-32 border-4 border-gray-100"
+                        key={`profile-${avatarVersion}`}
+                      >
+                        <AvatarImage
+                          src={previewUrl || addCacheBuster(avatarUrl)}
                           alt={user.name}
                         />
                         <AvatarFallback className="text-4xl bg-primary text-white">
@@ -560,43 +625,22 @@ export default function MyAccountPage() {
                         </AvatarFallback>
                       </Avatar>
                       {isEditing && (
-                        <CldUploadWidget
-                          signatureEndpoint="/api/cloudinary-signature"
-                          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                          onQueuesEnd={(results) => {
-                            try {
-                              const files = results?.info?.files || [];
-                              const first = files.find((f) => f.uploadInfo)?.uploadInfo;
-                              if (first) {
-                                setNewAvatar({
-                                  url: first.secure_url,
-                                  public_id: first.public_id,
-                                });
-                                showToast("success", "Image selected. Click Save to update.");
-                              }
-                            } catch (e) {}
-                          }}
-                          config={{
-                            cloud: {
-                              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-                              apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-                            },
-                          }}
-                          options={{ multiple: false, sources: ["local", "url", "google_drive"] }}
-                        >
-                          {({ open }) => (
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                open();
-                              }}
-                              aria-label="Change profile picture"
-                              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors"
-                            >
-                              <Edit2 className="w-4 h-4" aria-hidden="true" />
-                            </button>
-                          )}
-                        </CldUploadWidget>
+                        <div className="absolute bottom-0 right-0">
+                          <input
+                            type="file"
+                            id="avatar-upload"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange}
+                          />
+                          <label
+                            htmlFor="avatar-upload"
+                            className="bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer flex items-center justify-center shadow-md"
+                            title="Change Profile Picture"
+                          >
+                            <Edit2 className="w-4 h-4" aria-hidden="true" />
+                          </label>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -734,15 +778,22 @@ export default function MyAccountPage() {
                       <div className="flex gap-3 pt-4">
                         <Button
                           onClick={handleSave}
-                          disabled={saving}
-                          className="bg-primary hover:bg-primary/90 text-white"
+                          disabled={isUploading || isUpdating}
+                          className="bg-primary hover:bg-primary/90 text-white flex items-center"
                         >
-                          {saving ? "Saving..." : "Save Changes"}
+                          {isUploading || isUpdating ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                              {isUploading ? "Uploading Image..." : "Saving..."}
+                            </>
+                          ) : (
+                            "Save Changes"
+                          )}
                         </Button>
                         <Button
                           onClick={handleCancel}
                           variant="outline"
-                          disabled={saving}
+                          disabled={isUploading || isUpdating}
                         >
                           Cancel
                         </Button>

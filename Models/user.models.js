@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema(
         trim: true,
       },
     },
+    avatarUpdatedAt: {
+      type: Number,
+      default: 0,
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,

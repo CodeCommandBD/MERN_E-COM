@@ -42,13 +42,28 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Version for React Key & Cache Busting
+  // Prefer avatarUpdatedAt if available (Redux standard), otherwise fallback to _avatarVersion
+  const avatarVersion = auth?.avatarUpdatedAt || auth?._avatarVersion || 0;
+
+  // DEBUGGING: Trace Navbar updates
+  useEffect(() => {
+    console.log("🟢 NAVBAR AUTH UPDATE:", {
+      param_avatarUpdatedAt: auth?.avatarUpdatedAt,
+      param_avatarVersion: auth?._avatarVersion,
+      final_version: avatarVersion,
+      url: auth?.avatar?.url,
+    });
+  }, [auth, avatarVersion]);
+
   // Avatar URL getter
   const getAvatarUrl = () => {
-    return auth?.avatar?.url || userIcon.src;
+    if (auth?.avatar?.url) {
+      return `${auth.avatar.url}?v=${avatarVersion}`;
+    }
+    return userIcon.src;
   };
-  
-  // Version for React Key
-  const avatarVersion = auth?._avatarVersion || 0;
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -75,7 +90,8 @@ const Header = () => {
 
               // If avatar or name changed on server, update persisted auth so navbar avatar stays after hard reload
               if (
-                (fetchedUser?.avatar?.url || "") !== (auth?.avatar?.url || "") ||
+                (fetchedUser?.avatar?.url || "") !==
+                  (auth?.avatar?.url || "") ||
                 (fetchedUser?.name || "") !== (auth?.name || "")
               ) {
                 dispatch(
@@ -84,6 +100,8 @@ const Header = () => {
                     name: fetchedUser?.name ?? auth?.name,
                     email: fetchedUser?.email ?? auth?.email,
                     avatar: fetchedUser?.avatar ?? auth?.avatar,
+                    avatarUpdatedAt:
+                      fetchedUser?.avatarUpdatedAt ?? auth?.avatarUpdatedAt,
                   })
                 );
               }
@@ -132,14 +150,14 @@ const Header = () => {
 
     // Initial sync on mount
     syncOrderCount();
-    
+
     // Listen for order count change events to trigger sync
     const handleOrderCountChange = () => {
       syncOrderCount();
     };
-    
+
     window.addEventListener(ORDER_COUNT_CHANGED, handleOrderCountChange);
-    
+
     return () => {
       window.removeEventListener(ORDER_COUNT_CHANGED, handleOrderCountChange);
     };
@@ -356,7 +374,10 @@ const Header = () => {
               </div>
             ) : (
               <Link href={USER_DASHBOARD} aria-label="My Account">
-                <Avatar className="cursor-pointer w-8 h-8" key={`navbar-${avatarVersion}`}>
+                <Avatar
+                  className="cursor-pointer w-8 h-8"
+                  key={`navbar-${avatarVersion}`}
+                >
                   <AvatarImage
                     src={getAvatarUrl()}
                     alt={auth?.name || "User Profile"}

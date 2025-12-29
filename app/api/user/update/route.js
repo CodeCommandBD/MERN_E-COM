@@ -35,6 +35,7 @@ export async function PUT(request) {
         ...(user.avatar || {}),
         ...avatar,
       };
+      user.avatarUpdatedAt = Date.now();
     }
 
     await user.save();
@@ -48,6 +49,7 @@ export async function PUT(request) {
       gender: user.gender,
       address: user.address,
       avatar: user.avatar,
+      avatarUpdatedAt: user.avatarUpdatedAt,
       role: user.role,
       isEmailVerified: user.isEmailVerified,
     });

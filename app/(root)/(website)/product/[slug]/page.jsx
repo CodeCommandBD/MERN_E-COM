@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 import { preload } from "react-dom";
 
 import Script from "next/script";
-import xss from "xss";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import { getProductDetails } from "@/lib/actions/product.action";
 import {
@@ -57,14 +56,16 @@ export async function generateMetadata({ params, searchParams }) {
     const absoluteImage = imageUrl
       ? imageUrl.startsWith("http")
         ? imageUrl
-        : `${process.env.NEXT_PUBLIC_SITE_URL ||
-        process.env.NEXT_PUBLIC_APP_URL ||
-        ""
-        }${imageUrl}`
+        : `${
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            process.env.NEXT_PUBLIC_APP_URL ||
+            ""
+          }${imageUrl}`
       : undefined;
 
-    const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""
-      }/product/${product.slug}`;
+    const canonicalUrl = `${
+      process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || ""
+    }/product/${product.slug}`;
 
     return {
       title,
@@ -105,7 +106,13 @@ export async function generateMetadata({ params, searchParams }) {
   }
 }
 
-function ProductJsonLd({ product, variant, reviewCount, averageRating, reviews }) {
+function ProductJsonLd({
+  product,
+  variant,
+  reviewCount,
+  averageRating,
+  reviews,
+}) {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -163,7 +170,9 @@ function ProductJsonLd({ product, variant, reviewCount, averageRating, reviews }
         "@type": "Person",
         name: r.user?.name || "WearPoint Customer",
       },
-      datePublished: r.createdAt ? new Date(r.createdAt).toISOString().split("T")[0] : undefined,
+      datePublished: r.createdAt
+        ? new Date(r.createdAt).toISOString().split("T")[0]
+        : undefined,
       reviewBody: r.review || r.title,
       name: r.title,
       reviewRating: {
@@ -208,7 +217,15 @@ const ProductPage = async ({ params, searchParams }) => {
       );
     }
 
-    const { products: product, variant, getColor, getSize, reviewCount, averageRating, sampleReviews } = data;
+    const {
+      products: product,
+      variant,
+      getColor,
+      getSize,
+      reviewCount,
+      averageRating,
+      sampleReviews,
+    } = data;
     const sanitizedDescription = markdownToHtml(product.description || "");
 
     const imageUrl =
@@ -220,9 +237,9 @@ const ProductPage = async ({ params, searchParams }) => {
 
     return (
       <>
-        <ProductJsonLd 
-          product={product} 
-          variant={variant} 
+        <ProductJsonLd
+          product={product}
+          variant={variant}
           reviewCount={reviewCount}
           averageRating={averageRating}
           reviews={sampleReviews}

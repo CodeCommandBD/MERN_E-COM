@@ -30,13 +30,16 @@ export async function GET(request, { params }) {
     // SECURITY: Users can only access their own data, admins can access any
     if (auth.role !== "admin" && auth._id.toString() !== userId) {
       return NextResponse.json(
-        { success: false, message: "Forbidden. You can only access your own profile." },
+        {
+          success: false,
+          message: "Forbidden. You can only access your own profile.",
+        },
         { status: 403 }
       );
     }
 
     const user = await UserModel.findById(userId).select(
-      "name email avatar role phone address isEmailVerified"
+      "name email avatar avatarUpdatedAt role phone address isEmailVerified"
     );
 
     if (!user) {

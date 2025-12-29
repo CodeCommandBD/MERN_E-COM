@@ -48,7 +48,10 @@ const nextConfig = {
         source: "/sitemap.xml",
         headers: [
           { key: "Content-Type", value: "application/xml" },
-          { key: "Cache-Control", value: "public, max-age=3600, must-revalidate" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, must-revalidate",
+          },
         ],
       },
       // Main HTML documents (bfcache friendly)
@@ -93,7 +96,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https: https://res.cloudinary.com https://*.stripe.com",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://res.cloudinary.com https://api.stripe.com https://checkout.stripe.com https://maps.googleapis.com https://upload-widget.cloudinary.com",
+              "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://res.cloudinary.com https://api.stripe.com https://checkout.stripe.com https://maps.googleapis.com https://upload-widget.cloudinary.com https://api.cloudinary.com",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://upload-widget.cloudinary.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
