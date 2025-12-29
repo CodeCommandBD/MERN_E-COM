@@ -275,7 +275,10 @@ export default function MyAccountPage() {
       const result = await updateUser(payload).unwrap();
 
       if (result.success) {
-        showToast("success", "Profile updated successfully");
+        showToast(
+          "success",
+          "Profile updated successfully. Please reload the page."
+        );
 
         // Manual Redux Update to Guarantee UI Refresh
         const updatedUser = {
