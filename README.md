@@ -715,45 +715,43 @@ Create a `.env.local` file in the root directory
 # ===========================================
 # 🗄️ DATABASE
 # ===========================================
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/wearpoint
+MONGODB_URI=
 
 # ===========================================
 # 🔐 AUTHENTICATION
 # ===========================================
-JWT_SECRET=your-super-secret-jwt-key-min-32-chars
-
+JWT_SECRET=
 # ===========================================
 # ☁️ CLOUDINARY
 # ===========================================
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
 # ===========================================
 # 💳 STRIPE
 # ===========================================
-STRIPE_SECRET_KEY=sk_live_xxxxx
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
 
 # ===========================================
 # 🔴 REDIS (Optional)
 # ===========================================
-REDIS_URL=redis://localhost:6379
+REDIS_URL=
 
 # ===========================================
 # 📧 EMAIL (SMTP)
 # ===========================================
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
 # ===========================================
 # 🌐 APP URL
 # ===========================================
-NEXT_PUBLIC_SITE_URL=https://wearpoint-nu.vercel.app
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=
+NEXT_PUBLIC_APP_URL=
 ```
 
 ---
